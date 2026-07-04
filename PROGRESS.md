@@ -1,8 +1,10 @@
 # Patungan — Build Progress (mutable loop log)
 
-> The build agent updates this file every iteration. Spec is `docs/build-prd.md` (immutable).
-> Format per task: check the box, append the commit hash, and add a one-line note for any
-> decision/workaround/blocker. Put active BLOCKERs at the very top.
+> The build agent updates this file every iteration — it is **the only file the loop writes to**
+> (besides code). Loop protocol: [`ISSUE.md`](ISSUE.md). Task list: [`BACKLOG.md`](BACKLOG.md).
+> Frozen spec: [`docs/build-spec.md`](docs/build-spec.md). Format per task: check the box,
+> append the commit hash, and add a one-line note for any decision/workaround/blocker. Put
+> active BLOCKERs at the very top.
 
 ## 🚧 Blockers (top priority — clear these first)
 _None yet._
@@ -17,10 +19,19 @@ _None yet._
   contract (task 1.1). It is reuse scaffolding, not shipped as the product.
 - 2026-07-04 — Demo model = **seeded crowd + one live chip-in**; **Sponsor role folded into
   the Operator console**; seed crowd **N=50** default (not 100) for testnet rate limits.
+- 2026-07-04 — **Frontend framework = Next.js 14 (App Router)**, switched from Vite + React at
+  the user's direction. No SSR/server benefit (data is client-side wallet + live Soroban RPC),
+  so it's used purely as the SPA framework: every wallet/RPC component is `'use client'`, env
+  is `NEXT_PUBLIC_*` in `frontend/.env.local`, routing is file-based `app/`, no react-router.
+  (Recorded per §2 "do not substitute without recording a decision.")
+- 2026-07-04 — **Optimistic UI on `contribute` success is required** (was optional in B3): patch
+  `direct` (+amount) and `donor_count` (+1 only for first-time donors) via
+  `queryClient.setQueryData` on tx success, then invalidate to reconcile. `matched` is **never**
+  computed locally (QF is non-linear, §5.2) — it refreshes from the poll / `preview_matches`.
 
 ---
 
-## Ledger status (mirrors build-prd.md §13)
+## Ledger status (mirrors BACKLOG.md — check boxes here, not there)
 
 ### Phase 0 — Scaffolding
 - [x] 0.1 PROGRESS.md + .gitignore — done during scaffold (also: README.md, justfile, module
@@ -44,7 +55,7 @@ _None yet._
 - [ ] 3.1 seed.ts (idempotent, rate-limit-tolerant, prints summary)
 
 ### Phase 4 — Frontend foundation
-- [ ] 4.1 Vite+React+TS+Tailwind+router scaffold; config + formatIDR
+- [ ] 4.1 Next.js (App Router)+TS+Tailwind scaffold; providers + config + formatIDR
 - [ ] 4.2 rpc + react-query + freighter + WalletButton + network guard
 - [ ] 4.3 Contract client + read hooks + 4 UI states
 

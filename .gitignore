@@ -2,20 +2,33 @@
 target/
 **/target/
 
-# ---- Node / frontend ----
+# ---- Node / frontend (Next.js) ----
 node_modules/
+.next/
+out/
+next-env.d.ts
 dist/
-.vite/
 
 # ---- Secrets & local config ----
 .env
 .env.local
 .env.*.local
-frontend/.env
+frontend/.env*.local
+frontend/.env.local
 
 # ---- Seed script state (contains throwaway testnet keys) ----
 scripts/.seed-state.json
 scripts/.keys/
+
+# ---- Agent scaffolding & planning (kept local, out of the shipped repo) ----
+# The Ralph loop reads these from disk, not git, so untracking them is safe.
+# NOTE: scripts/ and PROGRESS.md are deliberately NOT ignored — the loop commits
+# to them (deploy.sh/seed.ts + per-iteration progress) and a clone needs them.
+docs/
+prototype-arisan/
+ralph/
+BACKLOG.md
+ISSUE.md
 
 # ---- OS / editor ----
 .DS_Store

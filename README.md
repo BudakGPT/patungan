@@ -16,12 +16,12 @@ Two modules, glued at deploy time:
 | Module | Path | Stack | Role |
 |---|---|---|---|
 | **Contract** (the backend) | [`contracts/patungan/`](contracts/) | Rust / Soroban | Holds the pool, records tagged contributions, runs the QF match, disburses. |
-| **Frontend** (the client) | [`frontend/`](frontend/) | Vite + React + TS | Wallet connect, browse/contribute, operator console, the match-curve reveal. |
+| **Frontend** (the client) | [`frontend/`](frontend/) | Next.js 14 (App Router) + React + TS | Wallet connect, browse/contribute, operator console, the match-curve reveal. Client-rendered (`'use client'`) — no SSR. |
 | **Scripts** (the glue) | [`scripts/`](scripts/) | Bash + Node/TS | `deploy.sh` (deploy + write IDs) and `seed.ts` (seed the demo scenario). |
 
 There is **no server and no database** — the frontend reads chain state directly over Soroban
 RPC. The only coupling between the two modules is the generated TypeScript bindings
-(`frontend/src/contract/`) plus the contract/token IDs written into `frontend/.env`.
+(`frontend/src/contract/`) plus the contract/token IDs written into `frontend/.env.local`.
 
 The Rust contract is forked from [`prototype-arisan/`](prototype-arisan/) (a working
 deposit→escrow→release slice with passing tests) — that's ~60% of the engine.
@@ -31,7 +31,7 @@ deposit→escrow→release slice with passing tests) — that's ~60% of the engi
 ```
 patungan/
 ├─ contracts/patungan/     # Soroban contract (Rust)  — forked from prototype-arisan
-├─ frontend/               # React app (Vite + TS)
+├─ frontend/               # Next.js 14 App Router app (React + TS)
 ├─ scripts/                # deploy.sh, seed.ts
 ├─ prototype-arisan/       # reuse base (fork source; not shipped as product)
 ├─ docs/                   # build-prd.md (spec), prd.md (product), + context
@@ -47,7 +47,7 @@ toolchain runbook lives in [`prototype-arisan/README.md`](prototype-arisan/READM
 ```bash
 # contract
 just contract-test          # cargo test (the QF math + whale-vs-crowd golden test)
-just deploy                 # build wasm, deploy to testnet, write ids into frontend/.env
+just deploy                 # build wasm, deploy to testnet, write ids into frontend/.env.local
 
 # demo data
 just seed                   # seed the demo scenario on testnet
