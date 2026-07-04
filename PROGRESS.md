@@ -78,7 +78,7 @@ _None yet._
   `src/test.rs` created (home for 1.5–1.7 too): 7 tests — full setup path asserts token escrow
   + stored state, idempotent re-verify, and rejections for AlreadyInitialized / DuplicateProject
   / InvalidAmount(0 and −1) / RoundNotOpen (status forced Finalized in storage since `finalize`
-  is 1.6) / missing-admin-auth. `cargo test` → 15 passed (8 qf + 7 setup), no warnings. _(HASH)_
+  is 1.6) / missing-admin-auth. `cargo test` → 15 passed (8 qf + 7 setup), no warnings. _(c8f0c83)_
 - [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
 - [ ] 1.6 finalize / disburse / views incl. preview_matches
 - [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)
