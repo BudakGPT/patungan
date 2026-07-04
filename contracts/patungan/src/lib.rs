@@ -11,6 +11,12 @@
 //! setup (`init`/`register_verified`/`register_project`/`fund_pool`), `contribute`,
 //! and `finalize`/`disburse` + the read views. The QF math lands in `qf.rs` (1.3).
 
+// The QF pool split (`finalize`/`preview_matches`) reads a project's per-donor totals out of
+// storage and feeds them to `qf`'s slice-based math (`&[i128]`/`&[u128]`). Bridging soroban
+// storage `Vec`s to those slices needs a transient heap `Vec`; soroban-sdk installs a wasm
+// global allocator, so `alloc` is available under `#![no_std]`.
+extern crate alloc;
+
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, token, Address, Env, String, Vec,
 };
@@ -260,7 +266,157 @@ impl Patungan {
         Ok(())
     }
 
+    // ---------- §4.3 Finalisation (task 1.6) ----------
+
+    /// Close the round and compute the QF match split (§4.3, §5). Admin only. Rejects a re-run
+    /// once `status == Finalized` (`AlreadyFinalized`). Computes `matched[]` from the CURRENT
+    /// state via the same deterministic path `preview_matches` uses (§10), writes each
+    /// `ProjectState.matched`, and flips `status` to `Finalized`. Pure state transition — no
+    /// transfers. If nobody has contributed (`total_weight == 0`) the QF math returns
+    /// `NothingToMatch` (§5.6): the error propagates, the pool stays, and status stays `Open`.
+    pub fn finalize(env: Env) -> Result<(), Error> {
+        Self::require_admin(&env);
+        let mut config = Self::load_config(&env);
+        if config.status != RoundStatus::Open {
+            return Err(Error::AlreadyFinalized);
+        }
+        // Runs the QF split on live state; `NothingToMatch` short-circuits before any write, so a
+        // no-contribution round is left untouched and still `Open`.
+        let matches = Self::compute_matches_now(&env)?;
+        for (id, matched) in matches.iter() {
+            let mut project: ProjectState =
+                env.storage().persistent().get(&DataKey::Project(id)).unwrap();
+            project.matched = matched;
+            env.storage().persistent().set(&DataKey::Project(id), &project);
+        }
+        config.status = RoundStatus::Finalized;
+        env.storage().instance().set(&DataKey::Config, &config);
+        Ok(())
+    }
+
+    /// Pay a finalised project out (§4.3). Admin only. Rejects if the round is not yet finalised
+    /// (`NotFinalized`), the project is unknown (`UnknownProject`), or it was already paid
+    /// (`AlreadyDisbursed`). Transfers `direct + matched` from the contract escrow to the
+    /// project's `payout` (reused arisan `token::Client::transfer` idiom, §4.6) and marks it
+    /// `disbursed` so a re-run is a rejected no-op (§10 idempotency).
+    pub fn disburse(env: Env, project_id: u32) -> Result<(), Error> {
+        Self::require_admin(&env);
+        let config = Self::load_config(&env);
+        if config.status != RoundStatus::Finalized {
+            return Err(Error::NotFinalized);
+        }
+        let mut project: ProjectState =
+            match env.storage().persistent().get(&DataKey::Project(project_id)) {
+                Some(p) => p,
+                None => return Err(Error::UnknownProject),
+            };
+        if project.disbursed {
+            return Err(Error::AlreadyDisbursed);
+        }
+        let amount = project.direct + project.matched;
+        let token_client = token::Client::new(&env, &config.token);
+        token_client.transfer(&env.current_contract_address(), &project.payout, &amount);
+        project.disbursed = true;
+        env.storage()
+            .persistent()
+            .set(&DataKey::Project(project_id), &project);
+        Ok(())
+    }
+
+    // ---------- §4.3 Views (read-only; consumed by the frontend) ----------
+
+    /// The round config (§4.3): admin, token, round_end, status, pool.
+    pub fn get_config(env: Env) -> Config {
+        Self::load_config(&env)
+    }
+
+    /// Full state of every registered project, in registration order (§4.3).
+    pub fn list_projects(env: Env) -> Vec<ProjectState> {
+        let ids: Vec<u32> = env
+            .storage()
+            .instance()
+            .get(&DataKey::ProjectIds)
+            .unwrap_or_else(|| Vec::new(&env));
+        let mut out = Vec::new(&env);
+        for id in ids.iter() {
+            let project: ProjectState =
+                env.storage().persistent().get(&DataKey::Project(id)).unwrap();
+            out.push_back(project);
+        }
+        out
+    }
+
+    /// One project's state (§4.3). Panics on an unknown id — the frontend catches the RPC error
+    /// and renders its not-found state (Epic A3); the frozen `-> ProjectState` return leaves no
+    /// room for an in-band error.
+    pub fn get_project(env: Env, id: u32) -> ProjectState {
+        env.storage().persistent().get(&DataKey::Project(id)).unwrap()
+    }
+
+    /// Whether `who` is in the verified-address registry (§4.3). Powers the "✓ Terverifikasi"
+    /// badge (Epic E1).
+    pub fn is_verified(env: Env, who: Address) -> bool {
+        env.storage()
+            .persistent()
+            .get(&DataKey::Verified(who))
+            .unwrap_or(false)
+    }
+
+    /// LIVE projected QF split on the CURRENT state (§4.3) — lets the UI show the whale-vs-crowd
+    /// gap before finalise. Runs the exact same computation `finalize` writes, so after finalise
+    /// it equals the stored `matched[]` (§10 determinism). Before any contribution the QF math
+    /// yields `NothingToMatch`; since this view can't return an error (frozen `-> Vec<...>`), it
+    /// surfaces that as an empty vec so the frontend renders "—" for every projected match.
+    pub fn preview_matches(env: Env) -> Vec<(u32, i128)> {
+        Self::compute_matches_now(&env).unwrap_or_else(|_| Vec::new(&env))
+    }
+
     // ---------- internal helpers ----------
+
+    /// The one canonical QF computation over the current on-chain state (§5), shared by
+    /// `finalize` (which persists it) and `preview_matches` (which returns it) so the two are
+    /// deterministic and always agree (§10). For each project (in `ProjectIds` order) it gathers
+    /// every distinct donor's CUMULATIVE total from storage, takes `isqrt` of each summed total
+    /// once (§5.2) via `qf::project_weight`, then splits `pool` proportional to the weights with
+    /// the largest-weight remainder rule (§5.3) via `qf::compute_matches`. Returns
+    /// `NothingToMatch` when no project has a donor (`total_weight == 0`, §5.6). The transient
+    /// heap `Vec`s bridge soroban storage to `qf`'s slice API and never touch chain state.
+    fn compute_matches_now(env: &Env) -> Result<Vec<(u32, i128)>, Error> {
+        let config = Self::load_config(env);
+        let ids: Vec<u32> = env
+            .storage()
+            .instance()
+            .get(&DataKey::ProjectIds)
+            .unwrap_or_else(|| Vec::new(env));
+
+        let mut weights: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
+        for id in ids.iter() {
+            let donors: Vec<Address> = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Donors(id))
+                .unwrap_or_else(|| Vec::new(env));
+            let mut donor_totals: alloc::vec::Vec<i128> = alloc::vec::Vec::new();
+            for donor in donors.iter() {
+                let total: i128 = env
+                    .storage()
+                    .persistent()
+                    .get(&DataKey::Contribution(id, donor))
+                    .unwrap_or(0);
+                donor_totals.push(total);
+            }
+            weights.push(qf::project_weight(&donor_totals)?);
+        }
+
+        let mut matched = alloc::vec![0i128; weights.len()];
+        qf::compute_matches(config.pool, &weights, &mut matched)?;
+
+        let mut out = Vec::new(env);
+        for (i, id) in ids.iter().enumerate() {
+            out.push_back((id, matched[i]));
+        }
+        Ok(out)
+    }
 
     fn load_config(env: &Env) -> Config {
         env.storage().instance().get(&DataKey::Config).unwrap()

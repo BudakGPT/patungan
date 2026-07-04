@@ -30,6 +30,12 @@ _None yet._
   (`checked_add`/`checked_mul` in `qf.rs`) we return `InvalidAmount` ("numbers out of range")
   rather than `panic!`, keeping the failure legible off-chain and staying within the frozen §4.5
   variant set.
+- 2026-07-05 — **QF split bridges storage→`qf` slices via `alloc` (task 1.6).** `qf::project_weight`/
+  `compute_matches` take `&[i128]`/`&[u128]`; `finalize`/`preview_matches` must feed them per-donor
+  totals read from soroban storage `Vec`s. Under `#![no_std]` that needs a transient heap `Vec`, so
+  `extern crate alloc;` (soroban-sdk installs a wasm global allocator) — kept `qf.rs` pure/untouched
+  rather than reshaping its tested slice API. `preview_matches` (frozen `-> Vec`, no `Result`) maps
+  the `NothingToMatch` error to an **empty vec** so the frontend renders "—" pre-contribution (§A2).
 - 2026-07-04 — **Optimistic UI on `contribute` success is required** (was optional in B3): patch
   `direct` (+amount) and `donor_count` (+1 only for first-time donors) via
   `queryClient.setQueryData` on tx success, then invalidate to reconcile. `matched` is **never**
@@ -94,7 +100,19 @@ _None yet._
   UnknownProject / InvalidAmount(0,−1) / RoundClosed(Finalized) / RoundClosed(past round_end via
   `env.ledger().set_timestamp`). `cargo test` → 23 passed (8 qf + 15 integration), no warnings.
   _(6154d2c)_
-- [ ] 1.6 finalize / disburse / views incl. preview_matches
+- [x] 1.6 finalize / disburse / views incl. preview_matches — §4.3 finalisation + read views.
+  `finalize` (admin; `AlreadyFinalized` if `status!=Open`; runs the QF split on live state,
+  writes each `ProjectState.matched`, flips `status=Finalized`; `NothingToMatch` short-circuits
+  BEFORE any write so a no-contribution round stays untouched + Open, §5.6). `disburse(id)`
+  (admin; `NotFinalized`/`UnknownProject`/`AlreadyDisbursed` guards; transfers `direct+matched`
+  contract→`payout` via the reused arisan transfer idiom; sets `disbursed`, so re-run is a
+  rejected no-op §10). Views `get_config`/`list_projects`/`get_project`/`is_verified`/
+  `preview_matches`. **Determinism (§10):** a single private `compute_matches_now` helper is the
+  ONE QF path — `finalize` persists it, `preview_matches` returns it — so they always agree; test
+  `finalize_writes_matches_and_preview_agrees` asserts preview==stored matched[] and `Σ==pool`.
+  8 new tests (finalize writes+preview-agrees, finalize-twice, NothingToMatch-stays-Open,
+  disburse pays direct+matched & drains escrow, disburse before-finalize/twice/unknown, views).
+  `cargo test` → 31 passed (8 qf + 23 integration), no warnings. _(<hash>)_
 - [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)
 
 ### Phase 2 — Deploy & bindings
