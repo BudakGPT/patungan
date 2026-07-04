@@ -36,7 +36,8 @@ _None yet._
 ### Phase 0 — Scaffolding
 - [x] 0.1 PROGRESS.md + .gitignore — done during scaffold (also: README.md, justfile, module
   dirs with .gitkeep, docs/ + prototype-arisan/ copied in). _(scaffold, pre-loop)_
-- [ ] 0.2 Toolchain confirmed (stellar/cargo/node)
+- [x] 0.2 Toolchain confirmed — `stellar 27.0.0`, `cargo 1.96.1` (Rust), `node v22.11.0`. All
+  print; nothing gated. _(61a88bd)_
 
 ### Phase 1 — Contract (THE GATE)
 - [ ] 1.1 Fork arisan → contracts/patungan; builds
