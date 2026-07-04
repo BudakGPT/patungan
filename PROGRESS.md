@@ -24,6 +24,12 @@ _None yet._
   so it's used purely as the SPA framework: every wallet/RPC component is `'use client'`, env
   is `NEXT_PUBLIC_*` in `frontend/.env.local`, routing is file-based `app/`, no react-router.
   (Recorded per §2 "do not substitute without recording a decision.")
+- 2026-07-05 — **QF overflow surfaces `Error::InvalidAmount`** (task 1.3). §4.5's frozen error
+  set has no dedicated `Overflow` variant, and §5.5 proves the products stay ≤ ~4·10²⁰ ≪
+  `i128::MAX` so overflow is unreachable in practice; where checked arithmetic could still fail
+  (`checked_add`/`checked_mul` in `qf.rs`) we return `InvalidAmount` ("numbers out of range")
+  rather than `panic!`, keeping the failure legible off-chain and staying within the frozen §4.5
+  variant set.
 - 2026-07-04 — **Optimistic UI on `contribute` success is required** (was optional in B3): patch
   `direct` (+amount) and `donor_count` (+1 only for first-time donors) via
   `queryClient.setQueryData` on tx success, then invalidate to reconcile. `matched` is **never**
@@ -51,7 +57,14 @@ _None yet._
   Arisan `init`/`contribute`/`payout` + their tests removed — the real §4.3 entrypoints land in
   1.4–1.6, new tests in 1.3/1.4/1.7. `#[contractimpl]` is intentionally empty for now.
   `cargo build` green. _(f265e9b)_
-- [ ] 1.3 qf.rs: isqrt + compute_matches (+ remainder rule) — tested
+- [x] 1.3 qf.rs: isqrt + compute_matches (+ remainder rule) — tested — pure chain-free
+  `qf.rs`: `isqrt` (Newton, power-of-two over-estimate seed so `x+n/x` never overflows even at
+  `u128::MAX`), `project_weight` (`(Σ isqrt(cumulative_d))²`, sqrt-per-donor-total-once §5.2),
+  `compute_matches` (floor `pool·w/total`, largest-weight remainder rule §5.3, `NothingToMatch`
+  on total_weight==0). Checked arithmetic throughout (§5.5). Wired into `lib.rs` via `mod qf;`
+  (file was authored by a prior crashed iteration but never declared → not compiled; that was
+  the reconcile). 8 unit tests green incl. whale-vs-crowd pool conservation + remainder-to-
+  largest. `cargo test qf` → 8 passed. _(hash below)_
 - [ ] 1.4 init / register_verified / register_project / fund_pool
 - [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
 - [ ] 1.6 finalize / disburse / views incl. preview_matches

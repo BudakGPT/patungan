@@ -13,6 +13,10 @@
 
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, String};
 
+// Pure, chain-free quadratic-funding math (isqrt + weights + pool split). Consumed by
+// `finalize` / `preview_matches` (task 1.6); unit-tested standalone here (task 1.3).
+mod qf;
+
 // ---------- §4.1 Types ----------
 
 /// Round-level configuration. `admin` is the operator (Sponsor + Admin); only it
