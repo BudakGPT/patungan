@@ -64,7 +64,7 @@ _None yet._
   on total_weight==0). Checked arithmetic throughout (§5.5). Wired into `lib.rs` via `mod qf;`
   (file was authored by a prior crashed iteration but never declared → not compiled; that was
   the reconcile). 8 unit tests green incl. whale-vs-crowd pool conservation + remainder-to-
-  largest. `cargo test qf` → 8 passed. _(hash below)_
+  largest. `cargo test qf` → 8 passed. _(5df136a)_
 - [ ] 1.4 init / register_verified / register_project / fund_pool
 - [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
 - [ ] 1.6 finalize / disburse / views incl. preview_matches
