@@ -123,7 +123,7 @@ _None yet._
   ones → matched 0, no divide-by-zero, funded project takes whole pool). `finalize_assigns_
   remainder_to_largest_weight` (§5.6 remainder row: pool 7, weights 4 & 1 → 6 & 1, dust to
   largest). `cargo test` → **34 passed** (8 qf + 26 integration), no warnings. **Phase 1 GATE
-  closed.** _(<hash>)_
+  closed.** _(cda264a)_
 
 ### Phase 2 — Deploy & bindings
 - [ ] 2.1 deploy.sh → testnet, writes CONTRACT_ID + TOKEN_ID
