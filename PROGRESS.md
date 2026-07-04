@@ -112,7 +112,7 @@ _None yet._
   `finalize_writes_matches_and_preview_agrees` asserts preview==stored matched[] and `Σ==pool`.
   8 new tests (finalize writes+preview-agrees, finalize-twice, NothingToMatch-stays-Open,
   disburse pays direct+matched & drains escrow, disburse before-finalize/twice/unknown, views).
-  `cargo test` → 31 passed (8 qf + 23 integration), no warnings. _(<hash>)_
+  `cargo test` → 31 passed (8 qf + 23 integration), no warnings. _(a858037)_
 - [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)
 
 ### Phase 2 — Deploy & bindings
