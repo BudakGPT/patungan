@@ -65,7 +65,20 @@ _None yet._
   (file was authored by a prior crashed iteration but never declared → not compiled; that was
   the reconcile). 8 unit tests green incl. whale-vs-crowd pool conservation + remainder-to-
   largest. `cargo test qf` → 8 passed. _(5df136a)_
-- [ ] 1.4 init / register_verified / register_project / fund_pool
+- [x] 1.4 init / register_verified / register_project / fund_pool — §4.3 setup entrypoints
+  land, all returning `Result<_, Error>` (no arisan-style panics). `init` (first caller
+  authorizes as admin; opens round, pool=0, empty `ProjectIds`; re-init→`AlreadyInitialized`),
+  `register_verified` (admin, idempotent set of `Verified(who)`), `register_project` (admin,
+  `DuplicateProject` guard, zeroed tallies, appended to `ProjectIds`), `fund_pool` (ANYONE +
+  `from.require_auth()`; `amount>0`→else `InvalidAmount`; `Open`→else `RoundNotOpen`; reused
+  arisan `token::Client::transfer` escrow into the contract; `pool+=amount`). Admin gate =
+  `config.admin.require_auth()` via `require_admin` helper (signatures carry no caller arg per
+  §4.3, so unauthorized callers are stopped by the auth framework — surfacing as an invoke
+  error, not `Error::NotAdmin`, which stays in the §4.5 set for the frontend message map).
+  `src/test.rs` created (home for 1.5–1.7 too): 7 tests — full setup path asserts token escrow
+  + stored state, idempotent re-verify, and rejections for AlreadyInitialized / DuplicateProject
+  / InvalidAmount(0 and −1) / RoundNotOpen (status forced Finalized in storage since `finalize`
+  is 1.6) / missing-admin-auth. `cargo test` → 15 passed (8 qf + 7 setup), no warnings. _(HASH)_
 - [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
 - [ ] 1.6 finalize / disburse / views incl. preview_matches
 - [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)

@@ -11,11 +11,18 @@
 //! setup (`init`/`register_verified`/`register_project`/`fund_pool`), `contribute`,
 //! and `finalize`/`disburse` + the read views. The QF math lands in `qf.rs` (1.3).
 
-use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, String};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, token, Address, Env, String, Vec,
+};
 
 // Pure, chain-free quadratic-funding math (isqrt + weights + pool split). Consumed by
 // `finalize` / `preview_matches` (task 1.6); unit-tested standalone here (task 1.3).
 mod qf;
+
+// Integration tests against the deployed client (setup path here in 1.4; `contribute`,
+// finalize/disburse/views, the §5.6 edge cases and the §5.7 golden scenario land in 1.5–1.7).
+#[cfg(test)]
+mod test;
 
 // ---------- §4.1 Types ----------
 
@@ -93,10 +100,106 @@ pub struct Patungan;
 
 #[contractimpl]
 impl Patungan {
-    // Entrypoints land in tasks 1.4–1.6 against the §4 surface above:
-    //   1.4 init / register_verified / register_project / fund_pool
-    //   1.5 contribute (cumulative per-donor tagging)
-    //   1.6 finalize / disburse / get_config / list_projects / get_project /
-    //       is_verified / preview_matches
-    // QF math (isqrt + compute_matches) lands in qf.rs (task 1.3).
+    // ---------- §4.3 Setup (task 1.4) ----------
+    // `contribute` (1.5), finalize/disburse + the read views (1.6) land against the same
+    // §4 surface; QF math (isqrt + compute_matches) lives in qf.rs (1.3).
+
+    /// One-time setup (§4.3). The first caller authorizes as the operator (`admin`); only
+    /// that address may later `register_*`/`finalize`/`disburse`. Opens the round with an
+    /// empty pool and no projects. Re-init is rejected with `AlreadyInitialized` (§4.5).
+    pub fn init(env: Env, admin: Address, token: Address, round_end: u64) -> Result<(), Error> {
+        admin.require_auth();
+        if env.storage().instance().has(&DataKey::Config) {
+            return Err(Error::AlreadyInitialized);
+        }
+        env.storage().instance().set(
+            &DataKey::Config,
+            &Config {
+                admin,
+                token,
+                round_end,
+                status: RoundStatus::Open,
+                pool: 0,
+            },
+        );
+        env.storage()
+            .instance()
+            .set(&DataKey::ProjectIds, &Vec::<u32>::new(&env));
+        Ok(())
+    }
+
+    /// Add `who` to the verified-address registry (§4.3). Admin only (gated by
+    /// `admin.require_auth()`). Idempotent — re-verifying an address is a harmless no-op.
+    pub fn register_verified(env: Env, who: Address) -> Result<(), Error> {
+        Self::require_admin(&env);
+        env.storage().persistent().set(&DataKey::Verified(who), &true);
+        Ok(())
+    }
+
+    /// Register a project (§4.3). Admin only. Rejects a duplicate `id` with
+    /// `DuplicateProject` (§4.5); otherwise creates zeroed tallies and appends to
+    /// `ProjectIds` so the frontend can enumerate every project.
+    pub fn register_project(
+        env: Env,
+        id: u32,
+        payout: Address,
+        title: String,
+        emoji: String,
+    ) -> Result<(), Error> {
+        Self::require_admin(&env);
+        if env.storage().persistent().has(&DataKey::Project(id)) {
+            return Err(Error::DuplicateProject);
+        }
+        env.storage().persistent().set(
+            &DataKey::Project(id),
+            &ProjectState {
+                id,
+                payout,
+                title,
+                emoji,
+                direct: 0,
+                donor_count: 0,
+                matched: 0,
+                disbursed: false,
+            },
+        );
+        let mut ids: Vec<u32> = env.storage().instance().get(&DataKey::ProjectIds).unwrap();
+        ids.push_back(id);
+        env.storage().instance().set(&DataKey::ProjectIds, &ids);
+        Ok(())
+    }
+
+    /// Deposit into the matching pool (§4.3). Callable by ANYONE (a real sponsor address can
+    /// fund) — gated only by `from.require_auth()`. `amount` must be > 0 (`InvalidAmount`) and
+    /// the round must still be `Open` (`RoundNotOpen`). Escrows the token into the contract
+    /// (reused arisan `token::Client::transfer` idiom, §4.6) and grows `pool`.
+    pub fn fund_pool(env: Env, from: Address, amount: i128) -> Result<(), Error> {
+        from.require_auth();
+        if amount <= 0 {
+            return Err(Error::InvalidAmount);
+        }
+        let mut config = Self::load_config(&env);
+        if config.status != RoundStatus::Open {
+            return Err(Error::RoundNotOpen);
+        }
+        let token_client = token::Client::new(&env, &config.token);
+        token_client.transfer(&from, &env.current_contract_address(), &amount);
+        config.pool += amount;
+        env.storage().instance().set(&DataKey::Config, &config);
+        Ok(())
+    }
+
+    // ---------- internal helpers ----------
+
+    fn load_config(env: &Env) -> Config {
+        env.storage().instance().get(&DataKey::Config).unwrap()
+    }
+
+    /// Admin gate for the `register_*`/`finalize`/`disburse` entrypoints: the signatures
+    /// carry no caller argument (§4.3), so the operator is authenticated by requiring the
+    /// stored `admin`'s signature. An unauthorized caller is stopped by the auth framework;
+    /// the `NotAdmin` variant (§4.5) is kept in the error set for the frontend's message map.
+    fn require_admin(env: &Env) {
+        Self::load_config(env).admin.require_auth();
+    }
 }
