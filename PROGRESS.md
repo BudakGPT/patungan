@@ -50,7 +50,7 @@ _None yet._
   Contribution, Verified} (§4.2); `#[contracterror] enum Error` with all 12 variants (§4.5).
   Arisan `init`/`contribute`/`payout` + their tests removed — the real §4.3 entrypoints land in
   1.4–1.6, new tests in 1.3/1.4/1.7. `#[contractimpl]` is intentionally empty for now.
-  `cargo build` green. _(<hash>)_
+  `cargo build` green. _(f265e9b)_
 - [ ] 1.3 qf.rs: isqrt + compute_matches (+ remainder rule) — tested
 - [ ] 1.4 init / register_verified / register_project / fund_pool
 - [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
