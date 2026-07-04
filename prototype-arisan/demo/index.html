@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arisan-on-chain — prototype</title>
+<style>
+  :root{
+    --gold:#FDDA24; --ink:#0b0c10; --panel:#15171f; --panel2:#1d2030;
+    --line:#2a2e3e; --muted:#8b90a3; --good:#3ddc84; --dim:#5a5f72;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 70% -10%,#1b1d2b,#0b0c10 60%);
+    color:#eef0f6;min-height:100vh;padding:32px 20px}
+  .wrap{max-width:880px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 2px;letter-spacing:-.5px}
+  h1 .chip{font-size:11px;vertical-align:middle;background:var(--gold);color:#000;
+    padding:3px 8px;border-radius:999px;margin-left:8px;font-weight:700}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+  .sub b{color:var(--gold)}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin:0 0 14px}
+  .pot{background:linear-gradient(160deg,#23262f,#15171f);border:1px solid var(--line);
+    border-radius:14px;padding:18px;text-align:center;margin-bottom:14px}
+  .pot .amt{font-size:40px;font-weight:800;color:var(--gold);line-height:1}
+  .pot .lbl{color:var(--muted);font-size:12px;margin-top:6px}
+  .roundrow{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:14px}
+  .roundrow b{color:#fff}
+  .members{display:flex;flex-direction:column;gap:10px}
+  .m{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);
+    border-radius:12px;background:var(--panel2);transition:.25s}
+  .m.recipient{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+  .m.paidout{opacity:.55}
+  .ava{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;
+    background:#2c3142;color:#cfd3e0;font-size:14px;flex:0 0 auto}
+  .m.recipient .ava{background:var(--gold);color:#000}
+  .mname{flex:1}
+  .mname .n{font-size:14px;font-weight:600}
+  .mname .bal{font-size:12px;color:var(--muted)}
+  .tag{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:700}
+  .tag.waiting{background:#2a2e3e;color:var(--muted)}
+  .tag.funded{background:rgba(61,220,132,.15);color:var(--good)}
+  .tag.gets{background:var(--gold);color:#000}
+  .tag.done{background:#23262f;color:var(--dim)}
+  .btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button{font:inherit;font-weight:600;border:none;border-radius:10px;padding:11px 16px;cursor:pointer}
+  button.primary{background:var(--gold);color:#000}
+  button.ghost{background:transparent;border:1px solid var(--line);color:#cfd3e0}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .log{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#aab;
+    background:#0d0f16;border:1px solid var(--line);border-radius:12px;padding:12px;height:172px;overflow:auto}
+  .log div{margin-bottom:5px;white-space:pre-wrap}
+  .log .ok{color:var(--good)} .log .gold{color:var(--gold)} .log .mut{color:var(--dim)}
+  .note{font-size:12px;color:var(--muted);margin-top:18px;line-height:1.5;border-top:1px solid var(--line);padding-top:14px}
+  .note code{background:#0d0f16;padding:1px 6px;border-radius:5px;color:#cfd3e0}
+  .done-banner{background:rgba(61,220,132,.12);border:1px solid var(--good);color:var(--good);
+    border-radius:12px;padding:12px;text-align:center;font-weight:600;font-size:14px;margin-top:14px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Arisan&#8209;on&#8209;chain <span class="chip">TRACK 1 · LOCAL FINANCE</span></h1>
+  <p class="sub">A rotating savings group (<b>arisan / paluwagan / chit fund</b>) with the trusted organizer replaced by a Soroban contract. This visual mirrors the real contract logic in <b>contracts/arisan/src/lib.rs</b>.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>The Pool</h2>
+      <div class="pot">
+        <div class="amt" id="pot">0</div>
+        <div class="lbl" id="potlbl">collected this round · 100 USDC × 4 members = 400 pot</div>
+      </div>
+      <div class="roundrow">
+        <span>Round <b id="round">1</b> of 4</span>
+        <span id="recipline">This round pays → <b id="recip">Sari</b></span>
+      </div>
+      <div class="members" id="members"></div>
+
+      <div class="btns">
+        <button class="primary" id="contribBtn">Next member contributes 100</button>
+        <button class="ghost" id="payoutBtn" disabled>Trigger payout</button>
+        <button class="ghost" id="resetBtn">Reset</button>
+      </div>
+      <div class="done-banner" id="doneBanner">Rotation complete — everyone paid 300, everyone received 300 once. No organizer touched the money.</div>
+    </div>
+
+    <div class="card">
+      <h2>On-chain activity</h2>
+      <div class="log" id="log"></div>
+      <div class="note">
+        Each <b>contribute</b> = a real <code>token.transfer</code> into escrow.
+        <b>payout</b> only fires when the round is fully funded, and the recipient
+        is fixed by contract state — so no one can jump the queue or run off with the pot.
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>What this proves for the track decision:</b> the escrow + rotation + queue-enforcement
+    here genuinely <i>needs</i> a smart contract — it's not a UI on a database. That on-chain
+    necessity is exactly why Track 1 scores well. The real, deployable version of this logic is in
+    <code>contracts/arisan/</code>; run <code>cargo test</code> to see it pass without any network.
+  </p>
+</div>
+
+<script>
+const NAMES = ["Sari","Budi","Dewi","Andi"];
+const CONTRIB = 100;
+let state;
+
+function fresh(){
+  return {
+    round: 0,
+    balances: NAMES.map(()=>1000),
+    contributed: NAMES.map(()=>false), // this round
+    received: NAMES.map(()=>false),    // ever
+    nextToContribute: 0,
+  };
+}
+
+const $ = id => document.getElementById(id);
+function log(html, cls=""){
+  const d=document.createElement("div");
+  d.innerHTML = (cls?`<span class="${cls}">`:"") + html + (cls?"</span>":"");
+  $("log").prepend(d);
+}
+
+function potThisRound(){
+  return state.contributed.filter(Boolean).length * CONTRIB;
+}
+function allFunded(){ return state.contributed.every(Boolean); }
+function complete(){ return state.round >= NAMES.length; }
+
+function render(){
+  const fullPot = NAMES.length * CONTRIB;
+  $("pot").textContent = potThisRound();
+  $("potlbl").textContent = `collected this round · ${CONTRIB} USDC × ${NAMES.length} members = ${fullPot} pot`;
+  $("round").textContent = Math.min(state.round+1, NAMES.length);
+  $("recip").textContent = complete()? "—" : NAMES[state.round];
+
+  const wrap = $("members"); wrap.innerHTML="";
+  NAMES.forEach((n,i)=>{
+    const isRecip = !complete() && i===state.round;
+    const row=document.createElement("div");
+    row.className="m"+(isRecip?" recipient":"")+(state.received[i]?" paidout":"");
+    let tag;
+    if(state.received[i]) tag=`<span class="tag done">received ✓</span>`;
+    else if(isRecip)      tag=`<span class="tag gets">gets pot</span>`;
+    else if(state.contributed[i]) tag=`<span class="tag funded">funded</span>`;
+    else                  tag=`<span class="tag waiting">waiting</span>`;
+    row.innerHTML=`
+      <div class="ava">${n[0]}</div>
+      <div class="mname"><div class="n">${n}</div><div class="bal">${state.balances[i]} USDC</div></div>
+      ${tag}`;
+    wrap.appendChild(row);
+  });
+
+  $("payoutBtn").disabled = !allFunded() || complete();
+  $("contribBtn").disabled = complete() || state.nextToContribute>=NAMES.length;
+  $("contribBtn").textContent = complete()? "Rotation complete"
+     : (state.nextToContribute<NAMES.length ? `${NAMES[state.nextToContribute]} contributes 100` : "Round funded — trigger payout");
+  $("doneBanner").style.display = complete()? "block":"none";
+}
+
+function contribute(){
+  const i = state.nextToContribute;
+  if(i>=NAMES.length) return;
+  state.balances[i]-=CONTRIB;
+  state.contributed[i]=true;
+  state.nextToContribute++;
+  log(`${NAMES[i]} → escrow  <span class="mut">transfer(${NAMES[i]}, contract, ${CONTRIB})</span>`);
+  if(allFunded()) log(`round fully funded · pot = ${NAMES.length*CONTRIB}`, "gold");
+  render();
+}
+
+function payout(){
+  if(!allFunded()||complete()) return;
+  const r=state.round, pot=NAMES.length*CONTRIB;
+  state.balances[r]+=pot;
+  state.received[r]=true;
+  log(`payout → ${NAMES[r]} receives ${pot}  <span class="mut">transfer(contract, ${NAMES[r]}, ${pot})</span>`, "ok");
+  // advance
+  state.round++;
+  state.contributed=NAMES.map(()=>false);
+  state.nextToContribute=0;
+  if(complete()) log(`rotation complete after ${NAMES.length} rounds`, "gold");
+  render();
+}
+
+function reset(){ state=fresh(); $("log").innerHTML=""; log("pool created · 4 members · 100 USDC/round","mut"); render(); }
+
+$("contribBtn").onclick=contribute;
+$("payoutBtn").onclick=payout;
+$("resetBtn").onclick=reset;
+reset();
+</script>
+</body>
+</html>

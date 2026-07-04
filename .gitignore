@@ -1,0 +1,23 @@
+# ---- Rust / Soroban ----
+target/
+**/target/
+
+# ---- Node / frontend ----
+node_modules/
+dist/
+.vite/
+
+# ---- Secrets & local config ----
+.env
+.env.local
+.env.*.local
+frontend/.env
+
+# ---- Seed script state (contains throwaway testnet keys) ----
+scripts/.seed-state.json
+scripts/.keys/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+*.log
