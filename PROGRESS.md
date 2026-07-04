@@ -93,7 +93,7 @@ _None yet._
   crux), donor-across-two-projects counted in each (§5.6), and rejections for NotVerified /
   UnknownProject / InvalidAmount(0,−1) / RoundClosed(Finalized) / RoundClosed(past round_end via
   `env.ledger().set_timestamp`). `cargo test` → 23 passed (8 qf + 15 integration), no warnings.
-  _(PENDING_HASH)_
+  _(6154d2c)_
 - [ ] 1.6 finalize / disburse / views incl. preview_matches
 - [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)
 
