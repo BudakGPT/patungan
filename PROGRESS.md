@@ -44,7 +44,13 @@ _None yet._
   to `contracts/patungan/`; crate renamed `patungan`, struct `Arisan`→`Patungan`. `#![no_std]`
   kept, deps match arisan (soroban-sdk 22.0.0). `cargo build` green (patungan v0.1.0 compiles).
   Standalone crate (own `[profile.release]`), no root workspace. _(9b98bff)_
-- [ ] 1.2 Types + DataKey + Error enum
+- [x] 1.2 Types + DataKey + Error enum — replaced the arisan rotating-savings type layer
+  with the frozen §4 surface: `Config`(admin/token/round_end/status/pool), `RoundStatus`
+  {Open,Finalized}, `ProjectState` (§4.1); `DataKey` {Config, ProjectIds, Project, Donors,
+  Contribution, Verified} (§4.2); `#[contracterror] enum Error` with all 12 variants (§4.5).
+  Arisan `init`/`contribute`/`payout` + their tests removed — the real §4.3 entrypoints land in
+  1.4–1.6, new tests in 1.3/1.4/1.7. `#[contractimpl]` is intentionally empty for now.
+  `cargo build` green. _(<hash>)_
 - [ ] 1.3 qf.rs: isqrt + compute_matches (+ remainder rule) — tested
 - [ ] 1.4 init / register_verified / register_project / fund_pool
 - [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
