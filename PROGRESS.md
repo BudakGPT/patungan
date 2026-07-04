@@ -79,7 +79,21 @@ _None yet._
   + stored state, idempotent re-verify, and rejections for AlreadyInitialized / DuplicateProject
   / InvalidAmount(0 and −1) / RoundNotOpen (status forced Finalized in storage since `finalize`
   is 1.6) / missing-admin-auth. `cargo test` → 15 passed (8 qf + 7 setup), no warnings. _(c8f0c83)_
-- [ ] 1.5 contribute (cumulative per-donor tagging + rejections)
+- [x] 1.5 contribute (cumulative per-donor tagging + rejections) — §4.3 round entrypoint:
+  `contribute(donor, project_id, amount)` with `donor.require_auth()`, all returning
+  `Result<_, Error>`. Reject order: `amount<=0`→`InvalidAmount`; `status!=Open`→`RoundClosed`;
+  `now>round_end`→`RoundClosed` (both closed conditions map to `RoundClosed` per §4.5/B2, distinct
+  from `fund_pool`'s `RoundNotOpen`); donor not in `Verified` registry→`NotVerified`; unknown
+  `Project(id)`→`UnknownProject`. On success: reused arisan `token::Client::transfer` escrow
+  donor→contract, then **cumulative per-donor** tagging (§5.2) — `Contribution(project_id,donor)
+  += amount`; a donor is NEW iff `prior==0` (safe since every contribution is `>0`, so a returning
+  donor always has `prior>0`), and only then is it pushed to `Donors(project_id)` and
+  `donor_count += 1`; `direct += amount` always. Tests (8 new, in `test.rs`): happy-path escrow +
+  direct/donor_count/Donors, **`same_donor_twice`** proving cumulative sum + single count (§5.2
+  crux), donor-across-two-projects counted in each (§5.6), and rejections for NotVerified /
+  UnknownProject / InvalidAmount(0,−1) / RoundClosed(Finalized) / RoundClosed(past round_end via
+  `env.ledger().set_timestamp`). `cargo test` → 23 passed (8 qf + 15 integration), no warnings.
+  _(PENDING_HASH)_
 - [ ] 1.6 finalize / disburse / views incl. preview_matches
 - [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)
 

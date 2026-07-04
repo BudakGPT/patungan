@@ -189,6 +189,77 @@ impl Patungan {
         Ok(())
     }
 
+    // ---------- §4.3 Round (task 1.5) ----------
+
+    /// Contribute to a project's direct total (§4.3). `donor.require_auth()`. Rejects when
+    /// `amount <= 0` (`InvalidAmount`), the round is closed (`RoundClosed`: status != Open, or
+    /// `now > round_end`), the donor is not in the verified registry (`NotVerified`), or the
+    /// project is unknown (`UnknownProject`). Escrows the token donor -> contract, then tags the
+    /// contribution **cumulatively per donor** (§5.2): `Contribution(project_id, donor) +=
+    /// amount`, and — only when this donor is NEW to this project — appends to `Donors(project_id)`
+    /// and bumps `donor_count` (the DISTINCT-donor breadth QF rewards). `direct += amount` always.
+    pub fn contribute(
+        env: Env,
+        donor: Address,
+        project_id: u32,
+        amount: i128,
+    ) -> Result<(), Error> {
+        donor.require_auth();
+        if amount <= 0 {
+            return Err(Error::InvalidAmount);
+        }
+        let config = Self::load_config(&env);
+        if config.status != RoundStatus::Open {
+            return Err(Error::RoundClosed);
+        }
+        if env.ledger().timestamp() > config.round_end {
+            return Err(Error::RoundClosed);
+        }
+        if !env
+            .storage()
+            .persistent()
+            .get(&DataKey::Verified(donor.clone()))
+            .unwrap_or(false)
+        {
+            return Err(Error::NotVerified);
+        }
+        let mut project: ProjectState =
+            match env.storage().persistent().get(&DataKey::Project(project_id)) {
+                Some(p) => p,
+                None => return Err(Error::UnknownProject),
+            };
+
+        // Escrow the contribution into the contract (reused arisan transfer idiom, §4.6).
+        let token_client = token::Client::new(&env, &config.token);
+        token_client.transfer(&donor, &env.current_contract_address(), &amount);
+
+        // CUMULATIVE per-donor tagging (§5.2): sum this donor's cumulative total to the project
+        // so `finalize` can `isqrt` that summed total ONCE. Since every contribution is `> 0`, a
+        // returning donor always has `prior > 0`; only a first-time donor (`prior == 0`) grows the
+        // distinct-donor set and `donor_count` — a repeat gift must not inflate QF breadth.
+        let contrib_key = DataKey::Contribution(project_id, donor.clone());
+        let prior: i128 = env.storage().persistent().get(&contrib_key).unwrap_or(0);
+        if prior == 0 {
+            let mut donors: Vec<Address> = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Donors(project_id))
+                .unwrap_or_else(|| Vec::new(&env));
+            donors.push_back(donor.clone());
+            env.storage()
+                .persistent()
+                .set(&DataKey::Donors(project_id), &donors);
+            project.donor_count += 1;
+        }
+        env.storage().persistent().set(&contrib_key, &(prior + amount));
+
+        project.direct += amount;
+        env.storage()
+            .persistent()
+            .set(&DataKey::Project(project_id), &project);
+        Ok(())
+    }
+
     // ---------- internal helpers ----------
 
     fn load_config(env: &Env) -> Config {

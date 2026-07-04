@@ -8,7 +8,10 @@
 #![cfg(test)]
 
 use super::{Config, DataKey, Error, Patungan, PatunganClient, ProjectState, RoundStatus};
-use soroban_sdk::{testutils::Address as _, token, Address, Env, String, Vec};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger as _},
+    token, Address, Env, String, Vec,
+};
 
 /// Register a fresh contract with a test SAC as its token, `init`-ed and Open with a far-future
 /// `round_end`. Returns the admin, the token id, the client, and the SAC's mint client.
@@ -163,6 +166,204 @@ fn fund_pool_rejects_when_round_not_open() {
     assert_eq!(
         client.try_fund_pool(&admin, &100i128),
         Err(Ok(Error::RoundNotOpen))
+    );
+}
+
+// ---------- contribute (task 1.5) ----------
+
+/// Register a verified donor with `balance` minted, plus project `0` if it isn't there yet.
+/// Keeps the contribute tests terse.
+fn verified_donor(
+    env: &Env,
+    client: &PatunganClient<'_>,
+    token_admin: &token::StellarAssetClient<'_>,
+    balance: i128,
+) -> Address {
+    let donor = Address::generate(env);
+    client.register_verified(&donor);
+    token_admin.mint(&donor, &balance);
+    donor
+}
+
+fn register_project0(env: &Env, client: &PatunganClient<'_>) {
+    let payout = Address::generate(env);
+    client.register_project(
+        &0u32,
+        &payout,
+        &String::from_str(env, "Atap Sekolah SDN 2"),
+        &String::from_str(env, "\u{1F3EB}"),
+    );
+}
+
+#[test]
+fn contribute_tags_direct_and_distinct_donor() {
+    let env = Env::default();
+    let (_admin, token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = verified_donor(&env, &client, &token_admin, 50_000);
+
+    client.contribute(&donor, &0u32, &50_000);
+
+    // Token escrowed donor -> contract.
+    let token = token::Client::new(&env, &token_id);
+    assert_eq!(token.balance(&client.address), 50_000);
+    assert_eq!(token.balance(&donor), 0);
+
+    env.as_contract(&client.address, || {
+        let proj: ProjectState = env.storage().persistent().get(&DataKey::Project(0)).unwrap();
+        assert_eq!(proj.direct, 50_000);
+        assert_eq!(proj.donor_count, 1);
+
+        let cum: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Contribution(0, donor.clone()))
+            .unwrap();
+        assert_eq!(cum, 50_000);
+
+        let donors: Vec<Address> = env.storage().persistent().get(&DataKey::Donors(0)).unwrap();
+        assert_eq!(donors.len(), 1);
+        assert_eq!(donors.get(0).unwrap(), donor);
+    });
+}
+
+#[test]
+fn same_donor_twice_sums_cumulative_once() {
+    // §5.2 correctness crux: two gifts from one donor sum to ONE cumulative total (sqrt'd once
+    // at finalize) and the donor is counted ONCE — splitting a gift must not inflate breadth.
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = verified_donor(&env, &client, &token_admin, 50_000);
+
+    client.contribute(&donor, &0u32, &10_000);
+    client.contribute(&donor, &0u32, &40_000);
+
+    env.as_contract(&client.address, || {
+        let proj: ProjectState = env.storage().persistent().get(&DataKey::Project(0)).unwrap();
+        assert_eq!(proj.direct, 50_000);
+        assert_eq!(proj.donor_count, 1, "repeat gift must not bump donor_count");
+
+        let cum: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Contribution(0, donor.clone()))
+            .unwrap();
+        assert_eq!(cum, 50_000, "per-donor total is cumulative");
+
+        let donors: Vec<Address> = env.storage().persistent().get(&DataKey::Donors(0)).unwrap();
+        assert_eq!(donors.len(), 1, "donor listed once");
+    });
+}
+
+#[test]
+fn donor_across_two_projects_counted_in_each() {
+    // §5.6: a donor to multiple projects is counted independently in each project's tally.
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let payout1 = Address::generate(&env);
+    client.register_project(
+        &1u32,
+        &payout1,
+        &String::from_str(&env, "Kebun"),
+        &String::from_str(&env, "\u{1F331}"),
+    );
+    let donor = verified_donor(&env, &client, &token_admin, 30_000);
+
+    client.contribute(&donor, &0u32, &10_000);
+    client.contribute(&donor, &1u32, &20_000);
+
+    env.as_contract(&client.address, || {
+        let p0: ProjectState = env.storage().persistent().get(&DataKey::Project(0)).unwrap();
+        let p1: ProjectState = env.storage().persistent().get(&DataKey::Project(1)).unwrap();
+        assert_eq!(p0.donor_count, 1);
+        assert_eq!(p0.direct, 10_000);
+        assert_eq!(p1.donor_count, 1);
+        assert_eq!(p1.direct, 20_000);
+    });
+}
+
+#[test]
+fn contribute_rejects_unverified_donor() {
+    let env = Env::default();
+    let (_admin, _token_id, client, _token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = Address::generate(&env); // never registered
+
+    assert_eq!(
+        client.try_contribute(&donor, &0u32, &10_000),
+        Err(Ok(Error::NotVerified))
+    );
+}
+
+#[test]
+fn contribute_rejects_unknown_project() {
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    let donor = verified_donor(&env, &client, &token_admin, 10_000);
+
+    assert_eq!(
+        client.try_contribute(&donor, &99u32, &10_000),
+        Err(Ok(Error::UnknownProject))
+    );
+}
+
+#[test]
+fn contribute_rejects_non_positive_amount() {
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = verified_donor(&env, &client, &token_admin, 10_000);
+
+    assert_eq!(
+        client.try_contribute(&donor, &0u32, &0i128),
+        Err(Ok(Error::InvalidAmount))
+    );
+    assert_eq!(
+        client.try_contribute(&donor, &0u32, &-1i128),
+        Err(Ok(Error::InvalidAmount))
+    );
+}
+
+#[test]
+fn contribute_rejects_when_round_finalized() {
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = verified_donor(&env, &client, &token_admin, 10_000);
+
+    // `finalize` lands in 1.6; force Finalized directly to prove the guard.
+    env.as_contract(&client.address, || {
+        let mut cfg: Config = env.storage().instance().get(&DataKey::Config).unwrap();
+        cfg.status = RoundStatus::Finalized;
+        env.storage().instance().set(&DataKey::Config, &cfg);
+    });
+
+    assert_eq!(
+        client.try_contribute(&donor, &0u32, &10_000),
+        Err(Ok(Error::RoundClosed))
+    );
+}
+
+#[test]
+fn contribute_rejects_after_round_end() {
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = verified_donor(&env, &client, &token_admin, 10_000);
+
+    // Move round_end into the past relative to the ledger clock.
+    env.as_contract(&client.address, || {
+        let mut cfg: Config = env.storage().instance().get(&DataKey::Config).unwrap();
+        cfg.round_end = 100;
+        env.storage().instance().set(&DataKey::Config, &cfg);
+    });
+    env.ledger().set_timestamp(200);
+
+    assert_eq!(
+        client.try_contribute(&donor, &0u32, &10_000),
+        Err(Ok(Error::RoundClosed))
     );
 }
 
