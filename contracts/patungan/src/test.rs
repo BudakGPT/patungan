@@ -546,3 +546,160 @@ fn views_report_config_projects_and_verification() {
     assert!(client.is_verified(&donor));
     assert!(!client.is_verified(&Address::generate(&env)));
 }
+
+// ---------- §5.7 golden + remaining §5.6 edge cases (task 1.7) ----------
+
+/// Add `n` fresh verified donors, each contributing exactly `amount` to `project_id`.
+/// This is the demo's breadth engine — many small gifts vs one whale (§5.7).
+fn crowd(
+    env: &Env,
+    client: &PatunganClient<'_>,
+    token_admin: &token::StellarAssetClient<'_>,
+    project_id: u32,
+    n: u32,
+    amount: i128,
+) {
+    for _ in 0..n {
+        let donor = verified_donor(env, client, token_admin, amount);
+        client.contribute(&donor, &project_id, &amount);
+    }
+}
+
+#[test]
+fn golden_whale_vs_crowd_crowd_wins_the_pool() {
+    // §5.7 — THE PRODUCT'S PROOF, end-to-end through the contract (not just qf.rs). Three
+    // projects each raise the SAME Rp1jt direct, but with different breadth:
+    //   🏫 School: 100 donors × 10_000  → weight (100·isqrt(10_000))² = (100·100)²  = 100_000_000
+    //   🌱 Garden:  10 donors × 100_000 → weight  (10·isqrt(100_000))² = (10·316)²  =   9_985_600
+    //   💧 Well:     1 donor  × 1_000_000 → weight    (isqrt(1_000_000))² = 1000²    =   1_000_000
+    // total_weight = 110_985_600, pool = 100_000_000. The crowd (School) must take ~90% of the
+    // pool while the whale (Well) gets ~0.9M — the whole reveal in one assert block. Exact
+    // per-project figures depend on isqrt truncation, so assert ordering/magnitude + exact
+    // pool conservation, not the decimals (§5.7).
+    let env = Env::default();
+    let (admin, _token_id, client, token_admin) = setup(&env);
+    let pool = 100_000_000i128;
+    token_admin.mint(&admin, &pool);
+    client.fund_pool(&admin, &pool);
+
+    let school_payout = Address::generate(&env);
+    client.register_project(
+        &0u32,
+        &school_payout,
+        &String::from_str(&env, "Atap Sekolah"),
+        &String::from_str(&env, "\u{1F3EB}"),
+    );
+    let garden_payout = Address::generate(&env);
+    client.register_project(
+        &1u32,
+        &garden_payout,
+        &String::from_str(&env, "Kebun Desa"),
+        &String::from_str(&env, "\u{1F331}"),
+    );
+    let well_payout = Address::generate(&env);
+    client.register_project(
+        &2u32,
+        &well_payout,
+        &String::from_str(&env, "Sumur"),
+        &String::from_str(&env, "\u{1F4A7}"),
+    );
+
+    crowd(&env, &client, &token_admin, 0, 100, 10_000); // School
+    crowd(&env, &client, &token_admin, 1, 10, 100_000); // Garden
+    crowd(&env, &client, &token_admin, 2, 1, 1_000_000); // Well
+
+    // Each project raised the identical Rp1jt direct — only breadth differs.
+    assert_eq!(client.get_project(&0u32).direct, 1_000_000);
+    assert_eq!(client.get_project(&1u32).direct, 1_000_000);
+    assert_eq!(client.get_project(&2u32).direct, 1_000_000);
+    assert_eq!(client.get_project(&0u32).donor_count, 100);
+    assert_eq!(client.get_project(&1u32).donor_count, 10);
+    assert_eq!(client.get_project(&2u32).donor_count, 1);
+
+    client.finalize();
+
+    let projects = client.list_projects();
+    let school = projects.get(0).unwrap().matched;
+    let garden = projects.get(1).unwrap().matched;
+    let well = projects.get(2).unwrap().matched;
+
+    // Ordering: School ≫ Garden ≫ Well — breadth beats depth.
+    assert!(school > garden, "School {school} must beat Garden {garden}");
+    assert!(garden > well, "Garden {garden} must beat Well {well}");
+    // Magnitude: the crowd dominates (≳90%), the whale is a rounding footnote (≲1M+dust).
+    assert!(school > pool * 4 / 5, "School {school} must dominate the pool {pool}");
+    assert!(well < 2_000_000, "Well {well} must stay a footnote");
+    // Exact pool conservation — every unit of the pool is allocated (§5.3 remainder rule).
+    assert_eq!(school + garden + well, pool);
+
+    // §10 determinism: the live projection equals the persisted split.
+    let after = client.preview_matches();
+    assert_eq!(after.get(0).unwrap(), (0u32, school));
+    assert_eq!(after.get(1).unwrap(), (1u32, garden));
+    assert_eq!(after.get(2).unwrap(), (2u32, well));
+}
+
+#[test]
+fn zero_donor_project_gets_zero_match() {
+    // §5.6 row 1: one project among active ones has NO donors → weight 0 → matched 0, with no
+    // divide-by-zero, and the funded project takes the whole pool.
+    let env = Env::default();
+    let (admin, _token_id, client, token_admin) = setup(&env);
+    token_admin.mint(&admin, &100);
+    client.fund_pool(&admin, &100);
+
+    register_project0(&env, &client); // active
+    let sepi_payout = Address::generate(&env);
+    client.register_project(
+        &1u32,
+        &sepi_payout,
+        &String::from_str(&env, "Proyek Sepi"),
+        &String::from_str(&env, "\u{1F4A7}"),
+    );
+
+    let donor = verified_donor(&env, &client, &token_admin, 10_000);
+    client.contribute(&donor, &0u32, &10_000);
+
+    client.finalize();
+    let projects = client.list_projects();
+    assert_eq!(projects.get(1).unwrap().matched, 0, "0-donor project matched 0");
+    assert_eq!(projects.get(0).unwrap().matched, 100, "sole funded project takes the pool");
+}
+
+#[test]
+fn finalize_assigns_remainder_to_largest_weight() {
+    // §5.6 remainder row: pool 7 does not divide evenly. p0 has two donors×1 → weight
+    // (isqrt(1)+isqrt(1))² = 4; p1 has one donor×1 → weight 1; total_weight = 5.
+    //   p0 share = ⌊7·4/5⌋ = 5, p1 share = ⌊7·1/5⌋ = 1, allocated 6, dust 1 → largest weight p0.
+    // So p0 = 6, p1 = 1, Σ = 7 (§5.3).
+    let env = Env::default();
+    let (admin, _token_id, client, token_admin) = setup(&env);
+    token_admin.mint(&admin, &7);
+    client.fund_pool(&admin, &7);
+
+    register_project0(&env, &client);
+    let payout1 = Address::generate(&env);
+    client.register_project(
+        &1u32,
+        &payout1,
+        &String::from_str(&env, "Sumur"),
+        &String::from_str(&env, "\u{1F4A7}"),
+    );
+
+    let a = verified_donor(&env, &client, &token_admin, 1);
+    let b = verified_donor(&env, &client, &token_admin, 1);
+    let c = verified_donor(&env, &client, &token_admin, 1);
+    client.contribute(&a, &0u32, &1);
+    client.contribute(&b, &0u32, &1);
+    client.contribute(&c, &1u32, &1);
+
+    client.finalize();
+    let projects = client.list_projects();
+    assert_eq!(projects.get(0).unwrap().matched, 6, "largest weight gets the dust");
+    assert_eq!(projects.get(1).unwrap().matched, 1);
+    assert_eq!(
+        projects.get(0).unwrap().matched + projects.get(1).unwrap().matched,
+        7,
+        "pool fully allocated"
+    );
+}

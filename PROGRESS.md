@@ -113,7 +113,17 @@ _None yet._
   8 new tests (finalize writes+preview-agrees, finalize-twice, NothingToMatch-stays-Open,
   disburse pays direct+matched & drains escrow, disburse before-finalize/twice/unknown, views).
   `cargo test` → 31 passed (8 qf + 23 integration), no warnings. _(a858037)_
-- [ ] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases)
+- [x] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases) — appended 3 integration tests
+  to `test.rs` closing every §5.6 row + the §5.7 proof at the **contract** level (qf.rs already
+  proved them at the pure-math level). `golden_whale_vs_crowd_crowd_wins_the_pool` drives the
+  real demo end-to-end: 100+10+1 verified donors `contribute` through the contract (all raise
+  Rp1jt direct, donor_count 100/10/1), then `finalize` — asserts School ≫ Garden ≫ Well, School
+  > 4/5·pool, Well < 2M, `Σ matched == pool` exactly, and `preview_matches` == stored matched[]
+  (§10 determinism). `zero_donor_project_gets_zero_match` (§5.6 row 1: empty project among active
+  ones → matched 0, no divide-by-zero, funded project takes whole pool). `finalize_assigns_
+  remainder_to_largest_weight` (§5.6 remainder row: pool 7, weights 4 & 1 → 6 & 1, dust to
+  largest). `cargo test` → **34 passed** (8 qf + 26 integration), no warnings. **Phase 1 GATE
+  closed.** _(<hash>)_
 
 ### Phase 2 — Deploy & bindings
 - [ ] 2.1 deploy.sh → testnet, writes CONTRACT_ID + TOKEN_ID
