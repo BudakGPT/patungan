@@ -40,7 +40,10 @@ _None yet._
   print; nothing gated. _(61a88bd)_
 
 ### Phase 1 — Contract (THE GATE)
-- [ ] 1.1 Fork arisan → contracts/patungan; builds
+- [x] 1.1 Fork arisan → contracts/patungan; builds — copied arisan crate verbatim (bar renames)
+  to `contracts/patungan/`; crate renamed `patungan`, struct `Arisan`→`Patungan`. `#![no_std]`
+  kept, deps match arisan (soroban-sdk 22.0.0). `cargo build` green (patungan v0.1.0 compiles).
+  Standalone crate (own `[profile.release]`), no root workspace. _(6b3ff2e)_
 - [ ] 1.2 Types + DataKey + Error enum
 - [ ] 1.3 qf.rs: isqrt + compute_matches (+ remainder rule) — tested
 - [ ] 1.4 init / register_verified / register_project / fund_pool
