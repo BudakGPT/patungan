@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { WatchWalletChanges } from "@stellar/freighter-api";
 import { config } from "./config";
 import {
   getAllowedAddress,
@@ -29,6 +30,8 @@ interface WalletState {
   network: string | null;
   /** True only when a wallet is connected and on the configured network — gates write buttons (E2). */
   canWrite: boolean;
+  /** Set when a connect attempt genuinely failed (not a user rejection). */
+  connectError: string | null;
   connect: () => Promise<void>;
   disconnect: () => void;
 }
@@ -40,6 +43,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [network, setNetwork] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,12 +63,31 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // E2: keep address/network live after connect — Freighter account or network switches
+  // must flip `canWrite`/`NetworkBanner` without a page reload. The watcher polls the
+  // extension; an empty watched address while connected means access was revoked.
+  useEffect(() => {
+    if (installed !== true) return;
+    const watcher = new WatchWalletChanges(3000);
+    watcher.watch(({ address: watchedAddress, network: watchedNetwork }) => {
+      if (watchedNetwork) setNetwork(watchedNetwork);
+      setAddress((prev) => (prev ? watchedAddress || null : prev));
+    });
+    return () => watcher.stop();
+  }, [installed]);
+
   const connect = useCallback(async () => {
     setConnecting(true);
+    setConnectError(null);
     try {
-      const { address: connectedAddress } = await requestFreighterAccess();
-      // A rejected/failed request leaves address null — back to idle, no error toast (B1 edge case).
-      if (!connectedAddress) return;
+      const { address: connectedAddress, error } = await requestFreighterAccess();
+      if (!connectedAddress) {
+        // A user rejection stays silent (B1 edge case); a genuine failure must not.
+        if (error && !/reject|declin|cancel|denied/i.test(error)) {
+          setConnectError(error);
+        }
+        return;
+      }
       setAddress(connectedAddress);
       setNetwork(await getFreighterNetwork());
     } finally {
@@ -75,6 +98,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const disconnect = useCallback(() => {
     setAddress(null);
     setNetwork(null);
+    setConnectError(null);
   }, []);
 
   const status: WalletStatus = useMemo(() => {
@@ -91,10 +115,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       address,
       network,
       canWrite: status === "connected",
+      connectError,
       connect,
       disconnect,
     }),
-    [status, address, network, connect, disconnect],
+    [status, address, network, connectError, connect, disconnect],
   );
 
   return (

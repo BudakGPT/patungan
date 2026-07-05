@@ -14,7 +14,7 @@ export default function LandingPage() {
   const matchByProjectId = new Map(
     (previewMatches.data ?? []).map(([id, matched]) => [id, matched]),
   );
-  const pool = round.data?.pool ?? BigInt(0);
+  const pool = round.data?.pool ?? 0n;
 
   return (
     <main className="min-h-screen p-8">
@@ -34,7 +34,7 @@ export default function LandingPage() {
                 project={project}
                 projectedMatch={
                   previewMatches.data && previewMatches.data.length > 0
-                    ? (matchByProjectId.get(project.id) ?? BigInt(0))
+                    ? (matchByProjectId.get(project.id) ?? 0n)
                     : undefined
                 }
                 pool={pool}

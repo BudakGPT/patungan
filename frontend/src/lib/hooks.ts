@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { Config, ProjectState } from "@/contract/dist/index.js";
+import type { Config, ProjectState } from "@/contract/src";
 import { contractClient } from "./contract";
 
 /** Round config: pool, admin, token, round_end, status (§4.3, §6.2 live poll). */
@@ -22,12 +22,18 @@ export function useProjects() {
   });
 }
 
-/** One project's state; throws (Error state) on an unknown id — the contract panics (§4.3). */
-export function useProject(id: number) {
+/**
+ * One project's state; throws (Error state) on an unknown id — the contract panics (§4.3).
+ * `enabled: false` for malformed ids keeps NaN out of the wire call, and a single retry
+ * (instead of react-query's default 3× backoff) keeps the not-found render fast.
+ */
+export function useProject(id: number, enabled = true) {
   return useQuery<ProjectState>({
     queryKey: ["project", id],
     queryFn: async () => (await contractClient.get_project({ id })).result,
     refetchInterval: 4000,
+    enabled,
+    retry: 1,
   });
 }
 

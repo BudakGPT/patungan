@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import freighterApi from "@stellar/freighter-api";
-import type { ProjectState } from "@/contract/dist/index.js";
+import { Errors, type ProjectState } from "@/contract/src";
 import { contractClient } from "@/lib/contract";
 import { useWallet } from "@/lib/wallet";
 import { formatIDR } from "@/lib/format";
@@ -20,14 +20,29 @@ type TxState =
   | { phase: "success"; hash: string }
   | { phase: "error"; message: string };
 
-/** Maps a thrown error or an unwrapped contract `Error` variant to Bahasa copy (§7 B2 edge cases). */
+/**
+ * Maps a failure to Bahasa copy (§7 B2 edge cases). Contract rejections surface two ways:
+ * an on-chain `result.isErr()` carries the bare variant name ("NotVerified"), but most
+ * rejections fail at SIMULATION time and are thrown as raw SDK strings embedding
+ * `Error(Contract, #N)` — extract the code and translate via the bindings' `Errors` map.
+ * Never render raw internals: unknown failures fall back to the generic message.
+ */
 function mapError(err: unknown): string {
   const raw =
     err && typeof err === "object" && "message" in err
       ? String((err as { message: unknown }).message)
       : String(err);
   if (/reject|declin|cancel/i.test(raw)) return strings.contribute.errors.rejected;
-  return strings.contribute.errors[raw] ?? raw;
+  if (strings.contribute.errors[raw]) return strings.contribute.errors[raw];
+  const code = raw.match(/Error\(Contract, #(\d+)\)/)?.[1];
+  const variant = code
+    ? (Errors as Record<number, { message: string }>)[Number(code)]?.message
+    : undefined;
+  if (variant && strings.contribute.errors[variant]) {
+    return strings.contribute.errors[variant];
+  }
+  console.error("contribute failed:", raw);
+  return strings.contribute.errors.generic;
 }
 
 /** B2/B3 · preset chip-in + full tx UX (§6.4) + required optimistic cache patch (§6.2). */
@@ -46,6 +61,19 @@ export function ContributeModal({
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
 
   const pending = tx.phase === "awaiting-signature" || tx.phase === "submitting";
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Dialog semantics: Escape closes (unless a tx is in flight) and focus lands inside.
+  useEffect(() => {
+    panelRef.current?.focus();
+  }, []);
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && !pending) onClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [pending, onClose]);
 
   async function submit() {
     if (pending || !address) return;
@@ -95,9 +123,21 @@ export function ContributeModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-semibold">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !pending) onClose();
+      }}
+    >
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contribute-title"
+        tabIndex={-1}
+        className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl outline-none"
+      >
+        <h2 id="contribute-title" className="text-lg font-semibold">
           {strings.contribute.title} {projectTitle}
         </h2>
 

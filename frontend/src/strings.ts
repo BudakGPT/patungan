@@ -67,9 +67,11 @@ export const strings = {
     testnetPill: "Testnet",
     wrongNetworkBanner:
       "Freighter tidak terhubung ke Testnet. Alihkan jaringan di Freighter untuk melanjutkan.",
+    connectFailed: "Gagal menghubungkan wallet. Coba lagi.",
   },
   loading: "Memuat…",
   empty: "Belum ada proyek",
   errorGeneric: "Terjadi kesalahan. Coba lagi.",
   retry: "Coba lagi",
+  staleData: "Gagal memuat pembaruan — menampilkan data terakhir.",
 } as const;

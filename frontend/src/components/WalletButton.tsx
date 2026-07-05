@@ -8,7 +8,7 @@ function truncate(address: string): string {
 }
 
 export function WalletButton() {
-  const { status, address, connect, disconnect } = useWallet();
+  const { status, address, connectError, connect, disconnect } = useWallet();
 
   if (status === "not-installed") {
     return (
@@ -25,14 +25,21 @@ export function WalletButton() {
 
   if (status === "disconnected" || status === "connecting") {
     return (
-      <button
-        type="button"
-        disabled={status === "connecting"}
-        onClick={() => void connect()}
-        className="rounded-md bg-neutral-800 px-3 py-1.5 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
-      >
-        {status === "connecting" ? strings.wallet.connecting : strings.wallet.connect}
-      </button>
+      <div className="flex items-center gap-2">
+        {connectError ? (
+          <span className="text-xs text-red-600" title={connectError}>
+            {strings.wallet.connectFailed}
+          </span>
+        ) : null}
+        <button
+          type="button"
+          disabled={status === "connecting"}
+          onClick={() => void connect()}
+          className="rounded-md bg-neutral-800 px-3 py-1.5 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
+        >
+          {status === "connecting" ? strings.wallet.connecting : strings.wallet.connect}
+        </button>
+      </div>
     );
   }
 

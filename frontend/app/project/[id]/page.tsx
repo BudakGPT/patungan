@@ -14,7 +14,7 @@ export default function ProjectDetailPage() {
   const id = Number(params.id);
   const isValidId = Number.isInteger(id) && id >= 0;
 
-  const project = useProject(id);
+  const project = useProject(id, isValidId);
   const round = useRound();
   const previewMatches = usePreviewMatch();
   const [showModal, setShowModal] = useState(false);
@@ -53,7 +53,10 @@ export default function ProjectDetailPage() {
 
   const data = project.data;
   const projectedMatch = previewMatches.data?.find(([pid]) => pid === id)?.[1];
-  const isOpen = round.data?.status.tag === "Open";
+  // Three-way CTA state: unknown (round still loading) renders the normal label disabled —
+  // only a KNOWN closed round may claim "Round ditutup".
+  const roundStatus = round.data?.status.tag;
+  const isOpen = roundStatus === "Open";
 
   return (
     <main className="min-h-screen p-8">
@@ -91,7 +94,9 @@ export default function ProjectDetailPage() {
         onClick={() => setShowModal(true)}
         className="mt-6 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-neutral-300"
       >
-        {isOpen ? strings.project.contributeCta : strings.project.roundClosedCta}
+        {roundStatus === "Finalized"
+          ? strings.project.roundClosedCta
+          : strings.project.contributeCta}
       </button>
 
       {showModal ? (

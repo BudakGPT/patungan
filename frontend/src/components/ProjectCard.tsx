@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ProjectState } from "@/contract/dist/index.js";
+import type { ProjectState } from "@/contract/src";
 import { formatIDR } from "@/lib/format";
 import { strings } from "@/strings";
 
@@ -17,8 +17,8 @@ export function ProjectCard({
   pool: bigint;
 }) {
   const pct =
-    projectedMatch !== undefined && pool > BigInt(0)
-      ? Math.min(Number((projectedMatch * BigInt(10000)) / pool) / 100, 100)
+    projectedMatch !== undefined && pool > 0n
+      ? Math.min(Number((projectedMatch * 10_000n) / pool) / 100, 100)
       : 0;
 
   return (

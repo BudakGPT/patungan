@@ -32,12 +32,3 @@ export async function getFreighterNetwork(): Promise<string | null> {
   if (result.error) return null;
   return result.network;
 }
-
-export async function signTransactionXdr(
-  xdr: string,
-  opts: { networkPassphrase: string; address: string },
-): Promise<{ signedTxXdr: string | null; error: string | null }> {
-  const result = await freighterApi.signTransaction(xdr, opts);
-  if (result.error) return { signedTxXdr: null, error: result.error.message };
-  return { signedTxXdr: result.signedTxXdr, error: null };
-}
