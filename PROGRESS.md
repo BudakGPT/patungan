@@ -83,7 +83,11 @@ _None yet._
   `frontend/src/contract/` (its own generated tsconfig), not `cd frontend && tsc`. _(e7e5981)_
 
 ### Phase 3 — Seed script
-- [ ] 3.1 seed.ts (idempotent, rate-limit-tolerant, prints summary)
+- [x] 3.1 seed.ts — scenario live: School 50 donors/830k direct, Well 1 whale/1M direct,
+  projected matches #0=92.6M vs #2=2.3M (crowd wins). **Gotcha:** testnet tx submission can
+  throw `SendFailed`/`TRY_AGAIN_LATER` transiently (distinct from friendbot 429s) — added
+  `invokeWithRetry` around every `signAndSend()`, rebuilding the tx each attempt since a stale
+  assembled tx's sequence number may already be consumed. _(pending commit)_
 
 ### Phase 4 — Frontend foundation
 - [ ] 4.1 Next.js (App Router)+TS+Tailwind scaffold; providers + config + formatIDR
