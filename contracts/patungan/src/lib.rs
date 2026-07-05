@@ -18,7 +18,8 @@
 extern crate alloc;
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, token, Address, Env, String, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env,
+    String, Vec,
 };
 
 // Pure, chain-free quadratic-funding math (isqrt + weights + pool split). Consumed by
@@ -77,6 +78,9 @@ pub enum DataKey {
     Donors(u32),                 // Vec<Address> — distinct donors of project (for QF sum)
     Contribution(u32, Address),  // i128 — CUMULATIVE amount from this donor to this project
     Verified(Address),           // bool — in the one-ID-per-address registry
+    SumSqrt(u32),                // u128 — running Σ isqrt(per-donor cumulative) for the project,
+                                 // maintained by `contribute` so the QF split reads ONE aggregate
+                                 // per project instead of every per-donor entry (tx-footprint safe)
 }
 
 // ---------- §4.5 Errors ----------
@@ -190,8 +194,9 @@ impl Patungan {
         }
         let token_client = token::Client::new(&env, &config.token);
         token_client.transfer(&from, &env.current_contract_address(), &amount);
-        config.pool += amount;
+        config.pool = config.pool.checked_add(amount).ok_or(Error::InvalidAmount)?;
         env.storage().instance().set(&DataKey::Config, &config);
+        env.events().publish((symbol_short!("fund"), from), amount);
         Ok(())
     }
 
@@ -240,7 +245,7 @@ impl Patungan {
         token_client.transfer(&donor, &env.current_contract_address(), &amount);
 
         // CUMULATIVE per-donor tagging (§5.2): sum this donor's cumulative total to the project
-        // so `finalize` can `isqrt` that summed total ONCE. Since every contribution is `> 0`, a
+        // so the QF weight `isqrt`s that summed total ONCE. Since every contribution is `> 0`, a
         // returning donor always has `prior > 0`; only a first-time donor (`prior == 0`) grows the
         // distinct-donor set and `donor_count` — a repeat gift must not inflate QF breadth.
         let contrib_key = DataKey::Contribution(project_id, donor.clone());
@@ -255,14 +260,32 @@ impl Patungan {
             env.storage()
                 .persistent()
                 .set(&DataKey::Donors(project_id), &donors);
-            project.donor_count += 1;
+            project.donor_count = project
+                .donor_count
+                .checked_add(1)
+                .ok_or(Error::InvalidAmount)?;
         }
-        env.storage().persistent().set(&contrib_key, &(prior + amount));
+        let new_total = prior.checked_add(amount).ok_or(Error::InvalidAmount)?;
+        env.storage().persistent().set(&contrib_key, &new_total);
 
-        project.direct += amount;
+        // Maintain the running Σ√ aggregate (§5.2 semantics unchanged — always √ of the
+        // CUMULATIVE per-donor total): swap this donor's old isqrt for the new one. This keeps
+        // `finalize`/`preview_matches` at ONE storage read per project instead of one per donor,
+        // so the QF split fits Soroban's per-tx ledger-entry footprint at any crowd size.
+        let sum_key = DataKey::SumSqrt(project_id);
+        let sum_sqrt: u128 = env.storage().persistent().get(&sum_key).unwrap_or(0);
+        let new_sum_sqrt = sum_sqrt
+            .checked_sub(qf::isqrt(prior as u128))
+            .and_then(|s| s.checked_add(qf::isqrt(new_total as u128)))
+            .ok_or(Error::InvalidAmount)?;
+        env.storage().persistent().set(&sum_key, &new_sum_sqrt);
+
+        project.direct = project.direct.checked_add(amount).ok_or(Error::InvalidAmount)?;
         env.storage()
             .persistent()
             .set(&DataKey::Project(project_id), &project);
+        env.events()
+            .publish((symbol_short!("contrib"), project_id, donor), amount);
         Ok(())
     }
 
@@ -288,9 +311,11 @@ impl Patungan {
                 env.storage().persistent().get(&DataKey::Project(id)).unwrap();
             project.matched = matched;
             env.storage().persistent().set(&DataKey::Project(id), &project);
+            env.events().publish((symbol_short!("match"), id), matched);
         }
         config.status = RoundStatus::Finalized;
         env.storage().instance().set(&DataKey::Config, &config);
+        env.events().publish((symbol_short!("final"),), config.pool);
         Ok(())
     }
 
@@ -313,13 +338,18 @@ impl Patungan {
         if project.disbursed {
             return Err(Error::AlreadyDisbursed);
         }
-        let amount = project.direct + project.matched;
+        let amount = project
+            .direct
+            .checked_add(project.matched)
+            .ok_or(Error::InvalidAmount)?;
         let token_client = token::Client::new(&env, &config.token);
         token_client.transfer(&env.current_contract_address(), &project.payout, &amount);
         project.disbursed = true;
         env.storage()
             .persistent()
             .set(&DataKey::Project(project_id), &project);
+        env.events()
+            .publish((symbol_short!("payout"), project_id), amount);
         Ok(())
     }
 
@@ -375,12 +405,14 @@ impl Patungan {
 
     /// The one canonical QF computation over the current on-chain state (§5), shared by
     /// `finalize` (which persists it) and `preview_matches` (which returns it) so the two are
-    /// deterministic and always agree (§10). For each project (in `ProjectIds` order) it gathers
-    /// every distinct donor's CUMULATIVE total from storage, takes `isqrt` of each summed total
-    /// once (§5.2) via `qf::project_weight`, then splits `pool` proportional to the weights with
-    /// the largest-weight remainder rule (§5.3) via `qf::compute_matches`. Returns
-    /// `NothingToMatch` when no project has a donor (`total_weight == 0`, §5.6). The transient
-    /// heap `Vec`s bridge soroban storage to `qf`'s slice API and never touch chain state.
+    /// deterministic and always agree (§10). For each project (in `ProjectIds` order) it reads
+    /// the running `SumSqrt` aggregate `contribute` maintains (Σ isqrt of each distinct donor's
+    /// CUMULATIVE total, §5.2) and squares it via `qf::weight_from_sum_sqrt` — ONE storage read
+    /// per project, so the split's tx footprint is O(projects) regardless of crowd size. Then it
+    /// splits `pool` proportional to the weights with the largest-weight remainder rule (§5.3)
+    /// via `qf::compute_matches`. Returns `NothingToMatch` when no project has a donor
+    /// (`total_weight == 0`, §5.6). The transient heap `Vec`s bridge soroban storage to `qf`'s
+    /// slice API and never touch chain state.
     fn compute_matches_now(env: &Env) -> Result<Vec<(u32, i128)>, Error> {
         let config = Self::load_config(env);
         let ids: Vec<u32> = env
@@ -391,21 +423,12 @@ impl Patungan {
 
         let mut weights: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
         for id in ids.iter() {
-            let donors: Vec<Address> = env
+            let sum_sqrt: u128 = env
                 .storage()
                 .persistent()
-                .get(&DataKey::Donors(id))
-                .unwrap_or_else(|| Vec::new(env));
-            let mut donor_totals: alloc::vec::Vec<i128> = alloc::vec::Vec::new();
-            for donor in donors.iter() {
-                let total: i128 = env
-                    .storage()
-                    .persistent()
-                    .get(&DataKey::Contribution(id, donor))
-                    .unwrap_or(0);
-                donor_totals.push(total);
-            }
-            weights.push(qf::project_weight(&donor_totals)?);
+                .get(&DataKey::SumSqrt(id))
+                .unwrap_or(0);
+            weights.push(qf::weight_from_sum_sqrt(sum_sqrt)?);
         }
 
         let mut matched = alloc::vec![0i128; weights.len()];

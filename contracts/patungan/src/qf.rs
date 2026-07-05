@@ -45,12 +45,24 @@ pub fn isqrt(n: u128) -> u128 {
     x
 }
 
-/// Weight of one project: `( Σ_{d} isqrt(cumulative_d) )²` (§5.1).
+/// Weight of one project from its running `Σ_{d} isqrt(cumulative_d)`: the square (§5.1).
+///
+/// The contract maintains that sum incrementally in `contribute` (replacing a donor's old
+/// `isqrt` with the new one on every gift), so `finalize`/`preview_matches` read ONE
+/// aggregate per project instead of every per-donor entry — O(projects), not O(donors).
+pub fn weight_from_sum_sqrt(sum_sqrt: u128) -> Result<u128, Error> {
+    sum_sqrt.checked_mul(sum_sqrt).ok_or(Error::InvalidAmount)
+}
+
+/// Reference weight of one project: `( Σ_{d} isqrt(cumulative_d) )²` (§5.1).
 ///
 /// `donor_totals` holds each **distinct** donor's **cumulative** contribution to this
 /// project — the sqrt is taken on the summed-per-donor total exactly once (§5.2), which
 /// is what stops a single donor from inflating breadth by splitting one gift into many.
 /// Non-positive entries (a 0-donor placeholder) contribute 0 and never divide by zero.
+/// The chain path uses the incremental aggregate (`weight_from_sum_sqrt`); this stays as
+/// the reference implementation the unit tests check that aggregate against.
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn project_weight(donor_totals: &[i128]) -> Result<u128, Error> {
     let mut sum_sqrt: u128 = 0;
     for &c in donor_totals {
@@ -61,7 +73,7 @@ pub fn project_weight(donor_totals: &[i128]) -> Result<u128, Error> {
             .checked_add(isqrt(c as u128))
             .ok_or(Error::InvalidAmount)?;
     }
-    sum_sqrt.checked_mul(sum_sqrt).ok_or(Error::InvalidAmount)
+    weight_from_sum_sqrt(sum_sqrt)
 }
 
 /// Split `pool` across projects proportional to `weights`, writing each project's

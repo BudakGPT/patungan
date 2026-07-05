@@ -9,8 +9,9 @@
 
 use super::{Config, DataKey, Error, Patungan, PatunganClient, ProjectState, RoundStatus};
 use soroban_sdk::{
-    testutils::{Address as _, Ledger as _},
-    token, Address, Env, String, Vec,
+    symbol_short,
+    testutils::{Address as _, Events as _, Ledger as _},
+    token, Address, Env, IntoVal, String, TryIntoVal, Val, Vec,
 };
 
 /// Register a fresh contract with a test SAC as its token, `init`-ed and Open with a far-future
@@ -253,7 +254,48 @@ fn same_donor_twice_sums_cumulative_once() {
 
         let donors: Vec<Address> = env.storage().persistent().get(&DataKey::Donors(0)).unwrap();
         assert_eq!(donors.len(), 1, "donor listed once");
+
+        // The running Σ√ aggregate must reflect √(cumulative) ONCE — not √10k + √40k.
+        let sum_sqrt: u128 = env.storage().persistent().get(&DataKey::SumSqrt(0)).unwrap();
+        assert_eq!(sum_sqrt, 223, "Σ√ = isqrt(50_000) = 223, the cumulative total sqrt'd once");
     });
+}
+
+#[test]
+fn contribute_maintains_sum_sqrt_across_donors() {
+    // The incremental aggregate must equal the reference Σ isqrt(per-donor cumulative).
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let a = verified_donor(&env, &client, &token_admin, 10_000);
+    let b = verified_donor(&env, &client, &token_admin, 40_000);
+
+    client.contribute(&a, &0u32, &10_000); // isqrt(10_000) = 100
+    client.contribute(&b, &0u32, &40_000); // isqrt(40_000) = 200
+
+    env.as_contract(&client.address, || {
+        let sum_sqrt: u128 = env.storage().persistent().get(&DataKey::SumSqrt(0)).unwrap();
+        assert_eq!(sum_sqrt, 300, "Σ√ = isqrt(10_000) + isqrt(40_000) = 100 + 200");
+    });
+}
+
+#[test]
+fn contribute_publishes_event() {
+    let env = Env::default();
+    let (_admin, _token_id, client, token_admin) = setup(&env);
+    register_project0(&env, &client);
+    let donor = verified_donor(&env, &client, &token_admin, 10_000);
+
+    client.contribute(&donor, &0u32, &10_000);
+
+    // The invocation's final event (after the token transfer's) is ours.
+    let last = env.events().all().last().unwrap();
+    assert_eq!(last.0, client.address);
+    let expected_topics: Vec<Val> =
+        (symbol_short!("contrib"), 0u32, donor.clone()).into_val(&env);
+    assert_eq!(last.1, expected_topics);
+    let data: i128 = last.2.try_into_val(&env).unwrap();
+    assert_eq!(data, 10_000);
 }
 
 #[test]
