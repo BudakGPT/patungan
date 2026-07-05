@@ -4,6 +4,15 @@
 # Never hardcode ids in source — this script is the only place they're minted (build-spec §11).
 set -euo pipefail
 
+# Fail fast with a legible message on a clean machine (instead of bash's mid-script
+# "command not found" after half the steps ran).
+for cmd in stellar cargo; do
+  command -v "$cmd" >/dev/null 2>&1 || {
+    echo "error: '$cmd' is required but not on PATH — see README 'Getting started'" >&2
+    exit 1
+  }
+done
+
 NETWORK="testnet"
 IDENTITY="${PATUNGAN_ADMIN_IDENTITY:-patungan-admin}"
 CONTRACT_DIR="contracts/patungan"

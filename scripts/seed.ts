@@ -7,7 +7,9 @@ import { execSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { Client, Keypair, contract } from "../frontend/src/contract/dist/index.js";
+// Import the bindings' TS source directly (tsx compiles it) — dist/ is git-ignored, so a
+// clean clone must not depend on it.
+import { Client, Keypair, contract } from "../frontend/src/contract/src/index.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = join(__dirname, "..", "frontend", ".env.local");
@@ -129,15 +131,17 @@ async function seedCohort(
   client: Client,
   networkPassphrase: string,
   state: SeedState,
-): Promise<void> {
+): Promise<number> {
   console.log(`==> Seeding ${label} (${donors.length} target) -> project ${projectId}`);
   let ok = 0;
+  let skipped = 0;
   for (const donor of donors) {
     if (!donor.funded) {
       donor.funded = await fundFriendbot(donor.address);
       saveState(state);
       if (!donor.funded) {
         console.warn(`   ${donor.address} could not be funded — skipping this run`);
+        skipped++;
         continue;
       }
     }
@@ -163,6 +167,7 @@ async function seedCohort(
     ok++;
   }
   console.log(`   ${label}: ${ok}/${donors.length} contributed this session`);
+  return skipped;
 }
 
 async function main() {
@@ -195,6 +200,22 @@ async function main() {
     state.whale = { secret: kp.secret(), address: kp.publicKey() };
   }
   saveState(state);
+
+  // 0. Live-demo wallet (§9): the presenter's own Freighter address must be in the
+  // verified registry or the on-stage contribute fails NotVerified. Idempotent, so it
+  // is safe (and cheap insurance) to pass DEMO_WALLET on every run.
+  const demoWallet = process.env.DEMO_WALLET;
+  if (demoWallet) {
+    console.log(`==> Verifying demo wallet ${demoWallet}`);
+    await invokeWithRetry(`register_verified(${demoWallet})`, () =>
+      client.register_verified({ who: demoWallet }),
+    );
+  } else {
+    console.warn(
+      "   NOTE: DEMO_WALLET not set — the live-demo Freighter address will NOT be verified.\n" +
+        "   Re-run with DEMO_WALLET=G... to enable the on-stage contribution.",
+    );
+  }
 
   // 1. Pool funding — driven off live chain state so re-runs never overfund.
   console.log("==> Checking pool");
@@ -233,9 +254,10 @@ async function main() {
   }
 
   // 3. Donor cohorts — leave the protagonist's own contribution for the live demo (§8).
-  await seedCohort("crowd", state.crowd, 0, SEED_CROWD_AMOUNT, client, networkPassphrase, state);
-  await seedCohort("mid", state.mids, 1, SEED_MID_AMOUNT, client, networkPassphrase, state);
-  await seedCohort("whale", [state.whale], 2, SEED_WHALE_AMOUNT, client, networkPassphrase, state);
+  let skipped = 0;
+  skipped += await seedCohort("crowd", state.crowd, 0, SEED_CROWD_AMOUNT, client, networkPassphrase, state);
+  skipped += await seedCohort("mid", state.mids, 1, SEED_MID_AMOUNT, client, networkPassphrase, state);
+  skipped += await seedCohort("whale", [state.whale], 2, SEED_WHALE_AMOUNT, client, networkPassphrase, state);
 
   // 4. Summary — lets the operator eyeball that the reveal will fire.
   console.log("\n==> Summary");
@@ -245,6 +267,12 @@ async function main() {
   }
   const preview = (await client.preview_matches()).result;
   console.log("   projected matches:", preview.map(([id, m]) => `#${id}=${m}`).join(", "));
+
+  // A half-seeded scenario must not look like a green run — resumable, so just re-run.
+  if (skipped > 0) {
+    console.error(`\n==> INCOMPLETE: ${skipped} donor(s) skipped (friendbot). Re-run to finish.`);
+    process.exitCode = 1;
+  }
 }
 
 main().catch((err) => {
