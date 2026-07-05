@@ -80,7 +80,7 @@ _None yet._
   `extern crate alloc` alone doesn't wire one up for that target). _(6c2e555)_
 - [x] 2.2 TS bindings generated into frontend/src/contract/ — **Gotcha:** frontend root has
   no package.json yet (4.1 not done), so verify ran as `npm install && npm run build` *inside*
-  `frontend/src/contract/` (its own generated tsconfig), not `cd frontend && tsc`. _(pending commit)_
+  `frontend/src/contract/` (its own generated tsconfig), not `cd frontend && tsc`. _(e7e5981)_
 
 ### Phase 3 — Seed script
 - [ ] 3.1 seed.ts (idempotent, rate-limit-tolerant, prints summary)
