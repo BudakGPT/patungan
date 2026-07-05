@@ -1,14 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { strings } from "@/strings";
 import { QueryState } from "@/components/QueryState";
-import { useProjects, useRound } from "@/lib/hooks";
-import { formatIDR } from "@/lib/format";
+import { RoundBanner } from "@/components/RoundBanner";
+import { ProjectCard } from "@/components/ProjectCard";
+import { useProjects, useRound, usePreviewMatch } from "@/lib/hooks";
 
 export default function LandingPage() {
   const round = useRound();
   const projects = useProjects();
+  const previewMatches = usePreviewMatch();
+
+  const matchByProjectId = new Map(
+    (previewMatches.data ?? []).map(([id, matched]) => [id, matched]),
+  );
+  const pool = round.data?.pool ?? BigInt(0);
 
   return (
     <main className="min-h-screen p-8">
@@ -16,30 +22,23 @@ export default function LandingPage() {
       <p className="mt-2 text-neutral-600">{strings.landing.subtitle}</p>
 
       <section className="mt-6">
-        <QueryState query={round}>
-          {(config) => (
-            <p className="text-sm text-neutral-700">
-              Pool {formatIDR(config.pool)} · {config.status.tag}
-            </p>
-          )}
-        </QueryState>
+        <RoundBanner />
       </section>
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2">
         <QueryState query={projects} isEmpty={(data) => data.length === 0}>
           {(data) =>
             data.map((project) => (
-              <Link
+              <ProjectCard
                 key={project.id}
-                href={`/project/${project.id}`}
-                className="rounded-lg border border-neutral-200 p-4 hover:border-neutral-400"
-              >
-                <p className="text-2xl">{project.emoji}</p>
-                <p className="mt-1 font-medium">{project.title}</p>
-                <p className="mt-1 text-sm text-neutral-600">
-                  {formatIDR(project.direct)} · {project.donor_count} pendukung
-                </p>
-              </Link>
+                project={project}
+                projectedMatch={
+                  previewMatches.data && previewMatches.data.length > 0
+                    ? (matchByProjectId.get(project.id) ?? BigInt(0))
+                    : undefined
+                }
+                pool={pool}
+              />
             ))
           }
         </QueryState>

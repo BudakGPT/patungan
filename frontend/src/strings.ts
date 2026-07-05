@@ -9,6 +9,17 @@ export const strings = {
   landing: {
     title: "Patungan",
     subtitle: "Urunan bersama, dicocokkan secara adil.",
+    poolLabel: "Dana padanan",
+    sponsorLabel: "Disponsori oleh",
+    sponsorName: "Pemprov Jawa Timur",
+    statusOpen: "Dibuka",
+    statusFinalized: "Selesai",
+    roundEndLabel: "Berakhir",
+    notInitialized: "Round belum dibuka",
+    waitingSponsor: "Menunggu sponsor",
+    donorCountSuffix: "pendukung",
+    projectedMatchLabel: "Proyeksi pencocokan",
+    noMatchYet: "—",
   },
   project: {
     backToLanding: "Kembali ke beranda",

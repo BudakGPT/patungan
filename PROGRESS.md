@@ -103,7 +103,9 @@ _None yet._
   preview_matches as expected) before committing. _(5b6c33d)_
 
 ### Phase 5 — Contributor flow
-- [ ] 5.1 Landing A1 + A2 (projected match)
+- [x] 5.1 Landing A1 + A2 — `RoundBanner` (pool/sponsor/status/round-end) + `ProjectCard`
+  (projected-match bar via `preview_matches`). Verified against live testnet: School 92.6M /
+  Garden 5.1M / Well 2.3M match, summing exactly to the 100M pool. _(pending commit)_
 - [ ] 5.2 ProjectDetail A3 + ContributeModal B2/B3
 
 ### Phase 6 — Operator
