@@ -97,7 +97,10 @@ _None yet._
   + `WalletButton` + `NetworkBanner` (E2) wired into `Header`/`providers.tsx`. **Gotcha:**
   `freighter-api` v6's `getAddress()` errors if the origin was never granted access — call
   `isAllowed()` first and only read the address when it's true, else silently stay idle. _(d27d9e3)_
-- [ ] 4.3 Contract client + read hooks + 4 UI states
+- [x] 4.3 Contract client + read hooks + 4 UI states. **Found pre-built from a prior
+  uncommitted iteration**; added missing `refetchInterval: 4000` (§6.2) to all 4 hooks,
+  verified live against deployed testnet contract (School 830000/50 donors dominates
+  preview_matches as expected) before committing. _(pending)_
 
 ### Phase 5 — Contributor flow
 - [ ] 5.1 Landing A1 + A2 (projected match)
