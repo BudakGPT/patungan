@@ -106,7 +106,9 @@ _None yet._
 - [x] 5.1 Landing A1 + A2 — `RoundBanner` (pool/sponsor/status/round-end) + `ProjectCard`
   (projected-match bar via `preview_matches`). Verified against live testnet: School 92.6M /
   Garden 5.1M / Well 2.3M match, summing exactly to the 100M pool. _(c298ce0)_
-- [ ] 5.2 ProjectDetail A3 + ContributeModal B2/B3
+- [x] 5.2 ProjectDetail A3 + ContributeModal B2/B3 — presets 10k/50k/100k, full tx UX,
+  optimistic `direct`/`donor_count` patch via `contributionTracker.ts` session-scoped
+  first-donor heuristic, `matched` never recomputed locally. _(pending commit)_
 
 ### Phase 6 — Operator
 - [ ] 6.1 /operator C1 gate + C2 fund + C3 finalize (+C4/C5)
