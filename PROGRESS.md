@@ -90,7 +90,9 @@ _None yet._
   assembled tx's sequence number may already be consumed. _(82f07e0)_
 
 ### Phase 4 — Frontend foundation
-- [ ] 4.1 Next.js (App Router)+TS+Tailwind scaffold; providers + config + formatIDR
+- [x] 4.1 Next.js (App Router)+TS+Tailwind scaffold; providers + config + formatIDR. **Found
+  pre-built from a prior uncommitted iteration** — verified `npm run build`/`npm run dev`
+  both pass (4 routes, HTTP 200) before committing. _(bdc9daa)_
 - [ ] 4.2 rpc + react-query + freighter + WalletButton + network guard
 - [ ] 4.3 Contract client + read hooks + 4 UI states
 
