@@ -87,7 +87,7 @@ _None yet._
   projected matches #0=92.6M vs #2=2.3M (crowd wins). **Gotcha:** testnet tx submission can
   throw `SendFailed`/`TRY_AGAIN_LATER` transiently (distinct from friendbot 429s) — added
   `invokeWithRetry` around every `signAndSend()`, rebuilding the tx each attempt since a stale
-  assembled tx's sequence number may already be consumed. _(pending commit)_
+  assembled tx's sequence number may already be consumed. _(82f07e0)_
 
 ### Phase 4 — Frontend foundation
 - [ ] 4.1 Next.js (App Router)+TS+Tailwind scaffold; providers + config + formatIDR
