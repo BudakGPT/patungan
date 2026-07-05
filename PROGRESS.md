@@ -1,10 +1,11 @@
 # Patungan — Build Progress (mutable loop log)
 
 > The build agent updates this file every iteration — it is **the only file the loop writes to**
-> (besides code). Loop protocol: [`ISSUE.md`](ISSUE.md). Task list: [`BACKLOG.md`](BACKLOG.md).
-> Frozen spec: [`docs/build-spec.md`](docs/build-spec.md). Format per task: check the box,
-> append the commit hash, and add a one-line note for any decision/workaround/blocker. Put
-> active BLOCKERs at the very top.
+> (besides code), and it is **re-read in full every iteration, so keep it lean.** Loop protocol:
+> [`ISSUE.md`](ISSUE.md). Task list: [`BACKLOG.md`](BACKLOG.md). Frozen spec (split by concern):
+> [`docs/build-spec/`](docs/build-spec/) — start at its `README.md`. Per task: check the box +
+> append the short commit hash + **≤2 lines** of note (only a gotcha a future iteration needs).
+> Put the detailed narrative in the **commit message**, not here. Active 🚧 BLOCKERs at the top.
 
 ## 🚧 Blockers (top priority — clear these first)
 _None yet._
@@ -40,93 +41,43 @@ _None yet._
   `direct` (+amount) and `donor_count` (+1 only for first-time donors) via
   `queryClient.setQueryData` on tx success, then invalidate to reconcile. `matched` is **never**
   computed locally (QF is non-linear, §5.2) — it refreshes from the poll / `preview_matches`.
+- 2026-07-05 — **IDR-stand-in token = wrapped native testnet XLM** (task 2.1), not a custom
+  issued asset. §4.4 says the QF math is decimal-agnostic regardless of the SAC's decimals, and
+  §8/§9 never require a custom issuer; wrapping native avoids issuer-account + trustline setup
+  for every seeded donor (§8's 50 crowd keypairs need funding either way via friendbot).
 
 ---
 
 ## Ledger status (mirrors BACKLOG.md — check boxes here, not there)
 
 ### Phase 0 — Scaffolding
-- [x] 0.1 PROGRESS.md + .gitignore — done during scaffold (also: README.md, justfile, module
-  dirs with .gitkeep, docs/ + prototype-arisan/ copied in). _(scaffold, pre-loop)_
-- [x] 0.2 Toolchain confirmed — `stellar 27.0.0`, `cargo 1.96.1` (Rust), `node v22.11.0`. All
-  print; nothing gated. _(61a88bd)_
+- [x] 0.1 PROGRESS.md + .gitignore + scaffold (README, justfile, module dirs, docs/ +
+  prototype-arisan/). _(scaffold, pre-loop)_
+- [x] 0.2 Toolchain confirmed — stellar 27.0.0, cargo 1.96.1, node v22.11.0. _(61a88bd)_
 
-### Phase 1 — Contract (THE GATE)
-- [x] 1.1 Fork arisan → contracts/patungan; builds — copied arisan crate verbatim (bar renames)
-  to `contracts/patungan/`; crate renamed `patungan`, struct `Arisan`→`Patungan`. `#![no_std]`
-  kept, deps match arisan (soroban-sdk 22.0.0). `cargo build` green (patungan v0.1.0 compiles).
-  Standalone crate (own `[profile.release]`), no root workspace. _(9b98bff)_
-- [x] 1.2 Types + DataKey + Error enum — replaced the arisan rotating-savings type layer
-  with the frozen §4 surface: `Config`(admin/token/round_end/status/pool), `RoundStatus`
-  {Open,Finalized}, `ProjectState` (§4.1); `DataKey` {Config, ProjectIds, Project, Donors,
-  Contribution, Verified} (§4.2); `#[contracterror] enum Error` with all 12 variants (§4.5).
-  Arisan `init`/`contribute`/`payout` + their tests removed — the real §4.3 entrypoints land in
-  1.4–1.6, new tests in 1.3/1.4/1.7. `#[contractimpl]` is intentionally empty for now.
-  `cargo build` green. _(f265e9b)_
-- [x] 1.3 qf.rs: isqrt + compute_matches (+ remainder rule) — tested — pure chain-free
-  `qf.rs`: `isqrt` (Newton, power-of-two over-estimate seed so `x+n/x` never overflows even at
-  `u128::MAX`), `project_weight` (`(Σ isqrt(cumulative_d))²`, sqrt-per-donor-total-once §5.2),
-  `compute_matches` (floor `pool·w/total`, largest-weight remainder rule §5.3, `NothingToMatch`
-  on total_weight==0). Checked arithmetic throughout (§5.5). Wired into `lib.rs` via `mod qf;`
-  (file was authored by a prior crashed iteration but never declared → not compiled; that was
-  the reconcile). 8 unit tests green incl. whale-vs-crowd pool conservation + remainder-to-
-  largest. `cargo test qf` → 8 passed. _(5df136a)_
-- [x] 1.4 init / register_verified / register_project / fund_pool — §4.3 setup entrypoints
-  land, all returning `Result<_, Error>` (no arisan-style panics). `init` (first caller
-  authorizes as admin; opens round, pool=0, empty `ProjectIds`; re-init→`AlreadyInitialized`),
-  `register_verified` (admin, idempotent set of `Verified(who)`), `register_project` (admin,
-  `DuplicateProject` guard, zeroed tallies, appended to `ProjectIds`), `fund_pool` (ANYONE +
-  `from.require_auth()`; `amount>0`→else `InvalidAmount`; `Open`→else `RoundNotOpen`; reused
-  arisan `token::Client::transfer` escrow into the contract; `pool+=amount`). Admin gate =
-  `config.admin.require_auth()` via `require_admin` helper (signatures carry no caller arg per
-  §4.3, so unauthorized callers are stopped by the auth framework — surfacing as an invoke
-  error, not `Error::NotAdmin`, which stays in the §4.5 set for the frontend message map).
-  `src/test.rs` created (home for 1.5–1.7 too): 7 tests — full setup path asserts token escrow
-  + stored state, idempotent re-verify, and rejections for AlreadyInitialized / DuplicateProject
-  / InvalidAmount(0 and −1) / RoundNotOpen (status forced Finalized in storage since `finalize`
-  is 1.6) / missing-admin-auth. `cargo test` → 15 passed (8 qf + 7 setup), no warnings. _(c8f0c83)_
-- [x] 1.5 contribute (cumulative per-donor tagging + rejections) — §4.3 round entrypoint:
-  `contribute(donor, project_id, amount)` with `donor.require_auth()`, all returning
-  `Result<_, Error>`. Reject order: `amount<=0`→`InvalidAmount`; `status!=Open`→`RoundClosed`;
-  `now>round_end`→`RoundClosed` (both closed conditions map to `RoundClosed` per §4.5/B2, distinct
-  from `fund_pool`'s `RoundNotOpen`); donor not in `Verified` registry→`NotVerified`; unknown
-  `Project(id)`→`UnknownProject`. On success: reused arisan `token::Client::transfer` escrow
-  donor→contract, then **cumulative per-donor** tagging (§5.2) — `Contribution(project_id,donor)
-  += amount`; a donor is NEW iff `prior==0` (safe since every contribution is `>0`, so a returning
-  donor always has `prior>0`), and only then is it pushed to `Donors(project_id)` and
-  `donor_count += 1`; `direct += amount` always. Tests (8 new, in `test.rs`): happy-path escrow +
-  direct/donor_count/Donors, **`same_donor_twice`** proving cumulative sum + single count (§5.2
-  crux), donor-across-two-projects counted in each (§5.6), and rejections for NotVerified /
-  UnknownProject / InvalidAmount(0,−1) / RoundClosed(Finalized) / RoundClosed(past round_end via
-  `env.ledger().set_timestamp`). `cargo test` → 23 passed (8 qf + 15 integration), no warnings.
-  _(6154d2c)_
-- [x] 1.6 finalize / disburse / views incl. preview_matches — §4.3 finalisation + read views.
-  `finalize` (admin; `AlreadyFinalized` if `status!=Open`; runs the QF split on live state,
-  writes each `ProjectState.matched`, flips `status=Finalized`; `NothingToMatch` short-circuits
-  BEFORE any write so a no-contribution round stays untouched + Open, §5.6). `disburse(id)`
-  (admin; `NotFinalized`/`UnknownProject`/`AlreadyDisbursed` guards; transfers `direct+matched`
-  contract→`payout` via the reused arisan transfer idiom; sets `disbursed`, so re-run is a
-  rejected no-op §10). Views `get_config`/`list_projects`/`get_project`/`is_verified`/
-  `preview_matches`. **Determinism (§10):** a single private `compute_matches_now` helper is the
-  ONE QF path — `finalize` persists it, `preview_matches` returns it — so they always agree; test
-  `finalize_writes_matches_and_preview_agrees` asserts preview==stored matched[] and `Σ==pool`.
-  8 new tests (finalize writes+preview-agrees, finalize-twice, NothingToMatch-stays-Open,
-  disburse pays direct+matched & drains escrow, disburse before-finalize/twice/unknown, views).
-  `cargo test` → 31 passed (8 qf + 23 integration), no warnings. _(a858037)_
-- [x] 1.7 Full cargo test green (§5.7 golden + §5.6 edge cases) — appended 3 integration tests
-  to `test.rs` closing every §5.6 row + the §5.7 proof at the **contract** level (qf.rs already
-  proved them at the pure-math level). `golden_whale_vs_crowd_crowd_wins_the_pool` drives the
-  real demo end-to-end: 100+10+1 verified donors `contribute` through the contract (all raise
-  Rp1jt direct, donor_count 100/10/1), then `finalize` — asserts School ≫ Garden ≫ Well, School
-  > 4/5·pool, Well < 2M, `Σ matched == pool` exactly, and `preview_matches` == stored matched[]
-  (§10 determinism). `zero_donor_project_gets_zero_match` (§5.6 row 1: empty project among active
-  ones → matched 0, no divide-by-zero, funded project takes whole pool). `finalize_assigns_
-  remainder_to_largest_weight` (§5.6 remainder row: pool 7, weights 4 & 1 → 6 & 1, dust to
-  largest). `cargo test` → **34 passed** (8 qf + 26 integration), no warnings. **Phase 1 GATE
-  closed.** _(cda264a)_
+### Phase 1 — Contract (THE GATE) — ✅ all green, gate closed
+> Full narrative for each is in the commit body; notes below keep only downstream-relevant gotchas.
+- [x] 1.1 Fork arisan → contracts/patungan; builds. **Standalone crate** (own
+  `[profile.release]`, no root workspace); struct `Arisan`→`Patungan`, soroban-sdk 22.0.0. _(9b98bff)_
+- [x] 1.2 Types + DataKey + Error enum — frozen §4 surface; all 12 §4.5 variants. _(f265e9b)_
+- [x] 1.3 qf.rs isqrt + compute_matches + remainder — pure/chain-free, checked arith (§5.5),
+  sqrt-per-donor-total-once (§5.2), wired via `mod qf`. _(5df136a)_
+- [x] 1.4 init/register_verified/register_project/fund_pool (§4.3 setup). **Gotcha for the
+  frontend:** the admin gate is `require_auth()`, so unauthorized calls surface as a Soroban
+  **invoke error, not `Error::NotAdmin`** (that variant stays in §4.5 for the message map). _(c8f0c83)_
+- [x] 1.5 contribute — cumulative per-donor tagging (§5.2), new-donor iff `prior==0`. Both
+  closed conditions → `RoundClosed` (distinct from fund_pool's `RoundNotOpen`). _(6154d2c)_
+- [x] 1.6 finalize/disburse/views + preview_matches — one private `compute_matches_now` path
+  (finalize persists it, preview returns it → always agree, §10). `preview_matches` maps
+  `NothingToMatch`→**empty vec** for the UI. _(a858037)_
+- [x] 1.7 Full suite green — §5.7 golden (crowd wins, `Σ matched==pool`) + all §5.6 edges.
+  **34 tests pass. Phase 1 GATE closed.** _(cda264a)_
 
 ### Phase 2 — Deploy & bindings
-- [ ] 2.1 deploy.sh → testnet, writes CONTRACT_ID + TOKEN_ID
+- [x] 2.1 deploy.sh → testnet, writes CONTRACT_ID + TOKEN_ID. **Toolchain gotcha:** stellar-cli
+  27 builds for `wasm32v1-none`, which needs `rustup target add wasm32v1-none` +
+  `soroban-sdk` `features = ["alloc"]` (else "no global memory allocator" — our manual
+  `extern crate alloc` alone doesn't wire one up for that target). _(PENDING_COMMIT)_
 - [ ] 2.2 TS bindings generated into frontend/src/contract/
 
 ### Phase 3 — Seed script
