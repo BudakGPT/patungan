@@ -93,7 +93,10 @@ _None yet._
 - [x] 4.1 Next.js (App Router)+TS+Tailwind scaffold; providers + config + formatIDR. **Found
   pre-built from a prior uncommitted iteration** — verified `npm run build`/`npm run dev`
   both pass (4 routes, HTTP 200) before committing. _(bdc9daa)_
-- [ ] 4.2 rpc + react-query + freighter + WalletButton + network guard
+- [x] 4.2 rpc.ts (Soroban `rpc.Server`) + `lib/freighter.ts` + `useWallet` (`lib/wallet.tsx`)
+  + `WalletButton` + `NetworkBanner` (E2) wired into `Header`/`providers.tsx`. **Gotcha:**
+  `freighter-api` v6's `getAddress()` errors if the origin was never granted access — call
+  `isAllowed()` first and only read the address when it's true, else silently stay idle. _(pending commit)_
 - [ ] 4.3 Contract client + read hooks + 4 UI states
 
 ### Phase 5 — Contributor flow

@@ -20,6 +20,15 @@ export const strings = {
     title: "Konsol Operator",
     gated: "Hubungkan wallet admin untuk mengakses konsol ini.",
   },
+  wallet: {
+    connect: "Hubungkan Wallet",
+    connecting: "Menghubungkan…",
+    notInstalled: "Pasang Freighter",
+    wrongNetworkPill: "Jaringan salah",
+    testnetPill: "Testnet",
+    wrongNetworkBanner:
+      "Freighter tidak terhubung ke Testnet. Alihkan jaringan di Freighter untuk melanjutkan.",
+  },
   loading: "Memuat…",
   empty: "Belum ada proyek",
   errorGeneric: "Terjadi kesalahan. Coba lagi.",
