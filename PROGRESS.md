@@ -77,7 +77,7 @@ _None yet._
 - [x] 2.1 deploy.sh → testnet, writes CONTRACT_ID + TOKEN_ID. **Toolchain gotcha:** stellar-cli
   27 builds for `wasm32v1-none`, which needs `rustup target add wasm32v1-none` +
   `soroban-sdk` `features = ["alloc"]` (else "no global memory allocator" — our manual
-  `extern crate alloc` alone doesn't wire one up for that target). _(PENDING_COMMIT)_
+  `extern crate alloc` alone doesn't wire one up for that target). _(6c2e555)_
 - [ ] 2.2 TS bindings generated into frontend/src/contract/
 
 ### Phase 3 — Seed script
