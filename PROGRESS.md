@@ -96,7 +96,7 @@ _None yet._
 - [x] 4.2 rpc.ts (Soroban `rpc.Server`) + `lib/freighter.ts` + `useWallet` (`lib/wallet.tsx`)
   + `WalletButton` + `NetworkBanner` (E2) wired into `Header`/`providers.tsx`. **Gotcha:**
   `freighter-api` v6's `getAddress()` errors if the origin was never granted access — call
-  `isAllowed()` first and only read the address when it's true, else silently stay idle. _(pending commit)_
+  `isAllowed()` first and only read the address when it's true, else silently stay idle. _(d27d9e3)_
 - [ ] 4.3 Contract client + read hooks + 4 UI states
 
 ### Phase 5 — Contributor flow
