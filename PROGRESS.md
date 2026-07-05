@@ -78,7 +78,9 @@ _None yet._
   27 builds for `wasm32v1-none`, which needs `rustup target add wasm32v1-none` +
   `soroban-sdk` `features = ["alloc"]` (else "no global memory allocator" — our manual
   `extern crate alloc` alone doesn't wire one up for that target). _(6c2e555)_
-- [ ] 2.2 TS bindings generated into frontend/src/contract/
+- [x] 2.2 TS bindings generated into frontend/src/contract/ — **Gotcha:** frontend root has
+  no package.json yet (4.1 not done), so verify ran as `npm install && npm run build` *inside*
+  `frontend/src/contract/` (its own generated tsconfig), not `cd frontend && tsc`. _(pending commit)_
 
 ### Phase 3 — Seed script
 - [ ] 3.1 seed.ts (idempotent, rate-limit-tolerant, prints summary)
