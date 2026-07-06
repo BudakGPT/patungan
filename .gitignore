@@ -34,3 +34,6 @@ ISSUE.md
 .DS_Store
 Thumbs.db
 *.log
+
+# Env backups (e.g. .env.local.stage-backup from demo staging) must never be committed
+frontend/.env.local.*

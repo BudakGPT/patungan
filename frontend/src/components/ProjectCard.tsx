@@ -10,11 +10,14 @@ export function ProjectCard({
   project,
   projectedMatch,
   pool,
+  finalized = false,
 }: {
   project: ProjectState;
   /** undefined = no projection yet (pre-contribution "—"), per preview_matches' empty-vec case. */
   projectedMatch: bigint | undefined;
   pool: bigint;
+  /** Post-finalize the match is no longer a projection — the label must say so. */
+  finalized?: boolean;
 }) {
   const pct =
     projectedMatch !== undefined && pool > 0n
@@ -33,7 +36,7 @@ export function ProjectCard({
       </p>
 
       <p className="mt-3 text-xs uppercase text-neutral-500">
-        {strings.landing.projectedMatchLabel}
+        {finalized ? strings.landing.finalMatchLabel : strings.landing.projectedMatchLabel}
       </p>
       <p className="text-sm font-medium">
         {projectedMatch === undefined ? strings.landing.noMatchYet : formatIDR(projectedMatch)}

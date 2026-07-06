@@ -9,7 +9,9 @@ import { useProjects, useRound, usePreviewMatch } from "@/lib/hooks";
 export default function LandingPage() {
   const round = useRound();
   const projects = useProjects();
-  const previewMatches = usePreviewMatch();
+  const isFinalized = round.data?.status.tag === "Finalized";
+  // Post-finalize each project's stored `matched` is authoritative — skip the simulation.
+  const previewMatches = usePreviewMatch(!isFinalized);
 
   const matchByProjectId = new Map(
     (previewMatches.data ?? []).map(([id, matched]) => [id, matched]),
@@ -33,11 +35,14 @@ export default function LandingPage() {
                 key={project.id}
                 project={project}
                 projectedMatch={
-                  previewMatches.data && previewMatches.data.length > 0
-                    ? (matchByProjectId.get(project.id) ?? 0n)
-                    : undefined
+                  isFinalized
+                    ? project.matched
+                    : previewMatches.data && previewMatches.data.length > 0
+                      ? (matchByProjectId.get(project.id) ?? 0n)
+                      : undefined
                 }
                 pool={pool}
+                finalized={isFinalized}
               />
             ))
           }

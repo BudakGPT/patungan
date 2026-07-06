@@ -47,11 +47,17 @@ export function useIsVerified(who: string | null) {
   });
 }
 
-/** Live projected QF split on current state; empty array pre-contribution (§10). */
-export function usePreviewMatch() {
+/**
+ * Live projected QF split on current state; empty array pre-contribution (§10).
+ * Pass `enabled: false` once the round is finalized — the stored `matched` is then
+ * authoritative and identical (§10 determinism), so re-simulating the split every 4s
+ * would be pure wasted RPC (it's the most expensive read in the app).
+ */
+export function usePreviewMatch(enabled = true) {
   return useQuery<Array<readonly [number, bigint]>>({
     queryKey: ["previewMatches"],
     queryFn: async () => (await contractClient.preview_matches()).result,
     refetchInterval: 4000,
+    enabled,
   });
 }

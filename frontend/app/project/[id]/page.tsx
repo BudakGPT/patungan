@@ -16,7 +16,9 @@ export default function ProjectDetailPage() {
 
   const project = useProject(id, isValidId);
   const round = useRound();
-  const previewMatches = usePreviewMatch();
+  const isFinalized = round.data?.status.tag === "Finalized";
+  // Post-finalize the stored `matched` is authoritative — skip the simulation.
+  const previewMatches = usePreviewMatch(!isFinalized);
   const [showModal, setShowModal] = useState(false);
 
   // Unknown/malformed id → not-found (the contract panics on an unknown id; a genuine
@@ -52,7 +54,9 @@ export default function ProjectDetailPage() {
   }
 
   const data = project.data;
-  const projectedMatch = previewMatches.data?.find(([pid]) => pid === id)?.[1];
+  const projectedMatch = isFinalized
+    ? data.matched
+    : previewMatches.data?.find(([pid]) => pid === id)?.[1];
   // Three-way CTA state: unknown (round still loading) renders the normal label disabled —
   // only a KNOWN closed round may claim "Round ditutup".
   const roundStatus = round.data?.status.tag;
@@ -72,7 +76,8 @@ export default function ProjectDetailPage() {
 
       <div className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
         <div>
-          <p className="text-xs uppercase text-neutral-500">{strings.landing.poolLabel}</p>
+          {/* This is the project's DIRECT raised total — not the matching pool. */}
+          <p className="text-xs uppercase text-neutral-500">{strings.project.raisedLabel}</p>
           <p className="text-xl font-semibold">{formatIDR(data.direct)}</p>
           <p className="text-sm text-neutral-600">
             {data.donor_count} {strings.landing.donorCountSuffix}
@@ -80,7 +85,7 @@ export default function ProjectDetailPage() {
         </div>
         <div>
           <p className="text-xs uppercase text-neutral-500">
-            {strings.landing.projectedMatchLabel}
+            {isFinalized ? strings.landing.finalMatchLabel : strings.landing.projectedMatchLabel}
           </p>
           <p className="text-xl font-semibold">
             {projectedMatch === undefined ? strings.landing.noMatchYet : formatIDR(projectedMatch)}

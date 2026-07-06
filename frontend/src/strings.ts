@@ -19,11 +19,13 @@ export const strings = {
     waitingSponsor: "Menunggu sponsor",
     donorCountSuffix: "pendukung",
     projectedMatchLabel: "Proyeksi pencocokan",
+    finalMatchLabel: "Pencocokan final",
     noMatchYet: "—",
   },
   project: {
     backToLanding: "Kembali ke beranda",
     notFound: "Proyek tidak ditemukan.",
+    raisedLabel: "Terkumpul",
     contributeCta: "Ikut urunan",
     roundClosedCta: "Round ditutup",
     stories: {
@@ -55,6 +57,7 @@ export const strings = {
   results: {
     title: "Hasil Pencocokan",
     notFinalized: "Round belum difinalisasi — berikut proyeksi pencocokan saat ini.",
+    projectLabel: "Proyek",
     directLabel: "Langsung",
     matchedLabel: "Pencocokan",
     totalLabel: "Total",
@@ -74,6 +77,16 @@ export const strings = {
       amountLabel: "Jumlah dana padanan",
       cta: "Kirim dana padanan",
       successTitle: "Dana padanan terkirim!",
+      invalidAmount: "Masukkan jumlah bulat positif.",
+    },
+    verify: {
+      heading: "Verifikasi alamat donatur",
+      description:
+        "Daftarkan wallet baru agar bisa ikut urunan — misalnya wallet juri yang ingin mencoba langsung.",
+      inputLabel: "Alamat wallet (G…)",
+      cta: "Verifikasi",
+      successTitle: "Alamat terverifikasi!",
+      invalidAddress: "Alamat Stellar tidak valid (diawali G, 56 karakter).",
     },
     finalize: {
       heading: "Finalisasi round",

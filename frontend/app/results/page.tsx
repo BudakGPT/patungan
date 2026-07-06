@@ -10,9 +10,9 @@ import { useProjects, useRound, usePreviewMatch } from "@/lib/hooks";
 export default function ResultsPage() {
   const round = useRound();
   const projects = useProjects();
-  const previewMatches = usePreviewMatch();
-
   const isFinalized = round.data?.status.tag === "Finalized";
+  // Post-finalize the stored `matched` is authoritative — stop re-simulating the split.
+  const previewMatches = usePreviewMatch(!isFinalized);
   const matchByProjectId = new Map(
     (previewMatches.data ?? []).map(([id, matched]) => [id, matched]),
   );
@@ -43,7 +43,7 @@ export default function ResultsPage() {
                   <table className="w-full min-w-[480px] border-collapse text-left text-sm">
                     <thead>
                       <tr className="border-b border-neutral-200 text-neutral-500">
-                        <th className="py-2 pr-4">{strings.landing.title}</th>
+                        <th className="py-2 pr-4">{strings.results.projectLabel}</th>
                         <th className="py-2 pr-4">{strings.results.directLabel}</th>
                         <th className="py-2 pr-4">{strings.results.matchedLabel}</th>
                         <th className="py-2 pr-4">{strings.results.totalLabel}</th>

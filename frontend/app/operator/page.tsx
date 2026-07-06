@@ -46,6 +46,13 @@ export default function OperatorPage() {
   const [finalizeTx, setFinalizeTx] = useState<TxState>({ phase: "idle" });
   const [confirmingFinalize, setConfirmingFinalize] = useState(false);
   const [disburseTx, setDisburseTx] = useState<Record<number, TxState>>({});
+  const [verifyAddress, setVerifyAddress] = useState("");
+  const [verifyTx, setVerifyTx] = useState<TxState>({ phase: "idle" });
+
+  // `BigInt(1.5)` throws and NaN slips past `<= 0`, so the guard must be an integer check —
+  // an invalid amount disables the button instead of surfacing a fake "transaction failed".
+  const fundAmountValid = Number.isSafeInteger(fundAmount) && fundAmount > 0;
+  const verifyAddressValid = /^G[A-Z2-7]{55}$/.test(verifyAddress.trim());
 
   // §6.3: loading/error before we even know the admin address.
   if (round.data === undefined) {
@@ -87,7 +94,7 @@ export default function OperatorPage() {
   const isFinalized = round.data.status.tag === "Finalized";
 
   async function submitFundPool() {
-    if (isPending(fundTx) || fundAmount <= 0) return;
+    if (isPending(fundTx) || !fundAmountValid) return;
     setFundTx({ phase: "awaiting-signature" });
     try {
       const assembled = await contractClient.fund_pool(
@@ -115,6 +122,39 @@ export default function OperatorPage() {
       setFundTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
     } catch (err) {
       setFundTx({ phase: "error", message: mapContractError(err, strings.operator.errors) });
+    }
+  }
+
+  // C5 · on-stage fallback for NotVerified: register any donor wallet live (e.g. a judge's,
+  // or the presenter's if the DEMO_WALLET seed step was skipped). Idempotent on-chain.
+  async function submitVerify() {
+    if (isPending(verifyTx) || !verifyAddressValid) return;
+    const who = verifyAddress.trim();
+    setVerifyTx({ phase: "awaiting-signature" });
+    try {
+      const assembled = await contractClient.register_verified(
+        { who },
+        { publicKey: address! },
+      );
+      const sent = await assembled.signAndSend({
+        signTransaction: freighterApi.signTransaction,
+        watcher: {
+          onSubmitted: () => setVerifyTx({ phase: "submitting" }),
+          onProgress: () => {},
+        },
+      });
+      if (sent.result.isErr()) {
+        setVerifyTx({
+          phase: "error",
+          message: mapContractError(sent.result.unwrapErr(), strings.operator.errors),
+        });
+        return;
+      }
+      // The E1 badge for this address (WalletButton/ContributeModal) flips on next poll.
+      void queryClient.invalidateQueries({ queryKey: ["isVerified", who] });
+      setVerifyTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
+    } catch (err) {
+      setVerifyTx({ phase: "error", message: mapContractError(err, strings.operator.errors) });
     }
   }
 
@@ -213,13 +253,19 @@ export default function OperatorPage() {
           </label>
           <button
             type="button"
-            disabled={isPending(fundTx) || !isOpen || fundAmount <= 0}
+            disabled={isPending(fundTx) || !isOpen || !fundAmountValid}
             onClick={() => void submitFundPool()}
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-60"
           >
             {txLabel(fundTx, strings.operator.fundPool.cta)}
           </button>
         </div>
+        {/* Nine-digit numbers are illegible on stage — echo the amount as formatted Rupiah. */}
+        <p className="mt-2 text-sm text-neutral-500">
+          {fundAmountValid
+            ? `= ${formatIDR(fundAmount)}`
+            : strings.operator.fundPool.invalidAmount}
+        </p>
         {!isOpen ? (
           <p className="mt-2 text-sm text-neutral-500">{strings.operator.errors.RoundNotOpen}</p>
         ) : null}
@@ -229,6 +275,47 @@ export default function OperatorPage() {
         {fundTx.phase === "success" ? (
           <p className="mt-2 text-sm text-emerald-700">
             {strings.operator.fundPool.successTitle} <ExplorerLink hash={fundTx.hash} />
+          </p>
+        ) : null}
+      </section>
+
+      {/* C5 · verify a donor address live (NotVerified fallback) */}
+      <section className="rounded-lg border border-neutral-200 p-4">
+        <h2 className="text-lg font-semibold">{strings.operator.verify.heading}</h2>
+        <p className="mt-1 text-sm text-neutral-600">{strings.operator.verify.description}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <label className="flex flex-col text-xs uppercase text-neutral-500">
+            {strings.operator.verify.inputLabel}
+            <input
+              type="text"
+              value={verifyAddress}
+              disabled={isPending(verifyTx)}
+              onChange={(e) => setVerifyAddress(e.target.value)}
+              placeholder="G…"
+              spellCheck={false}
+              className="mt-1 w-[30rem] max-w-full rounded-md border border-neutral-300 px-3 py-1.5 font-mono text-sm normal-case text-neutral-900 disabled:opacity-60"
+            />
+          </label>
+          <button
+            type="button"
+            disabled={isPending(verifyTx) || !verifyAddressValid}
+            onClick={() => void submitVerify()}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-60"
+          >
+            {txLabel(verifyTx, strings.operator.verify.cta)}
+          </button>
+        </div>
+        {verifyAddress.trim() !== "" && !verifyAddressValid ? (
+          <p className="mt-2 text-sm text-neutral-500">
+            {strings.operator.verify.invalidAddress}
+          </p>
+        ) : null}
+        {verifyTx.phase === "error" ? (
+          <p className="mt-2 text-sm text-red-600">{verifyTx.message}</p>
+        ) : null}
+        {verifyTx.phase === "success" ? (
+          <p className="mt-2 text-sm text-emerald-700">
+            {strings.operator.verify.successTitle} <ExplorerLink hash={verifyTx.hash} />
           </p>
         ) : null}
       </section>

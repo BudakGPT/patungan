@@ -58,6 +58,13 @@ live w/ Freighter (see cleared 9.1 blocker); README documents run/deploy/seed/de
   issued asset. §4.4 says the QF math is decimal-agnostic regardless of the SAC's decimals, and
   §8/§9 never require a custom issuer; wrapping native avoids issuer-account + trustline setup
   for every seeded donor (§8's 50 crowd keypairs need funding either way via friendbot).
+- 2026-07-06 — **Post-DONE senior review pass (frontend only, no contract change):** results
+  table header bug ("Patungan"→"Proyek"); operator fund input integer-guarded (`BigInt(1.5)`
+  threw) + live Rp echo; **C5 verify-address form added to /operator** (on-stage NotVerified
+  fallback, e.g. a judge's wallet); `preview_matches` polling disabled post-finalize (stored
+  `matched` is authoritative, §10); "Proyeksi"→"Pencocokan final" labels + ProjectDetail's
+  direct total relabeled "Terkumpul" (was wrongly "Dana padanan"); `.gitignore` catches
+  `frontend/.env.local.*` backups.
 - 2026-07-06 — **Critique-driven hardening (see `critique.md`), contract redeployed.** (a) New
   `DataKey::SumSqrt(u32)`: `contribute` maintains a running Σ√(per-donor cumulative), so
   `finalize`/`preview_matches` read O(projects) entries — a 56-donor finalize no longer risks
