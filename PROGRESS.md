@@ -7,6 +7,12 @@
 > append the short commit hash + **≤2 lines** of note (only a gotcha a future iteration needs).
 > Put the detailed narrative in the **commit message**, not here. Active 🚧 BLOCKERs at the top.
 
+## ✅ DONE (2026-07-06) — all BACKLOG boxes checked; §12 Definition of Done holds
+Contract `cargo test` 36 green (§5.7 golden + §5.6 edges); deployed to testnet, `get_config`
+returns state; bindings typecheck; `npm run build` clean (6 routes); §9 demo dry-run passed
+live w/ Freighter (see cleared 9.1 blocker); README documents run/deploy/seed/demo;
+`frontend/.env.local` git-ignored; repo builds from clean checkout. **Loop finished — stop.**
+
 ## 🚧 Blockers (top priority — clear these first)
 - _(none)_ — 9.1's human-signature blocker is CLEARED (2026-07-06). Presenter completed the
   full §9 browser dry-run with Freighter: steps 5/6/7 (finalise + results reveal + disburse)
@@ -146,4 +152,6 @@
 - [x] 9.1 §9 demo script passes end-to-end on testnet. Human browser dry-run w/ Freighter:
   contribute+sign on stage, finalise/results/disburse on throwaway. All 7 steps green.
   _(verification = human dry-run, no code artifact; see cleared blocker above)_
-- [ ] 9.2 README run/deploy/seed/demo; clean-checkout build
+- [x] 9.2 README run/deploy/seed/demo; clean-checkout build. Added a **Running the demo** (§9
+  7-step) section + env block; noted `docs/` are git-ignored scaffolding (dead in a fresh
+  clone). Verified: `cargo test` 36 green, `npm run build` clean, `.env.local` git-ignored. _(<hash>)_

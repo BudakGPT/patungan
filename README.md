@@ -4,8 +4,8 @@
 > village projects, and a sponsor's matching pool is split by **Quadratic Funding** so the
 > project backed by *the most people* wins the biggest match, not the one backed by one whale.
 >
-> **Status:** 🚧 in build. Monorepo scaffold. See [`docs/build-prd.md`](docs/build-prd.md) for
-> the full build spec and [`PROGRESS.md`](PROGRESS.md) for live progress.
+> **Status:** ✅ complete — contract (36 tests green) + frontend (`next build` clean) + deploy/
+> seed scripts, all live on Stellar **Testnet**. See [`PROGRESS.md`](PROGRESS.md) for the build log.
 >
 > APAC Stellar Hackathon · Payment & Consumer Applications · Stellar **Testnet**.
 
@@ -62,6 +62,44 @@ just dev                    # Next.js dev server
 (If you don't have [`just`](https://github.com/casey/just), open the `justfile` and run the
 underlying commands directly.)
 
+### Environment
+
+`scripts/deploy.sh` writes `frontend/.env.local` for you (git-ignored — never committed). It
+holds the Testnet wiring the client reads via `process.env.NEXT_PUBLIC_*`:
+
+```
+NEXT_PUBLIC_NETWORK=TESTNET
+NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+NEXT_PUBLIC_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
+NEXT_PUBLIC_CONTRACT_ID=<written by deploy.sh>
+NEXT_PUBLIC_TOKEN_ID=<the IDR-stand-in SAC address>
+NEXT_PUBLIC_EXPLORER_BASE=https://stellar.expert/explorer/testnet
+NEXT_PUBLIC_ADMIN_ADDRESS=<the operator public key>
+```
+
+## Running the demo
+
+The whole product is one ~10-second reveal: a matching pool splits so the project backed by
+*the most people* wins the biggest match, not the one backed by one whale. After `just deploy`
++ `just seed` + `just dev`, walk the seven steps below (the app's end-to-end acceptance flow):
+
+1. **Landing `/`** — pool shows *Rp100.000.000 · Pemprov Jawa Timur*, status **Open**, three
+   projects with live tallies: School ~50 pendukung, Well 1 donatur, both ~Rp1jt terkumpul.
+2. **Open School** (`/project/0`) and read the story.
+3. **Connect Freighter** as the protagonist — the `DEMO_WALLET` you seeded, a pre-verified PMI
+   address. The **✓ Terverifikasi** badge appears.
+4. **Chip in Rp50rb** to School → sign in Freighter → success toast + Stellar Expert link;
+   School's *pendukung* count ticks up live (optimistic, then reconciled from chain).
+5. **Go to `/operator`** as the admin wallet (`NEXT_PUBLIC_ADMIN_ADDRESS`) → click **Finalise**
+   → confirm. *(Finalise is one-way — do it live during the reveal, not in rehearsal.)*
+6. **`/results`** — the match-curve animates: School's matched bar dwarfs Well's, and the
+   caption lands: *"Dana padanan mengikuti jumlah orang, bukan jumlah uang."*
+7. *(optional)* **Disburse** from the operator console → each project shows paid out, with
+   explorer links proving the on-chain transfer.
+
+The presenter wallet **must be verified** before step 4, or the contribution is rejected
+(`NotVerified`); pass it as `DEMO_WALLET=G...` to `just seed`, which registers it.
+
 ## Known limitations (hackathon scope — deliberate, not oversights)
 
 - **`init` is not front-run-proof.** Deploy and `init` are two transactions; in a hostile
@@ -80,8 +118,12 @@ underlying commands directly.)
 
 ## Docs
 
-- [`docs/build-prd.md`](docs/build-prd.md) — **the build spec** (frozen; the source of truth
-  for what to build and how to verify it).
-- [`docs/prd.md`](docs/prd.md) — the product PRD (problem, mechanism, scope, decisions).
-- [`docs/quadratic-funding.md`](docs/quadratic-funding.md) — the QF mechanism deep-dive.
-- [`docs/pitch-deck-outline.md`](docs/pitch-deck-outline.md) — the pitch narrative.
+The design/planning docs (`docs/`, `BACKLOG.md`, `ISSUE.md`, `prototype-arisan/`) are **local
+build scaffolding, deliberately git-ignored** — they are not part of a fresh clone. If you have
+the full working repo they're the source of truth:
+
+- `docs/build-spec/` — **the build spec** (frozen; what to build and how to verify it), split by
+  concern; start at its `README.md`.
+- `docs/prd.md` — the product PRD (problem, mechanism, scope, decisions).
+- `docs/quadratic-funding.md` — the QF mechanism deep-dive.
+- `docs/pitch-deck-outline.md` — the pitch narrative.
