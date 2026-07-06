@@ -45,6 +45,14 @@ _None yet._
   issued asset. §4.4 says the QF math is decimal-agnostic regardless of the SAC's decimals, and
   §8/§9 never require a custom issuer; wrapping native avoids issuer-account + trustline setup
   for every seeded donor (§8's 50 crowd keypairs need funding either way via friendbot).
+- 2026-07-06 — **Critique-driven hardening (see `critique.md`), contract redeployed.** (a) New
+  `DataKey::SumSqrt(u32)`: `contribute` maintains a running Σ√(per-donor cumulative), so
+  `finalize`/`preview_matches` read O(projects) entries — a 56-donor finalize no longer risks
+  the per-tx ledger-read footprint (verified: real finalize+disburse landed on a throwaway
+  deploy). (b) Events on fund/contrib/match/final/payout. (c) Checked arithmetic on all tallies.
+  (d) Frontend/seed import the bindings' **TS source** (`src/contract/src`), never git-ignored
+  `dist/` — clean clones build. (e) `seed.ts` takes `DEMO_WALLET` to verify the presenter's
+  Freighter address. New CONTRACT_ID in `frontend/.env.local`; reseed from kept keypairs.
 
 ---
 

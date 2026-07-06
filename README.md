@@ -41,24 +41,42 @@ patungan/
 
 ## Getting started
 
-Prerequisites: `rustup` + `wasm32-unknown-unknown` target, `stellar-cli`, Node 18+. The
-toolchain runbook lives in [`prototype-arisan/README.md`](prototype-arisan/README.md).
+Prerequisites: `rustup` + `wasm32v1-none` target (`rustup target add wasm32v1-none`),
+`stellar-cli` ≥ 27, Node 18+.
 
 ```bash
 # contract
 just contract-test          # cargo test (the QF math + whale-vs-crowd golden test)
 just deploy                 # build wasm, deploy to testnet, write ids into frontend/.env.local
+just bindings               # regenerate frontend/src/contract/ bindings from the deployed contract
 
-# demo data
-just seed                   # seed the demo scenario on testnet
+# demo data — DEMO_WALLET is the Freighter address you'll contribute from on stage;
+# it MUST be verified or the live contribution is rejected (NotVerified).
+DEMO_WALLET=G... just seed  # seed the demo scenario on testnet (idempotent, resumable)
 
-# frontend
+# frontend — imports the bindings' TS source directly; no extra bindings build step needed
 cd frontend && npm install
-just dev                    # vite dev server
+just dev                    # Next.js dev server
 ```
 
 (If you don't have [`just`](https://github.com/casey/just), open the `justfile` and run the
 underlying commands directly.)
+
+## Known limitations (hackathon scope — deliberate, not oversights)
+
+- **`init` is not front-run-proof.** Deploy and `init` are two transactions; in a hostile
+  environment someone could `init` first and own the contract. `scripts/deploy.sh` runs them
+  back-to-back on testnet; production would set the admin atomically in a constructor.
+- **No refund/cancel path.** Escrowed funds only leave via `disburse` after `finalize`. If a
+  round were never finalized, contributions and pool would stay locked. `fund_pool` also
+  checks only round *status*, not `round_end` — a sponsor can still top up after the deadline
+  until finalize.
+- **Storage TTL is unmanaged.** Persistent entries live well past the hackathon window on
+  testnet defaults, but nothing calls `extend_ttl` — a months-idle deployment would need
+  re-seeding (or TTL bumps) before reuse.
+- **QF weights are aggregated incrementally on-chain** (`contribute` maintains a running
+  Σ√cumulative per project), so `finalize`/`preview_matches` read O(projects) ledger entries
+  — the tx footprint is crowd-size-independent by construction.
 
 ## Docs
 
