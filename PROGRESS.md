@@ -128,7 +128,7 @@ _None yet._
 ### Phase 7 — Reveal
 - [x] 7.1 /results D1 table + D2 `MatchCurve` (framer-motion) + D3 verdict caption. **Gotcha:**
   `framer-motion` wasn't a dependency yet — added it; pre-finalize the page falls back to
-  `preview_matches` (not a broken/empty screen) so §7 D1's edge case holds. _(pending commit)_
+  `preview_matches` (not a broken/empty screen) so §7 D1's edge case holds. _(5f7ec6e)_
 
 ### Phase 8 — Trust polish
 - [ ] 8.1 VerifiedBadge + ExplorerLinks + strings.ts sweep
