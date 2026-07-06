@@ -126,7 +126,9 @@ _None yet._
   state, matching 5.2's precedent for write paths needing a real signature. _(36ab2e9)_
 
 ### Phase 7 — Reveal
-- [ ] 7.1 /results D1 + D2 match-curve + D3 caption
+- [x] 7.1 /results D1 table + D2 `MatchCurve` (framer-motion) + D3 verdict caption. **Gotcha:**
+  `framer-motion` wasn't a dependency yet — added it; pre-finalize the page falls back to
+  `preview_matches` (not a broken/empty screen) so §7 D1's edge case holds. _(pending commit)_
 
 ### Phase 8 — Trust polish
 - [ ] 8.1 VerifiedBadge + ExplorerLinks + strings.ts sweep

@@ -54,6 +54,13 @@ export const strings = {
   },
   results: {
     title: "Hasil Pencocokan",
+    notFinalized: "Round belum difinalisasi — berikut proyeksi pencocokan saat ini.",
+    directLabel: "Langsung",
+    matchedLabel: "Pencocokan",
+    totalLabel: "Total",
+    donorSuffix: "donatur",
+    verdict: "Dana padanan mengikuti jumlah orang, bukan jumlah uang.",
+    hook: "Satu donatur besar vs banyak donatur kecil — lihat siapa yang menang.",
   },
   operator: {
     title: "Konsol Operator",
