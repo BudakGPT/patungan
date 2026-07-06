@@ -24,11 +24,13 @@ scripts/.keys/
 # The Ralph loop reads these from disk, not git, so untracking them is safe.
 # NOTE: scripts/ and PROGRESS.md are deliberately NOT ignored — the loop commits
 # to them (deploy.sh/seed.ts + per-iteration progress) and a clone needs them.
-docs/
+# docs/
 prototype-arisan/
 ralph/
-BACKLOG.md
-ISSUE.md
+# BACKLOG.md
+# ISSUE.md
+# critique.md
+# PROGRESS.md
 
 # ---- OS / editor ----
 .DS_Store
