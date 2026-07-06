@@ -114,6 +114,17 @@ export const strings = {
       "Freighter tidak terhubung ke Testnet. Alihkan jaringan di Freighter untuk melanjutkan.",
     connectFailed: "Gagal menghubungkan wallet. Coba lagi.",
   },
+  verified: {
+    yes: "✓ Terverifikasi",
+    no: "Belum terverifikasi",
+  },
+  explorer: {
+    viewTx: "Lihat transaksi di Explorer",
+    viewContract: "Lihat kontrak di Explorer",
+  },
+  footer: {
+    transparency: "Setiap aksi tercatat on-chain di Stellar Testnet.",
+  },
   loading: "Memuat…",
   empty: "Belum ada proyek",
   errorGeneric: "Terjadi kesalahan. Coba lagi.",

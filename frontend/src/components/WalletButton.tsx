@@ -2,6 +2,7 @@
 
 import { useWallet } from "@/lib/wallet";
 import { strings } from "@/strings";
+import { VerifiedBadge } from "./VerifiedBadge";
 
 function truncate(address: string): string {
   return `${address.slice(0, 4)}…${address.slice(-4)}`;
@@ -46,6 +47,7 @@ export function WalletButton() {
   const isWrongNetwork = status === "wrong-network";
   return (
     <div className="flex items-center gap-2">
+      {address ? <VerifiedBadge address={address} /> : null}
       <span
         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
           isWrongNetwork

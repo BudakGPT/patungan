@@ -10,9 +10,9 @@ import { useWallet } from "@/lib/wallet";
 import { useRound, useProjects } from "@/lib/hooks";
 import { mapContractError } from "@/lib/errors";
 import { formatIDR } from "@/lib/format";
-import { config as env } from "@/lib/config";
 import { strings } from "@/strings";
 import { QueryState } from "@/components/QueryState";
+import { ExplorerLink } from "@/components/ExplorerLink";
 
 const DEFAULT_POOL_AMOUNT = 100_000_000;
 
@@ -31,20 +31,6 @@ function txLabel(tx: TxState, idleLabel: string): string {
   if (tx.phase === "awaiting-signature") return strings.operator.awaitingSignature;
   if (tx.phase === "submitting") return strings.operator.submitting;
   return idleLabel;
-}
-
-function ExplorerLink({ hash }: { hash: string }) {
-  if (!hash) return null;
-  return (
-    <a
-      href={`${env.explorerBase}/tx/${hash}`}
-      target="_blank"
-      rel="noreferrer"
-      className="underline underline-offset-2"
-    >
-      {strings.operator.viewOnExplorer}
-    </a>
-  );
 }
 
 /** C1–C4 · gated operator console: fund pool, finalise, disburse (§7 Epic C). */

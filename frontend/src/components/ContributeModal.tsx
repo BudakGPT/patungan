@@ -7,10 +7,11 @@ import type { ProjectState } from "@/contract/src";
 import { contractClient } from "@/lib/contract";
 import { useWallet } from "@/lib/wallet";
 import { formatIDR } from "@/lib/format";
-import { config } from "@/lib/config";
 import { strings } from "@/strings";
 import { hasContributed, markContributed } from "@/lib/contributionTracker";
 import { mapContractError } from "@/lib/errors";
+import { ExplorerLink } from "./ExplorerLink";
+import { VerifiedBadge } from "./VerifiedBadge";
 
 const PRESETS = [10_000, 50_000, 100_000] as const;
 
@@ -117,25 +118,21 @@ export function ContributeModal({
         tabIndex={-1}
         className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl outline-none"
       >
-        <h2 id="contribute-title" className="text-lg font-semibold">
-          {strings.contribute.title} {projectTitle}
-        </h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 id="contribute-title" className="text-lg font-semibold">
+            {strings.contribute.title} {projectTitle}
+          </h2>
+          {address ? <VerifiedBadge address={address} /> : null}
+        </div>
 
         {!canWrite ? (
           <p className="mt-4 text-sm text-neutral-600">{strings.contribute.connectFirst}</p>
         ) : tx.phase === "success" ? (
           <div className="mt-4 space-y-3">
             <p className="text-emerald-700">{strings.contribute.successTitle}</p>
-            {tx.hash ? (
-              <a
-                href={`${config.explorerBase}/tx/${tx.hash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="block text-sm underline underline-offset-2"
-              >
-                {strings.contribute.viewOnExplorer}
-              </a>
-            ) : null}
+            <p className="text-sm">
+              <ExplorerLink hash={tx.hash} label={strings.contribute.viewOnExplorer} />
+            </p>
           </div>
         ) : (
           <div className="mt-4 space-y-4">

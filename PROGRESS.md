@@ -131,7 +131,9 @@ _None yet._
   `preview_matches` (not a broken/empty screen) so §7 D1's edge case holds. _(5f7ec6e)_
 
 ### Phase 8 — Trust polish
-- [ ] 8.1 VerifiedBadge + ExplorerLinks + strings.ts sweep
+- [x] 8.1 VerifiedBadge (E1, `useIsVerified` hook) in Header+ContributeModal; shared
+  `ExplorerLink`/`ContractExplorerLink` (F1) replacing operator's local copy + modal inline link;
+  footer contract link in layout. Sweep clean — components already used `strings.*`. _(<hash>)_
 
 ### Phase 9 — End-to-end
 - [ ] 9.1 §9 demo script passes end-to-end on testnet

@@ -37,6 +37,16 @@ export function useProject(id: number, enabled = true) {
   });
 }
 
+/** Whether `who` is in the verified-address registry (§4.3) — powers the E1 badge. */
+export function useIsVerified(who: string | null) {
+  return useQuery<boolean>({
+    queryKey: ["isVerified", who],
+    queryFn: async () => (await contractClient.is_verified({ who: who! })).result,
+    enabled: !!who,
+    refetchInterval: 4000,
+  });
+}
+
 /** Live projected QF split on current state; empty array pre-contribution (§10). */
 export function usePreviewMatch() {
   return useQuery<Array<readonly [number, bigint]>>({
