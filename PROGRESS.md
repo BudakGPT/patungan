@@ -8,17 +8,14 @@
 > Put the detailed narrative in the **commit message**, not here. Active 🚧 BLOCKERs at the top.
 
 ## 🚧 Blockers (top priority — clear these first)
-- 🚧 **9.1 needs a human Freighter signature — autonomous loop cannot finish it.** §9 steps
-  3/4/5/7 (connect + sign contribute + sign finalize + sign disburse) require a browser +
-  Freighter holding the protagonist/admin keys; the loop has no browser wallet. **De-risked
-  autonomously this iteration (all green):** `npm run build` passes (5 routes); live testnet
-  reads correct — `get_config` = pool 100M/Open/admin==env, `list_projects` = School 50 /
-  Garden 5 / Well 1 donatur (§9 step1), `preview_matches` = School 91.76M ≫ Well 3.67M summing
-  **exactly** to 100M pool (§9 step6 reveal fires); all 4 routes serve HTTP 200, `/` renders
-  chrome (no white-screen). **Human to do (the actual dry-run):** `cd frontend && npm run dev`,
-  then walk §9 in a browser with Freighter. ⚠ **Finalise is destructive** — it ends the live
-  Open round; rehearse finalize/results on a throwaway deploy, or let step5 happen live on
-  stage. Unblock = presenter completes the browser dry-run; then check 9.1.
+- _(none)_ — 9.1's human-signature blocker is CLEARED (2026-07-06). Presenter completed the
+  full §9 browser dry-run with Freighter: steps 5/6/7 (finalise + results reveal + disburse)
+  rehearsed on a **throwaway deploy** (`CBSSEQ3C…F3XZA`, admin `patungan-admin`); steps 3/4
+  (connect → "✓ Terverifikasi" → chip in Rp50rb → sign → success toast) confirmed live on the
+  **stage** contract (`CATB7Q7T…CTL3`, still Open, pool 100M). Demo wallet
+  `GAXJL7P7…BE3G6Q` verified on stage (`is_verified=true`). ⚠ Stage tallies drifted to School
+  51 donatur / match ~Rp92.4M (was 50 / 91.77M) — still sums **exactly** to 100M; reveal fires.
+  ⚠ **Finalise is still destructive** — do the real stage finalise live during the reveal only.
 
 ## 🧭 Decisions log (choices made where the spec was silent)
 - 2026-07-04 — **Monorepo** at repo root `patungan/` (contract + frontend + scripts), one git
@@ -146,5 +143,7 @@
   footer contract link in layout. Sweep clean — components already used `strings.*`. _(bceb1b2)_
 
 ### Phase 9 — End-to-end
-- [ ] 9.1 §9 demo script passes end-to-end on testnet
+- [x] 9.1 §9 demo script passes end-to-end on testnet. Human browser dry-run w/ Freighter:
+  contribute+sign on stage, finalise/results/disburse on throwaway. All 7 steps green.
+  _(verification = human dry-run, no code artifact; see cleared blocker above)_
 - [ ] 9.2 README run/deploy/seed/demo; clean-checkout build
