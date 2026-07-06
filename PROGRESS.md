@@ -154,4 +154,4 @@ live w/ Freighter (see cleared 9.1 blocker); README documents run/deploy/seed/de
   _(verification = human dry-run, no code artifact; see cleared blocker above)_
 - [x] 9.2 README run/deploy/seed/demo; clean-checkout build. Added a **Running the demo** (§9
   7-step) section + env block; noted `docs/` are git-ignored scaffolding (dead in a fresh
-  clone). Verified: `cargo test` 36 green, `npm run build` clean, `.env.local` git-ignored. _(<hash>)_
+  clone). Verified: `cargo test` 36 green, `npm run build` clean, `.env.local` git-ignored. _(78d8164)_
