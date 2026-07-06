@@ -119,7 +119,11 @@ _None yet._
   first-donor heuristic, `matched` never recomputed locally. _(f1f0ad7)_
 
 ### Phase 6 — Operator
-- [ ] 6.1 /operator C1 gate + C2 fund + C3 finalize (+C4/C5)
+- [x] 6.1 /operator C1 gate + C2 fund + C3 finalize + C4 disburse. **Gotcha:** didn't run
+  finalize against the live demo contract to verify (would end the presenter's Open round
+  prematurely) — verified gate logic against read-only `get_config` (admin matches
+  `NEXT_PUBLIC_ADMIN_ADDRESS`, status still `Open`) + `npm run build`/dev-server SSR loading
+  state, matching 5.2's precedent for write paths needing a real signature. _(pending commit)_
 
 ### Phase 7 — Reveal
 - [ ] 7.1 /results D1 + D2 match-curve + D3 caption

@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import freighterApi from "@stellar/freighter-api";
-import { Errors, type ProjectState } from "@/contract/src";
+import type { ProjectState } from "@/contract/src";
 import { contractClient } from "@/lib/contract";
 import { useWallet } from "@/lib/wallet";
 import { formatIDR } from "@/lib/format";
 import { config } from "@/lib/config";
 import { strings } from "@/strings";
 import { hasContributed, markContributed } from "@/lib/contributionTracker";
+import { mapContractError } from "@/lib/errors";
 
 const PRESETS = [10_000, 50_000, 100_000] as const;
 
@@ -20,29 +21,8 @@ type TxState =
   | { phase: "success"; hash: string }
   | { phase: "error"; message: string };
 
-/**
- * Maps a failure to Bahasa copy (§7 B2 edge cases). Contract rejections surface two ways:
- * an on-chain `result.isErr()` carries the bare variant name ("NotVerified"), but most
- * rejections fail at SIMULATION time and are thrown as raw SDK strings embedding
- * `Error(Contract, #N)` — extract the code and translate via the bindings' `Errors` map.
- * Never render raw internals: unknown failures fall back to the generic message.
- */
 function mapError(err: unknown): string {
-  const raw =
-    err && typeof err === "object" && "message" in err
-      ? String((err as { message: unknown }).message)
-      : String(err);
-  if (/reject|declin|cancel/i.test(raw)) return strings.contribute.errors.rejected;
-  if (strings.contribute.errors[raw]) return strings.contribute.errors[raw];
-  const code = raw.match(/Error\(Contract, #(\d+)\)/)?.[1];
-  const variant = code
-    ? (Errors as Record<number, { message: string }>)[Number(code)]?.message
-    : undefined;
-  if (variant && strings.contribute.errors[variant]) {
-    return strings.contribute.errors[variant];
-  }
-  console.error("contribute failed:", raw);
-  return strings.contribute.errors.generic;
+  return mapContractError(err, strings.contribute.errors);
 }
 
 /** B2/B3 · preset chip-in + full tx UX (§6.4) + required optimistic cache patch (§6.2). */
