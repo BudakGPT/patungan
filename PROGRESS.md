@@ -123,7 +123,7 @@ _None yet._
   finalize against the live demo contract to verify (would end the presenter's Open round
   prematurely) — verified gate logic against read-only `get_config` (admin matches
   `NEXT_PUBLIC_ADMIN_ADDRESS`, status still `Open`) + `npm run build`/dev-server SSR loading
-  state, matching 5.2's precedent for write paths needing a real signature. _(pending commit)_
+  state, matching 5.2's precedent for write paths needing a real signature. _(36ab2e9)_
 
 ### Phase 7 — Reveal
 - [ ] 7.1 /results D1 + D2 match-curve + D3 caption
