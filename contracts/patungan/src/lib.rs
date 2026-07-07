@@ -490,4 +490,497 @@ impl Patungan {
         }
         Ok(())
     }
+
+    // ---------- round lifecycle + continuous donation ----------
+
+    /// Open a new matching round ("season"). **Admin only.** Enforces the **at-most-one-open**
+    /// invariant (`RoundAlreadyOpen`) so QF settles over one clean snapshot. `sponsor` is recorded
+    /// metadata (the institution the pool is credited to); `categories` scopes which campaigns the
+    /// round matches (EMPTY = all). Assigns `NextRoundId++`, `pool = 0`, status `Open`; appends to
+    /// `RoundIds`. Emit `("roundopen", id)`.
+    pub fn open_round(
+        env: Env,
+        sponsor: Address,
+        round_end: u64,
+        categories: Vec<Category>,
+    ) -> Result<u32, Error> {
+        require_admin(&env)?;
+        if find_open_round(&env).is_some() {
+            return Err(Error::RoundAlreadyOpen);
+        }
+
+        let id: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::NextRoundId)
+            .unwrap_or(0);
+        env.storage().instance().set(&DataKey::NextRoundId, &(id + 1));
+
+        let round = RoundState {
+            id,
+            sponsor,
+            pool: 0,
+            status: RoundStatus::Open,
+            round_end,
+            categories,
+        };
+        put(&env, &DataKey::Round(id), &round);
+
+        let mut ids: Vec<u32> = env
+            .storage()
+            .instance()
+            .get(&DataKey::RoundIds)
+            .unwrap_or(Vec::new(&env));
+        ids.push_back(id);
+        env.storage().instance().set(&DataKey::RoundIds, &ids);
+        bump_instance(&env);
+
+        env.events().publish((symbol_short!("roundopen"), id), ());
+        Ok(id)
+    }
+
+    /// Fund an `Open` round's matching pool. `from` must authorize, give `amount > 0`, and hold the
+    /// `Institution` tier (`TierTooLow`) — pool funders are the KYC-heavy role. Escrows the
+    /// tokens into the contract and grows `round.pool`. Emit `("fund", round_id, from)`.
+    pub fn fund_pool(env: Env, from: Address, round_id: u32, amount: i128) -> Result<(), Error> {
+        from.require_auth();
+        if amount <= 0 {
+            return Err(Error::InvalidAmount);
+        }
+        let mut round: RoundState = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Round(round_id))
+            .ok_or(Error::UnknownRound)?;
+        if round.status != RoundStatus::Open {
+            return Err(Error::RoundNotOpen);
+        }
+        if tier_of(&env, &from) < Tier::Institution {
+            return Err(Error::TierTooLow);
+        }
+
+        let token_id: Address = env.storage().instance().get(&DataKey::Token).unwrap();
+        token::Client::new(&env, &token_id).transfer(
+            &from,
+            &env.current_contract_address(),
+            &amount,
+        );
+
+        round.pool += amount;
+        put(&env, &DataKey::Round(round_id), &round);
+
+        env.events()
+            .publish((symbol_short!("fund"), round_id, from), amount);
+        Ok(())
+    }
+
+    /// Donate directly to an `Approved` campaign. Continuous (always-open): every gift grows
+    /// `lifetime_direct`. If a round is `Open` **and** the campaign's category is in scope, the gift
+    /// also feeds that round's QF aggregates (per-round cumulative-sqrt, keyed `(round, project)`);
+    /// otherwise it grows `unrounded_direct`, claimable via `claim_unmatched`.
+    /// `donor` must be `≥ Basic` (`TierTooLow`); target must be `Approved` (`ProjectNotApproved`).
+    pub fn contribute(env: Env, donor: Address, project_id: u32, amount: i128) -> Result<(), Error> {
+        donor.require_auth();
+        if amount <= 0 {
+            return Err(Error::InvalidAmount);
+        }
+        if tier_of(&env, &donor) < Tier::Basic {
+            return Err(Error::TierTooLow);
+        }
+        let mut p = load_project(&env, project_id)?;
+        if p.status != ProjectStatus::Approved {
+            return Err(Error::ProjectNotApproved);
+        }
+
+        let token_id: Address = env.storage().instance().get(&DataKey::Token).unwrap();
+        token::Client::new(&env, &token_id).transfer(
+            &donor,
+            &env.current_contract_address(),
+            &amount,
+        );
+
+        p.lifetime_direct += amount;
+
+        // route the gift to the open in-scope round, else to `unrounded_direct`.
+        match find_open_round(&env) {
+            Some((round_id, round))
+                if round.categories.len() == 0
+                    || round.categories.iter().any(|c| c == p.category) =>
+            {
+                update_round_aggregates(&env, round_id, project_id, &donor, amount);
+            }
+            _ => {
+                p.unrounded_direct += amount;
+            }
+        }
+
+        put(&env, &DataKey::Project(project_id), &p);
+
+        env.events()
+            .publish((symbol_short!("contrib"), project_id, donor), amount);
+        Ok(())
+    }
+
+    /// Settle a round's matching pool by QF. **Admin only.** Round must be `Open` (else
+    /// `AlreadyFinalized`). Runs the deterministic `compute_matches_now` split over the round's
+    /// participating **Approved, in-scope** projects (`RoundSumSqrt` → `qf::weight_from_sum_sqrt`
+    /// → `qf::compute_matches`); `NothingToMatch` short-circuits **before any write**. Writes each
+    /// `RoundMatched(r,p)`, flips status `Finalized`. **`Σ RoundMatched(r,·) == round.pool`.** Emits
+    /// `("match", r, p)` per project + `("final", r)`.
+    pub fn finalize_round(env: Env, round_id: u32) -> Result<(), Error> {
+        require_admin(&env)?;
+        let mut round: RoundState = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Round(round_id))
+            .ok_or(Error::UnknownRound)?;
+        if round.status != RoundStatus::Open {
+            return Err(Error::AlreadyFinalized);
+        }
+
+        // Compute first (may `NothingToMatch`) so no partial state is written on the empty path.
+        let matches = compute_matches_now(&env, round_id)?;
+        for (pid, matched) in matches.iter() {
+            put(&env, &DataKey::RoundMatched(round_id, pid), &matched);
+            env.events()
+                .publish((symbol_short!("match"), round_id, pid), matched);
+        }
+
+        round.status = RoundStatus::Finalized;
+        put(&env, &DataKey::Round(round_id), &round);
+        env.events().publish((symbol_short!("final"), round_id), ());
+        Ok(())
+    }
+
+    /// Read-only projection of a round's QF split — the same deterministic computation as
+    /// `finalize_round`, so it equals the stored `RoundMatched` after finalize. Returns an **empty
+    /// vec** when there is nothing to match (or the round is unknown); it never writes.
+    pub fn preview_round(env: Env, round_id: u32) -> Vec<(u32, i128)> {
+        compute_matches_now(&env, round_id).unwrap_or(Vec::new(&env))
+    }
+
+    /// Pay a finalized round's `RoundDirect + RoundMatched` for one campaign to its `payout`
+    /// address. Authorized by the campaign **owner**. Round must be `Finalized` (`NotFinalized`);
+    /// not already claimed (`AlreadyClaimed`). Sets `RoundClaimed`, emits `("payout", r, p)`.
+    pub fn claim(env: Env, round_id: u32, project_id: u32) -> Result<(), Error> {
+        let round: RoundState = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Round(round_id))
+            .ok_or(Error::UnknownRound)?;
+        let p = load_project(&env, project_id)?;
+        p.owner.require_auth();
+        if round.status != RoundStatus::Finalized {
+            return Err(Error::NotFinalized);
+        }
+        let ps = env.storage().persistent();
+        if ps.get(&DataKey::RoundClaimed(round_id, project_id)).unwrap_or(false) {
+            return Err(Error::AlreadyClaimed);
+        }
+        let direct: i128 = ps.get(&DataKey::RoundDirect(round_id, project_id)).unwrap_or(0);
+        let matched: i128 = ps.get(&DataKey::RoundMatched(round_id, project_id)).unwrap_or(0);
+        let amount = direct + matched;
+
+        let token_id: Address = env.storage().instance().get(&DataKey::Token).unwrap();
+        token::Client::new(&env, &token_id).transfer(
+            &env.current_contract_address(),
+            &p.payout,
+            &amount,
+        );
+        put(&env, &DataKey::RoundClaimed(round_id, project_id), &true);
+        env.events()
+            .publish((symbol_short!("payout"), round_id, project_id), amount);
+        Ok(())
+    }
+
+    /// Sweep a campaign's `unrounded_direct` (donations made while no in-scope round was open, or
+    /// rolled in from a cancelled round) to its `payout`. Owner-authorized; `NothingToClaim` if the
+    /// balance is zero. Zeroes `unrounded_direct` so escrow never sticks. Emits `("payout", p)`.
+    pub fn claim_unmatched(env: Env, project_id: u32) -> Result<(), Error> {
+        let mut p = load_project(&env, project_id)?;
+        p.owner.require_auth();
+        if p.unrounded_direct <= 0 {
+            return Err(Error::NothingToClaim);
+        }
+        let amount = p.unrounded_direct;
+
+        let token_id: Address = env.storage().instance().get(&DataKey::Token).unwrap();
+        token::Client::new(&env, &token_id).transfer(
+            &env.current_contract_address(),
+            &p.payout,
+            &amount,
+        );
+        p.unrounded_direct = 0;
+        put(&env, &DataKey::Project(project_id), &p);
+        env.events()
+            .publish((symbol_short!("payout"), project_id), amount);
+        Ok(())
+    }
+
+    /// Cancel an `Open` round pre-finalize. **Admin only.** Refunds `round.pool` to the sponsor and
+    /// **rolls each `RoundDirect(r,p)` into that campaign's `unrounded_direct`** — donors meant to
+    /// fund the campaign regardless of the match, so campaigns keep their direct gifts; only the
+    /// match pool refunds. Zeroes `pool`, status `Cancelled`. Emits `("rndcancel", r)`.
+    pub fn cancel_round(env: Env, round_id: u32) -> Result<(), Error> {
+        require_admin(&env)?;
+        let mut round: RoundState = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Round(round_id))
+            .ok_or(Error::UnknownRound)?;
+        if round.status != RoundStatus::Open {
+            return Err(Error::RoundNotOpen);
+        }
+
+        let token_id: Address = env.storage().instance().get(&DataKey::Token).unwrap();
+        if round.pool > 0 {
+            token::Client::new(&env, &token_id).transfer(
+                &env.current_contract_address(),
+                &round.sponsor,
+                &round.pool,
+            );
+        }
+
+        // Roll each project's in-round direct into its claimable unrounded balance.
+        let project_ids: Vec<u32> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::ProjectIds)
+            .unwrap_or(Vec::new(&env));
+        for pid in project_ids.iter() {
+            let rd: i128 = env
+                .storage()
+                .persistent()
+                .get(&DataKey::RoundDirect(round_id, pid))
+                .unwrap_or(0);
+            if rd > 0 {
+                if let Some(mut p) = env
+                    .storage()
+                    .persistent()
+                    .get::<DataKey, ProjectState>(&DataKey::Project(pid))
+                {
+                    p.unrounded_direct += rd;
+                    put(&env, &DataKey::Project(pid), &p);
+                }
+            }
+        }
+
+        round.pool = 0; // refunded — drop it so money-conservation over open/finalized rounds holds
+        round.status = RoundStatus::Cancelled;
+        put(&env, &DataKey::Round(round_id), &round);
+        env.events().publish((symbol_short!("rndcancel"), round_id), ());
+        Ok(())
+    }
+
+    // ---------- views (read-only) ----------
+
+    /// The global role/token config in one call.
+    pub fn get_config(env: Env) -> Config {
+        let s = env.storage().instance();
+        Config {
+            admin: s.get(&DataKey::Admin).unwrap(),
+            curator: s.get(&DataKey::Curator).unwrap(),
+            attester: s.get(&DataKey::Attester).unwrap(),
+            token: s.get(&DataKey::Token).unwrap(),
+        }
+    }
+
+    /// All rounds, in creation order.
+    pub fn list_rounds(env: Env) -> Vec<RoundState> {
+        let ids: Vec<u32> = env
+            .storage()
+            .instance()
+            .get(&DataKey::RoundIds)
+            .unwrap_or(Vec::new(&env));
+        let mut out: Vec<RoundState> = Vec::new(&env);
+        for id in ids.iter() {
+            if let Some(r) = env
+                .storage()
+                .persistent()
+                .get::<DataKey, RoundState>(&DataKey::Round(id))
+            {
+                out.push_back(r);
+            }
+        }
+        out
+    }
+
+    /// One round by id (panics on unknown id — callers use ids from `list_rounds`).
+    pub fn get_round(env: Env, id: u32) -> RoundState {
+        env.storage().persistent().get(&DataKey::Round(id)).unwrap()
+    }
+
+    /// The id of the single currently-`Open` round, if any.
+    pub fn open_round_id(env: Env) -> Option<u32> {
+        find_open_round(&env).map(|(id, _)| id)
+    }
+
+    /// **All** campaigns regardless of status — the frontend filters for discovery vs. the owner
+    /// dashboard.
+    pub fn list_projects(env: Env) -> Vec<ProjectState> {
+        let ids: Vec<u32> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::ProjectIds)
+            .unwrap_or(Vec::new(&env));
+        let mut out: Vec<ProjectState> = Vec::new(&env);
+        for id in ids.iter() {
+            if let Some(p) = env
+                .storage()
+                .persistent()
+                .get::<DataKey, ProjectState>(&DataKey::Project(id))
+            {
+                out.push_back(p);
+            }
+        }
+        out
+    }
+
+    /// **Approved** campaigns in one category — the public discovery listing.
+    pub fn list_projects_by_category(env: Env, category: Category) -> Vec<ProjectState> {
+        let ids: Vec<u32> = env
+            .storage()
+            .persistent()
+            .get(&DataKey::ProjectIds)
+            .unwrap_or(Vec::new(&env));
+        let mut out: Vec<ProjectState> = Vec::new(&env);
+        for id in ids.iter() {
+            if let Some(p) = env
+                .storage()
+                .persistent()
+                .get::<DataKey, ProjectState>(&DataKey::Project(id))
+            {
+                if p.status == ProjectStatus::Approved && p.category == category {
+                    out.push_back(p);
+                }
+            }
+        }
+        out
+    }
+
+    /// One campaign by id (panics on unknown id — callers use ids from `list_projects`).
+    pub fn get_project(env: Env, id: u32) -> ProjectState {
+        env.storage().persistent().get(&DataKey::Project(id)).unwrap()
+    }
+
+    /// Per-(round, project) tallies for the frontend: `(direct, donors, matched, claimed)`.
+    pub fn round_project(env: Env, round_id: u32, project_id: u32) -> (i128, u32, i128, bool) {
+        let ps = env.storage().persistent();
+        (
+            ps.get(&DataKey::RoundDirect(round_id, project_id)).unwrap_or(0),
+            ps.get(&DataKey::RoundDonorCount(round_id, project_id)).unwrap_or(0),
+            ps.get(&DataKey::RoundMatched(round_id, project_id)).unwrap_or(0),
+            ps.get(&DataKey::RoundClaimed(round_id, project_id)).unwrap_or(false),
+        )
+    }
+}
+
+/// Cumulative-sqrt discipline, keyed per `(round, project)`: a donor's per-round cumulative total
+/// is summed first, then `isqrt` is taken on that total **once** — swapping the old √ for the new
+/// one in `RoundSumSqrt` so `finalize` reads one aggregate per project (O(projects)). A donor's
+/// *first* gift in the round bumps `RoundDonorCount`. `RoundDirect` tracks this round's raw direct
+/// total (paid out alongside the match at `claim`). Never reimplements `qf::isqrt`.
+fn update_round_aggregates(
+    env: &Env,
+    round_id: u32,
+    project_id: u32,
+    donor: &Address,
+    amount: i128,
+) {
+    let ps = env.storage().persistent();
+
+    let old_cum: i128 = ps
+        .get(&DataKey::RoundContribution(round_id, project_id, donor.clone()))
+        .unwrap_or(0);
+    let new_cum = old_cum + amount;
+
+    // Swap this donor's old √ for the new one in the project's running Σ√ (sqrt the summed total,
+    // not each gift — the anti-sybil crux the `same_donor_twice_in_round` test proves).
+    let mut sum_sqrt: u128 = ps
+        .get(&DataKey::RoundSumSqrt(round_id, project_id))
+        .unwrap_or(0);
+    sum_sqrt = sum_sqrt - qf::isqrt(old_cum as u128) + qf::isqrt(new_cum as u128);
+
+    if old_cum == 0 {
+        let donors: u32 = ps
+            .get(&DataKey::RoundDonorCount(round_id, project_id))
+            .unwrap_or(0);
+        put(env, &DataKey::RoundDonorCount(round_id, project_id), &(donors + 1));
+    }
+
+    let round_direct: i128 = ps
+        .get(&DataKey::RoundDirect(round_id, project_id))
+        .unwrap_or(0);
+
+    put(
+        env,
+        &DataKey::RoundContribution(round_id, project_id, donor.clone()),
+        &new_cum,
+    );
+    put(env, &DataKey::RoundSumSqrt(round_id, project_id), &sum_sqrt);
+    put(
+        env,
+        &DataKey::RoundDirect(round_id, project_id),
+        &(round_direct + amount),
+    );
+}
+
+/// The single deterministic QF split shared by `finalize_round` (writes `RoundMatched`) and
+/// `preview_round` (read-only). Gathers the round's **participating** projects — currently
+/// `Approved`, in the round's category scope, and carrying a non-zero `RoundSumSqrt(r,p)` — squares
+/// each Σ√ into a weight, and hands them to `qf::compute_matches` to split `round.pool`
+/// proportionally (with the remainder rule, so `Σ matched == pool`). Bridges soroban storage
+/// to `qf`'s slices via transient heap `Vec`s. `NothingToMatch` (no in-scope contributions) bubbles
+/// up so `finalize_round` writes nothing and `preview_round` returns empty.
+fn compute_matches_now(env: &Env, round_id: u32) -> Result<Vec<(u32, i128)>, Error> {
+    let round: RoundState = env
+        .storage()
+        .persistent()
+        .get(&DataKey::Round(round_id))
+        .ok_or(Error::UnknownRound)?;
+
+    let project_ids: Vec<u32> = env
+        .storage()
+        .persistent()
+        .get(&DataKey::ProjectIds)
+        .unwrap_or(Vec::new(env));
+
+    let mut ids: alloc::vec::Vec<u32> = alloc::vec::Vec::new();
+    let mut weights: alloc::vec::Vec<u128> = alloc::vec::Vec::new();
+    for pid in project_ids.iter() {
+        let p = match env
+            .storage()
+            .persistent()
+            .get::<DataKey, ProjectState>(&DataKey::Project(pid))
+        {
+            Some(p) => p,
+            None => continue,
+        };
+        if p.status != ProjectStatus::Approved {
+            continue;
+        }
+        if !(round.categories.len() == 0 || round.categories.iter().any(|c| c == p.category)) {
+            continue;
+        }
+        let sum_sqrt: u128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::RoundSumSqrt(round_id, pid))
+            .unwrap_or(0);
+        if sum_sqrt == 0 {
+            continue;
+        }
+        ids.push(pid);
+        weights.push(qf::weight_from_sum_sqrt(sum_sqrt)?);
+    }
+
+    let mut out: alloc::vec::Vec<i128> = alloc::vec![0i128; weights.len()];
+    // Empty `weights` ⇒ total_weight 0 ⇒ `NothingToMatch`, the short-circuit both callers rely on.
+    qf::compute_matches(round.pool, &weights, &mut out)?;
+
+    let mut result: Vec<(u32, i128)> = Vec::new(env);
+    for i in 0..ids.len() {
+        result.push_back((ids[i], out[i]));
+    }
+    Ok(result)
 }
