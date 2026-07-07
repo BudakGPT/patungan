@@ -1,0 +1,44 @@
+# Every push must keep the contract tests green and the frontend building from a clean
+# checkout (no local node_modules, no dist/).
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: contracts/patungan
+      - name: cargo test
+        run: cargo test --manifest-path contracts/patungan/Cargo.toml
+
+  frontend:
+    runs-on: ubuntu-latest
+    env:
+      # Build-time placeholders (public testnet identifiers, not secrets). Runtime always
+      # uses frontend/.env.local written by scripts/deploy.sh.
+      NEXT_PUBLIC_NETWORK: TESTNET
+      NEXT_PUBLIC_SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
+      NEXT_PUBLIC_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
+      NEXT_PUBLIC_CONTRACT_ID: CB3XHHEHIXV6HHXEB2CSOWMIG3MLPMTT5REZ5GBWYGUH7MX4B3Z6RYUH
+      NEXT_PUBLIC_TOKEN_ID: CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+      NEXT_PUBLIC_EXPLORER_BASE: https://stellar.expert/explorer/testnet
+      NEXT_PUBLIC_ADMIN_ADDRESS: GBO6MF56C7EWFCXX2FNL4OTECCHD2K6CLKXN7ROQVYDWKJWVXUUHJVP6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: npm ci
+        run: npm ci
+        working-directory: frontend
+      - name: next build
+        run: npm run build
+        working-directory: frontend

@@ -1,0 +1,20 @@
+# Normalize line endings: LF in the repo for all text files.
+* text=auto eol=lf
+
+# Shell scripts MUST be LF (deploy.sh / seed helpers break with CRLF on the toolchain).
+*.sh text eol=lf
+
+# Source & config — keep LF.
+*.rs   text eol=lf
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+
+# Binary assets — never touch.
+*.png binary
+*.jpg binary
+*.wasm binary
