@@ -1,0 +1,348 @@
+"use client";
+
+import { Suspense, useMemo } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import type { RoundState } from "@/contract/src";
+import { strings } from "@/strings";
+import { formatIDR } from "@/lib/format";
+import { CategoryChip } from "@/components/CategoryChip";
+import { useRounds, useCampaigns, usePreviewRound, useRoundProjects } from "@/lib/hooks";
+
+const r = strings.results;
+
+const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
+
+/**
+ * Round-scoped results `/results?round=`. The app's one "magic number" moment:
+ * the quadratic split for a single season, rendered as per-campaign direct-vs-matched bars ranked by
+ * matched descending, so the campaign that won on *pendukung* (donor count) not rupiah sits on top.
+ * Defaults to the latest finalized round (else the open round's live `preview_round`). The whole page
+ * is client-side (wallet-free reads), so `useSearchParams` needs a Suspense boundary to build.
+ */
+export default function ResultsPage() {
+  return (
+    <main className="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10">
+      <Suspense fallback={<PageSkeleton />}>
+        <ResultsInner />
+      </Suspense>
+    </main>
+  );
+}
+
+function ResultsInner() {
+  const rounds = useRounds();
+  const searchParams = useSearchParams();
+  const paramRaw = searchParams.get("round");
+
+  // Default when no ?round=: newest Finalized → the Open round → newest of any status.
+  const list = rounds.data;
+  const defaultId = useMemo(() => {
+    if (!list || list.length === 0) return null;
+    const finalized = list.filter((x) => x.status.tag === "Finalized").sort((a, b) => b.id - a.id);
+    if (finalized.length) return finalized[0].id;
+    const open = list.find((x) => x.status.tag === "Open");
+    if (open) return open.id;
+    return [...list].sort((a, b) => b.id - a.id)[0].id;
+  }, [list]);
+
+  if (list === undefined) {
+    return rounds.isError ? <ErrorPanel onRetry={() => rounds.refetch()} /> : <PageSkeleton />;
+  }
+  if (list.length === 0) {
+    return <NotFound title={r.notFoundTitle} body={r.noRounds} />;
+  }
+
+  const selectedId = paramRaw !== null ? Number(paramRaw) : defaultId;
+  const round = list.find((x) => x.id === selectedId);
+  if (round === undefined) {
+    return <NotFound title={r.notFoundTitle} body={r.notFoundBody} />;
+  }
+
+  return <RoundResults key={round.id} round={round} rounds={list} />;
+}
+
+function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState[] }) {
+  const preview = usePreviewRound(round.id);
+  const campaigns = useCampaigns();
+
+  // Campaigns that got a QF split for this round, ranked by matched desc (crowd winner on top).
+  const ranked = useMemo(
+    () => [...(preview.data ?? [])].sort((a, b) => descBig(a[1], b[1])),
+    [preview.data],
+  );
+  const pids = useMemo(() => ranked.map(([pid]) => Number(pid)), [ranked]);
+  const tallies = useRoundProjects(round.id, pids);
+
+  const campaignOf = useMemo(() => {
+    const m = new Map<number, { title: string; category: string }>();
+    for (const c of campaigns.data ?? []) m.set(c.id, { title: c.title, category: c.category.tag });
+    return m;
+  }, [campaigns.data]);
+
+  const finalized = round.status.tag === "Finalized";
+
+  // Rows: direct/donors from round_project, matched from the (live or stored) preview split.
+  const talliesReady = pids.length === 0 || tallies.every((q) => q.data !== undefined);
+  const rows = useMemo(() => {
+    return ranked.map(([pid, matched], i) => {
+      const t = tallies[i]?.data;
+      return {
+        pid: Number(pid),
+        matched,
+        direct: t?.[0] ?? 0n,
+        donors: t?.[1] ?? 0,
+      };
+    });
+  }, [ranked, tallies]);
+
+  // Shared bar scale = the largest direct+matched total, so rows read comparably.
+  const scale = useMemo(() => {
+    let max = 0;
+    for (const row of rows) {
+      const total = Number(row.direct) + Number(row.matched);
+      if (total > max) max = total;
+    }
+    return max;
+  }, [rows]);
+
+  const totalMatched = useMemo(
+    () => ranked.reduce((sum, [, m]) => sum + m, 0n),
+    [ranked],
+  );
+
+  const loading = preview.data === undefined || campaigns.data === undefined || !talliesReady;
+
+  return (
+    <>
+      <Header round={round} rounds={rounds} finalized={finalized} />
+
+      <div className="mt-8">
+        {loading ? (
+          preview.isError && preview.data === undefined ? (
+            <ErrorPanel onRetry={() => preview.refetch()} />
+          ) : (
+            <RowsSkeleton />
+          )
+        ) : ranked.length === 0 ? (
+          <EmptyPanel />
+        ) : (
+          <>
+            {preview.isError ? (
+              <p className="mb-3 text-xs text-amber-700">{strings.staleData}</p>
+            ) : null}
+            <ul className="space-y-3" aria-label={r.barLabel}>
+              {rows.map((row, i) => (
+                <ResultRow
+                  key={row.pid}
+                  index={i}
+                  campaign={campaignOf.get(row.pid)}
+                  fallbackId={row.pid}
+                  direct={row.direct}
+                  matched={row.matched}
+                  donors={row.donors}
+                  scale={scale}
+                />
+              ))}
+            </ul>
+
+            <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-line pt-5">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-faint">{r.poolLabel}</p>
+                <p className="tabular mt-0.5 text-lg font-bold text-ink">{formatIDR(round.pool)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-wide text-faint">{r.totalMatchedLabel}</p>
+                <p className="tabular mt-0.5 text-lg font-bold text-match-ink">
+                  {formatIDR(totalMatched)}
+                </p>
+              </div>
+            </div>
+            <p className="mt-6 text-center text-sm text-muted">{r.verdict}</p>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+/* ── One campaign's row: figures + the direct-vs-matched comparison bar ───────────────────── */
+
+function ResultRow({
+  index,
+  campaign,
+  fallbackId,
+  direct,
+  matched,
+  donors,
+  scale,
+}: {
+  index: number;
+  campaign?: { title: string; category: string };
+  fallbackId: number;
+  direct: bigint;
+  matched: bigint;
+  donors: number;
+  scale: number;
+}) {
+  const directPct = scale > 0 ? (Number(direct) / scale) * 100 : 0;
+  const matchedPct = scale > 0 ? (Number(matched) / scale) * 100 : 0;
+
+  return (
+    <li className="rounded-2xl border border-line bg-surface p-5 shadow-card">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          {campaign ? <CategoryChip tag={campaign.category} /> : null}
+          <h3 className="mt-1.5 truncate text-base font-semibold text-ink">
+            {campaign?.title ?? `#${fallbackId}`}
+          </h3>
+          <p className="mt-0.5 text-xs text-muted">
+            {donors} {r.donorSuffix}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-baseline gap-5 text-right">
+          <div>
+            <p className="text-[0.6875rem] uppercase tracking-wide text-faint">{r.directLabel}</p>
+            <p className="tabular font-semibold text-ink">{formatIDR(direct)}</p>
+          </div>
+          <div>
+            <p className="text-[0.6875rem] uppercase tracking-wide text-faint">{r.matchedLabel}</p>
+            <p className="tabular font-bold text-match-ink">+{formatIDR(matched)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-line/40">
+        <div
+          className="flex h-full origin-left motion-safe:animate-bar-in"
+          style={{ animationDelay: `${index * 45}ms` }}
+        >
+          <div className="h-full bg-ink/25" style={{ width: `${directPct}%` }} />
+          <div className="h-full bg-match" style={{ width: `${matchedPct}%` }} />
+        </div>
+      </div>
+    </li>
+  );
+}
+
+/* ── Header: season label, status, projection note, round picker ─────────────────────────── */
+
+function Header({
+  round,
+  rounds,
+  finalized,
+}: {
+  round: RoundState;
+  rounds: RoundState[];
+  finalized: boolean;
+}) {
+  const router = useRouter();
+  const ordered = [...rounds].sort((a, b) => b.id - a.id);
+
+  return (
+    <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        <p className="text-sm font-medium text-muted">{r.title}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2.5">
+          <h1 className="text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-[2.25rem]">
+            {r.seasonLabel(round.id)}
+          </h1>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              finalized ? "bg-match-soft text-match-ink" : "bg-accent-soft text-accent-ink"
+            }`}
+          >
+            {finalized ? strings.seasons.status.Finalized : strings.seasons.status.Open}
+          </span>
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          {finalized ? r.finalized : r.notFinalized}
+        </p>
+      </div>
+
+      <label className="flex items-center gap-2 text-sm text-muted">
+        <span className="whitespace-nowrap">{r.roundPickerLabel}</span>
+        <select
+          value={round.id}
+          onChange={(e) => router.replace(`/results?round=${e.target.value}`)}
+          className="rounded-xl border border-line bg-surface py-2.5 pl-3 pr-8 text-sm font-medium text-ink transition-colors focus:border-accent focus:outline-none"
+        >
+          {ordered.map((x) => (
+            <option key={x.id} value={x.id}>
+              {r.seasonLabel(x.id)} · {strings.seasons.status[x.status.tag] ?? x.status.tag}
+            </option>
+          ))}
+        </select>
+      </label>
+    </header>
+  );
+}
+
+/* ── States ──────────────────────────────────────────────────────────────────────────────── */
+
+function RowsSkeleton() {
+  return (
+    <ul className="space-y-3">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <li key={i} className="rounded-2xl border border-line bg-surface p-5 shadow-card">
+          <div className="flex items-start justify-between gap-3">
+            <div className="h-5 w-1/3 animate-pulse rounded bg-line/50" />
+            <div className="h-5 w-24 animate-pulse rounded bg-line/50" />
+          </div>
+          <div className="mt-4 h-2.5 w-full animate-pulse rounded-full bg-line/40" />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function PageSkeleton() {
+  return (
+    <div>
+      <div className="h-10 w-48 animate-pulse rounded bg-line/50" />
+      <div className="mt-3 h-4 w-72 animate-pulse rounded bg-line/50" />
+      <div className="mt-8">
+        <RowsSkeleton />
+      </div>
+    </div>
+  );
+}
+
+function EmptyPanel() {
+  return (
+    <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+      <p className="text-base font-semibold text-ink">{r.empty}</p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{r.emptyHint}</p>
+    </div>
+  );
+}
+
+function NotFound({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+      <p className="text-base font-semibold text-ink">{title}</p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{body}</p>
+      <Link
+        href="/seasons"
+        className="mt-5 inline-block text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+      >
+        {r.backToSeasons}
+      </Link>
+    </div>
+  );
+}
+
+function ErrorPanel({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+      <p className="text-ink">{strings.errorGeneric}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+      >
+        {strings.retry}
+      </button>
+    </div>
+  );
+}
