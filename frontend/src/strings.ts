@@ -1,0 +1,652 @@
+/** All UI copy lives here (Bahasa-first). Components import from this module, never inline strings. */
+export const strings = {
+  appName: "Patungan",
+  nav: {
+    landing: "Beranda",
+    seasons: "Musim",
+    results: "Hasil",
+    dashboard: "Dasbor",
+    account: "Akun",
+    operator: "Operator",
+  },
+  landing: {
+    title: "Patungan",
+    subtitle: "Urunan bersama, dicocokkan secara adil.",
+    poolLabel: "Dana padanan",
+    sponsorLabel: "Disponsori oleh",
+    sponsorName: "Pemprov Jawa Timur",
+    statusOpen: "Dibuka",
+    statusFinalized: "Selesai",
+    roundEndLabel: "Berakhir",
+    notInitialized: "Round belum dibuka",
+    waitingSponsor: "Menunggu sponsor",
+    donorCountSuffix: "pendukung",
+    projectedMatchLabel: "Proyeksi pencocokan",
+    finalMatchLabel: "Pencocokan final",
+    noMatchYet: "—",
+  },
+  /** Bahasa labels for the on-chain `Category` enum tags. Reused on every campaign surface. */
+  categories: {
+    DevelopingRegions: "Daerah Berkembang",
+    DisasterRelief: "Tanggap Bencana",
+    EducationHealth: "Pendidikan & Kesehatan",
+  } as Record<string, string>,
+  /** Discovery `/` — the public directory over live chain state. */
+  discovery: {
+    heading: "Jelajahi kampanye",
+    tagline: "Dukungan kecil dari banyak orang, dilipatgandakan secara adil.",
+    searchPlaceholder: "Cari kampanye…",
+    sortLabel: "Urutkan",
+    sort: {
+      mostBacked: "Paling didukung",
+      newest: "Terbaru",
+      closingSoon: "Segera berakhir",
+    },
+    allFilter: "Semua",
+    createCta: "Ajukan kampanye",
+    resultCount: (n: number) => `${n} kampanye`,
+    emptyApproved: "Belum ada kampanye yang disetujui.",
+    emptyFiltered: "Tidak ada kampanye yang cocok dengan filter ini.",
+    resetFilters: "Atur ulang filter",
+    // Season / round banner
+    season: "Musim Pencocokan",
+    live: "Berlangsung",
+    scopeAll: "Semua kategori",
+    scopeLabel: "Kategori dalam ronde",
+    endsInLabel: "Berakhir dalam",
+    endedLabel: "Ronde berakhir",
+    noRound: "Belum ada ronde pencocokan aktif",
+    noRoundHint: "Donasi langsung tetap dibuka. Ronde berikutnya segera hadir.",
+    countdown: { day: "h", hour: "j", min: "m", ended: "Berakhir" },
+    // Card
+    donorSuffix: "pendukung",
+    directShort: "Langsung",
+    matchSuffix: "padanan",
+    noThumbAlt: "Tanpa gambar",
+    // Onboarding "how it works" strip — QF explainer for cold visitors
+    howItWorks: {
+      overline: "Cara kerjanya",
+      steps: [
+        {
+          n: "01",
+          title: "Donasi langsung, kapan saja",
+          body: "Pilih kampanye yang kamu percaya, lalu beri donasi langsung — tanpa menunggu ronde.",
+        },
+        {
+          n: "02",
+          title: "Jumlah orang, bukan besar donasi",
+          body: "Banyak donatur kecil memberi sinyal lebih kuat daripada satu donatur besar.",
+        },
+        {
+          n: "03",
+          title: "Dana padanan dibagi tiap musim",
+          body: "Di akhir tiap ronde, dana sponsor dibagikan mengikuti sinyal itu secara kuadratik.",
+        },
+      ],
+      viz: {
+        crowd: "banyak donatur kecil",
+        whale: "satu donatur besar",
+        beats: "lebih kuat dari",
+        sr: "Banyak donatur kecil lebih kuat daripada satu donatur besar.",
+      },
+    },
+  },
+  /** Campaign detail `/campaign/[id]` — story, ledger sidebar, inline contribute panel. */
+  campaign: {
+    back: "Kembali ke jelajah",
+    notFoundTitle: "Kampanye tidak ditemukan",
+    notFoundBody: "Kampanye ini mungkin belum ada, atau tautannya keliru.",
+    backHome: "Kembali ke beranda",
+    byOwner: "Dikelola oleh",
+    storyHeading: "Tentang kampanye ini",
+    raisedLabel: "Total donasi langsung",
+    thisRoundHeading: "Musim pencocokan ini",
+    donorSuffix: "pendukung",
+    projectedMatchLabel: "Proyeksi padanan kuadratik",
+    notInRound:
+      "Belum termasuk ronde pencocokan aktif — donasi langsung tetap dilipatkan pada ronde berikutnya.",
+    /** Notice shown when a non-Approved campaign is opened directly (owner-shared link). */
+    status: {
+      Pending: "Kampanye ini masih menunggu kurasi. Donasi dibuka setelah disetujui kurator.",
+      Rejected: "Kampanye ini tidak lolos kurasi dan tidak menerima donasi.",
+      Cancelled: "Kampanye ini telah dibatalkan.",
+    } as Record<string, string>,
+    /** Campaign create `/campaign/new` — gated self-serve submission form + IPFS image upload. */
+    create: {
+      back: "Kembali ke jelajah",
+      heading: "Ajukan kampanye",
+      subtitle:
+        "Ceritakan kampanyemu, unggah satu gambar, lalu kirim untuk kurasi. Setelah disetujui kurator, kampanye tampil publik dan siap menerima donasi.",
+      // Gate ladder (mirrors the contribute gate)
+      connectPrompt: "Hubungkan wallet Testnet untuk mengajukan kampanye.",
+      wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
+      tierGateTitle: "Verifikasi dulu",
+      tierGateBody: "Kamu perlu verifikasi tingkat Basic untuk mengajukan kampanye.",
+      tierGateCta: "Verifikasi sekarang",
+      // Fields
+      titleLabel: "Judul kampanye",
+      titlePlaceholder: "mis. Sumur bersih untuk Dusun Sumber",
+      categoryLabel: "Kategori",
+      storyLabel: "Cerita kampanye",
+      storyPlaceholder:
+        "Jelaskan siapa yang terbantu, apa yang didanai, dan mengapa ini penting.",
+      payoutLabel: "Alamat pencairan",
+      payoutHelper: "Default: wallet-mu. Dana yang terkumpul dicairkan ke alamat ini.",
+      payoutReset: "Pakai wallet saya",
+      imageLabel: "Gambar kampanye",
+      // Image dropzone
+      image: {
+        dropPrompt: "Seret gambar ke sini atau pilih berkas",
+        dropHint: "PNG atau JPG, disematkan ke IPFS",
+        pickFile: "Pilih berkas",
+        uploading: "Menyematkan ke IPFS…",
+        replace: "Ganti gambar",
+        remove: "Hapus",
+        cidLabel: "CID",
+        errorFallback: "Gagal menyematkan gambar. Coba lagi.",
+        previewAlt: "Pratinjau gambar kampanye",
+      },
+      // Client-side validation
+      invalid: {
+        titleRequired: "Judul wajib diisi.",
+        titleTooLong: "Judul maksimal 96 karakter.",
+        storyRequired: "Cerita wajib diisi.",
+        storyTooLong: "Cerita maksimal 1024 karakter.",
+        payoutInvalid: "Alamat Stellar tidak valid (diawali G, 56 karakter).",
+        imageRequired: "Unggah satu gambar kampanye.",
+      } as Record<string, string>,
+      // Submit tx
+      submit: "Kirim untuk kurasi",
+      awaiting: "Buka Freighter untuk menandatangani…",
+      submitting: "Mengirim transaksi…",
+      // Success
+      successTitle: "Kampanye terkirim — menunggu kurasi",
+      successBody:
+        "Kampanyemu tercatat on-chain dengan status Menunggu kurasi. Setelah kurator menyetujui, kampanye tampil publik dan bisa menerima donasi.",
+      viewCampaign: "Lihat kampanye",
+      createAnother: "Ajukan kampanye lain",
+    },
+    contribute: {
+      cta: "Ikut urunan",
+      amountLabel: "Pilih jumlah",
+      confirm: "Kirim & tanda tangani",
+      awaiting: "Buka Freighter untuk menandatangani…",
+      submitting: "Mengirim transaksi…",
+      successTitle: "Terima kasih — urunanmu tercatat on-chain.",
+      done: "Selesai",
+      cancel: "Batal",
+      connectPrompt: "Hubungkan wallet Testnet untuk ikut urunan.",
+      wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
+      tierGateTitle: "Verifikasi dulu",
+      tierGateBody: "Kamu perlu verifikasi tingkat Basic untuk ikut urunan.",
+      tierGateCta: "Verifikasi sekarang",
+    },
+  },
+  project: {
+    backToLanding: "Kembali ke beranda",
+    notFound: "Proyek tidak ditemukan.",
+    raisedLabel: "Terkumpul",
+    contributeCta: "Ikut urunan",
+    roundClosedCta: "Round ditutup",
+    stories: {
+      0: "Atap Sekolah SDN 2 bocor setiap musim hujan. Urunan ini mengganti atap seng agar anak-anak belajar dengan aman dan kering.",
+      1: "Kebun Warga RW 5 memasok sayur segar untuk posyandu. Urunan ini membeli bibit dan alat tani sederhana.",
+      2: "Dusun Sumber berjalan jauh setiap hari mengambil air bersih. Urunan ini mendanai sumur bor untuk warga.",
+    } as Record<number, string>,
+  },
+  contribute: {
+    title: "Urun untuk",
+    amountLabel: "Pilih jumlah",
+    connectFirst: "Hubungkan wallet Testnet untuk melanjutkan.",
+    confirmCta: "Kirim & tanda tangani",
+    awaitingSignature: "Buka Freighter untuk menandatangani…",
+    submitting: "Mengirim transaksi…",
+    successTitle: "Urunan berhasil!",
+    viewOnExplorer: "Lihat transaksi di Explorer",
+    close: "Tutup",
+    cancel: "Batal",
+    errors: {
+      NotVerified: "Alamat belum terverifikasi.",
+      RoundClosed: "Round sudah ditutup untuk kontribusi baru.",
+      UnknownProject: "Proyek tidak ditemukan.",
+      InvalidAmount: "Jumlah tidak valid.",
+      rejected: "Tanda tangan dibatalkan.",
+      generic: "Transaksi gagal. Coba lagi.",
+    } as Record<string, string>,
+  },
+  /**
+   * Seasons archive `/seasons` — every matching round as a reverse-chronological
+   * ledger: the "this platform runs season after season" surface. Bahasa-first.
+   */
+  seasons: {
+    title: "Arsip musim",
+    subtitle:
+      "Setiap ronde pencocokan yang pernah dibuka, dari yang terbaru. Ronde yang selesai menampilkan kampanye dengan padanan terbesar.",
+    seasonLabel: (id: number) => `Musim #${id}`,
+    poolLabel: "Dana padanan",
+    sponsorLabel: "Sponsor",
+    scopeLabel: "Kategori",
+    scopeAll: "Semua kategori",
+    // Status pills (reuse the dashboard tones)
+    status: {
+      Open: "Berlangsung",
+      Finalized: "Selesai",
+      Cancelled: "Dibatalkan",
+    } as Record<string, string>,
+    // Open round line
+    liveEndsIn: "Berakhir dalam",
+    liveEnded: "Menunggu finalisasi",
+    liveProjection: "Proyeksi pencocokan berjalan",
+    countdown: { day: "h", hour: "j", min: "m", ended: "Berakhir" },
+    // Finalized leaderboard
+    topHeading: "Padanan terbesar",
+    noMatches: "Tidak ada kampanye yang dicocokkan musim ini.",
+    cancelledNote: "Ronde ini dibatalkan sebelum finalisasi. Dana dikembalikan ke sponsor.",
+    viewResults: "Lihat hasil",
+    // States
+    empty: "Belum ada musim pencocokan.",
+    emptyHint: "Musim pertama akan muncul di sini setelah sponsor membuka ronde.",
+  },
+  /**
+   * Round-scoped results `/results?round=` — the quadratic split reveal for one
+   * season: per-campaign direct vs matched, ranked, with the crowd-beats-whale verdict.
+   */
+  results: {
+    title: "Hasil pencocokan",
+    seasonLabel: (id: number) => `Musim #${id}`,
+    notFinalized: "Ronde belum difinalisasi. Berikut proyeksi pencocokan berdasarkan kontribusi saat ini.",
+    finalized: "Hasil final ronde ini.",
+    roundPickerLabel: "Musim",
+    directLabel: "Langsung",
+    matchedLabel: "Padanan",
+    donorSuffix: "pendukung",
+    poolLabel: "Dana padanan",
+    totalMatchedLabel: "Total padanan dibagikan",
+    verdict: "Dana padanan mengikuti jumlah pendukung, bukan besar donasi.",
+    // States
+    empty: "Belum ada kontribusi untuk dicocokkan musim ini.",
+    emptyHint: "Hasil akan muncul setelah kampanye menerima donasi dalam ronde ini.",
+    notFoundTitle: "Musim tidak ditemukan",
+    notFoundBody: "Ronde ini mungkin belum ada, atau tautannya keliru.",
+    backToSeasons: "Lihat arsip musim",
+    noRounds: "Belum ada musim pencocokan.",
+    barLabel: "Perbandingan donasi langsung dan padanan",
+  },
+  /**
+   * Operator/sponsor console `/operator` — the deepest, most privileged surface.
+   * Five write actions grouped by blast radius: the season lifecycle (open → fund → finalize) and
+   * governance (curation queue, verify fallback). All copy Bahasa-first.
+   */
+  operator: {
+    title: "Konsol Operator",
+    subtitle:
+      "Jalankan satu musim pencocokan penuh: buka ronde, isi dana, kurasi kampanye, lalu finalisasi.",
+    // Gate ladder
+    connectPrompt: "Hubungkan wallet operator untuk mengakses konsol ini.",
+    notRole:
+      "Wallet yang terhubung bukan pemegang peran operator (admin, kurator, atau penerbit atestasi).",
+    wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
+    // Shared tx phases
+    awaiting: "Buka Freighter untuk menandatangani…",
+    submitting: "Mengirim transaksi…",
+    // Status strip — the anchor every action is read against
+    status: {
+      connectedAs: "Terhubung sebagai",
+      roles: "Peran",
+      roleAdmin: "Admin",
+      roleCurator: "Kurator",
+      roleAttester: "Penerbit atestasi",
+      liveRound: "Ronde berjalan",
+      noRound: "Belum ada ronde terbuka",
+      poolLabel: "Dana padanan",
+      scopeAll: "Semua kategori",
+      endsLabel: "Berakhir",
+      ended: "Berakhir",
+    },
+    // Region headings
+    lifecycleHeading: "Musim pencocokan",
+    governanceHeading: "Tata kelola",
+    // Section overlines / step numbers
+    step: { open: "01 · Buka ronde", fund: "02 · Isi dana", finalize: "03 · Finalisasi" },
+    // 1 · Open round
+    open: {
+      heading: "Buka ronde pencocokan",
+      description:
+        "Mulai musim baru: tetapkan tanggal berakhir dan kategori yang dicocokkan. Hanya satu ronde bisa terbuka pada satu waktu.",
+      endLabel: "Tanggal berakhir",
+      endHelper: "Ditampilkan sebagai hitung mundur ke donatur.",
+      categoriesLabel: "Kategori dalam ronde",
+      categoriesHint: "Kosongkan untuk mencocokkan semua kategori.",
+      cta: "Buka ronde",
+      successTitle: "Ronde dibuka!",
+      alreadyOpen: (id: number) => `Ronde #${id} sedang berjalan. Finalisasi dulu untuk membuka yang baru.`,
+      invalidDate: "Pilih tanggal berakhir di masa depan.",
+    },
+    // 2 · Fund pool
+    fund: {
+      heading: "Isi dana padanan",
+      description:
+        "Setor dana ke kolam pencocokan ronde berjalan. Butuh verifikasi tingkat Institution.",
+      amountLabel: "Jumlah dana (IDR)",
+      echoLabel: "Akan menyetor",
+      cta: "Kirim dana",
+      successTitle: "Dana padanan terkirim!",
+      invalidAmount: "Masukkan jumlah bulat positif.",
+      needsRound: "Buka ronde dulu sebelum mengisi dana.",
+      tierGateTitle: "Perlu tingkat Institution",
+      tierGateBody:
+        "Hanya wallet terverifikasi Institution yang boleh mengisi dana padanan. Gunakan konsol verifikasi di bawah untuk menaikkan tingkat wallet ini.",
+    },
+    // 3 · Finalize
+    finalize: {
+      heading: "Finalisasi ronde",
+      description:
+        "Menutup ronde untuk kontribusi baru dan menghitung pencocokan kuadratik. Tidak bisa dibatalkan.",
+      cta: "Finalisasi ronde",
+      confirmMessage: "Finalisasi tidak bisa dibatalkan. Lanjutkan?",
+      confirmCta: "Ya, finalisasi sekarang",
+      cancelCta: "Batal",
+      successTitle: "Ronde difinalisasi!",
+      viewResults: "Lihat hasil",
+      needsRound: "Belum ada ronde terbuka untuk difinalisasi.",
+    },
+    // 4 · Curation queue
+    curation: {
+      heading: "Antrean kurasi",
+      description: "Kampanye baru menunggu persetujuan sebelum tampil publik dan menerima donasi.",
+      empty: "Tidak ada kampanye yang menunggu kurasi.",
+      pendingBadge: "Menunggu",
+      approve: "Setujui",
+      reject: "Tolak",
+      approving: "Menyetujui…",
+      rejecting: "Menolak…",
+      byOwner: "Oleh",
+      approvedToast: "Kampanye disetujui.",
+      rejectedToast: "Kampanye ditolak.",
+    },
+    // 5 · Verify fallback
+    verify: {
+      heading: "Verifikasi manual",
+      description:
+        "Tetapkan tingkat verifikasi untuk sebuah alamat — jalur pengganti testnet untuk KYC anchor.",
+      addressLabel: "Alamat wallet (G…)",
+      tierLabel: "Tingkat",
+      tiers: { None: "Tidak ada", Basic: "Basic", Institution: "Institution" } as Record<string, string>,
+      cta: "Tetapkan tingkat",
+      successTitle: "Tingkat verifikasi ditetapkan!",
+      invalidAddress: "Alamat Stellar tidak valid (diawali G, 56 karakter).",
+    },
+    viewOnExplorer: "Lihat transaksi di Explorer",
+    /** Error overrides specific to operator actions; anything omitted falls back to shared strings.errors. */
+    errors: {
+      RoundAlreadyOpen: "Sudah ada ronde yang berjalan.",
+      RoundNotOpen: "Ronde sudah tidak dibuka untuk aksi ini.",
+      AlreadyFinalized: "Ronde sudah difinalisasi.",
+      NothingToMatch: "Belum ada kontribusi untuk dicocokkan.",
+      TierTooLow: "Tingkat verifikasi belum mencukupi (butuh Institution).",
+      NotAdmin: "Hanya admin yang dapat melakukan aksi ini.",
+      NotCurator: "Hanya kurator yang dapat melakukan aksi ini.",
+      NotAttester: "Hanya penerbit atestasi yang dapat melakukan aksi ini.",
+      ProjectNotPending: "Kampanye tidak sedang menunggu kurasi.",
+      InvalidAmount: "Jumlah tidak valid.",
+      rejected: "Tanda tangan dibatalkan.",
+      generic: "Transaksi gagal. Coba lagi.",
+    } as Record<string, string>,
+  },
+  /**
+   * Owner dashboard `/dashboard` — a reconciliation ledger of the campaigns the
+   * connected wallet has submitted (every status), their lifetime direct total, and the per-season
+   * matched payout each finalized round owes, with self-serve claim. Bahasa-first.
+   */
+  dashboard: {
+    title: "Dasbor saya",
+    subtitle:
+      "Kampanye yang kamu ajukan, total donasi yang terkumpul, dan pencairan dana padanan tiap musim.",
+    createCta: "Ajukan kampanye",
+    // Gate ladder (owners need no verification tier — just a Testnet wallet)
+    connectPrompt: "Hubungkan wallet Testnet untuk melihat kampanyemu.",
+    wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
+    // Empty state
+    empty: "Kamu belum punya kampanye.",
+    emptyHint: "Ajukan kampanye pertamamu untuk mulai menerima donasi dan dana padanan.",
+    // Per-campaign
+    statusPill: {
+      Pending: "Menunggu kurasi",
+      Approved: "Aktif",
+      Rejected: "Ditolak",
+      Cancelled: "Dibatalkan",
+    } as Record<string, string>,
+    lifetimeLabel: "Total donasi langsung",
+    seasonsHeading: "Pencairan per musim",
+    seasonsLoading: "Memuat pencairan…",
+    noSeasons: "Kampanye ini belum ikut musim pencocokan yang difinalisasi.",
+    // Per finalized round
+    round: {
+      label: (id: number) => `Musim #${id}`,
+      directLabel: "Langsung",
+      donorSuffix: "pendukung",
+      matchedLabel: "Padanan",
+      claim: "Klaim padanan",
+      claiming: "Mengklaim…",
+      claimed: "Terklaim",
+      nothing: "Tanpa padanan musim ini",
+    },
+    // Campaign-level claim of donations received while no round was open
+    direct: {
+      heading: "Donasi di luar musim",
+      body: "Donasi yang masuk saat tak ada musim aktif — bisa dicairkan kapan saja.",
+      claim: "Klaim donasi langsung",
+      claiming: "Mengklaim…",
+      claimed: "Donasi langsung telah dicairkan.",
+    },
+    // Shared tx phases
+    awaiting: "Buka Freighter untuk menandatangani…",
+    submitting: "Mengirim transaksi…",
+    claimedTitle: "Dana berhasil diklaim!",
+    viewOnExplorer: "Lihat transaksi di Explorer",
+  },
+  /**
+   * Contributor account `/account` — "me": my verification tier, my total impact,
+   * and my past direct donations reconstructed from on-chain `contrib` events, grouped by campaign.
+   */
+  account: {
+    title: "Kontribusi saya",
+    subtitle:
+      "Riwayat donasi langsungmu, direkonstruksi dari catatan on-chain — dikelompokkan per kampanye.",
+    // Gate ladder (a contributor only needs a Testnet wallet to see their own history)
+    connectPrompt: "Hubungkan wallet Testnet untuk melihat riwayat kontribusimu.",
+    wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
+    // Header ledger figure (quiet total, not a hero card)
+    tierLabel: "Verifikasi",
+    tier: { None: "Belum terverifikasi", Basic: "Basic", Institution: "Institution" } as Record<
+      string,
+      string
+    >,
+    impactLabel: "Total dampak saya",
+    campaignCount: (n: number) => `${n} kampanye`,
+    giftCount: (n: number) => `${n} donasi`,
+    // Per-campaign group
+    myTotalLabel: "Donasiku",
+    unknownCampaign: (id: number) => `Kampanye #${id}`,
+    viewCampaign: "Lihat kampanye",
+    viewTx: "Lihat di Explorer",
+    // Empty state
+    empty: "Kamu belum berdonasi.",
+    emptyHint:
+      "Donasi pertamamu akan muncul di sini, tercatat langsung dari transaksi on-chain.",
+    exploreCta: "Jelajahi kampanye",
+    // Retention caveat — testnet RPC prunes old events; keep the reconstruction honest.
+    retentionNote:
+      "Hanya donasi dalam jendela retensi RPC Testnet yang bisa ditampilkan.",
+  },
+  /** Tier-aware verification badge labels + one-line unlock captions (`TierBadge`). */
+  tierBadge: {
+    currentLabel: "Tingkat verifikasi kamu",
+    tiers: {
+      None: "Belum terverifikasi",
+      Basic: "Terverifikasi Basic",
+      Institution: "Terverifikasi Institution",
+    } as Record<string, string>,
+    unlocks: {
+      None: "Verifikasi untuk mulai ikut urunan dan mengajukan kampanye.",
+      Basic: "Kamu bisa ikut urunan dan mengajukan kampanye.",
+      Institution: "Kamu bisa ikut urunan, mengajukan kampanye, dan mengisi dana padanan.",
+    } as Record<string, string>,
+  },
+  /**
+   * Verification flow `/verify` — a linear 3-step trust ladder: see your tier,
+   * prove wallet ownership to the anchor (SEP-10), then get a tier attested. On testnet the anchor's
+   * KYC is a clearly-labeled stand-in; the attester (operator) writes the tier. Bahasa-first.
+   */
+  verify: {
+    title: "Verifikasi",
+    subtitle:
+      "Verifikasi sekali untuk membuka urunan dan pengajuan kampanye. Data identitasmu tak pernah tersimpan di sini — hanya tingkat verifikasinya yang tercatat on-chain.",
+    // Gate ladder
+    connectPrompt: "Hubungkan wallet Testnet untuk mulai verifikasi.",
+    wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
+    // What each tier unlocks — the ladder rail
+    ladderHeading: "Yang terbuka di tiap tingkat",
+    ladder: [
+      { tier: "Basic", unlock: "Ikut urunan & ajukan kampanye" },
+      { tier: "Institution", unlock: "Isi dana padanan sebagai sponsor" },
+    ],
+    // Step 1 — SEP-10 ownership
+    sep10: {
+      overline: "01 · Bukti kepemilikan",
+      heading: "Buktikan kamu pemilik wallet ini",
+      description:
+        "Tanda tangani tantangan dari anchor (SEP-10) untuk membuktikan kepemilikan wallet. Tidak ada dana yang berpindah.",
+      cta: "Mulai bukti kepemilikan",
+      pending: "Menghubungi anchor…",
+      awaiting: "Buka Freighter untuk menandatangani…",
+      successTitle: "Kepemilikan terbukti",
+      successBody: "Anchor menerbitkan token sesi. Lanjut ke atestasi tingkat.",
+      notConfiguredTitle: "Anchor belum dikonfigurasi",
+      notConfiguredBody:
+        "Belum ada anchor SEP-10 yang tersambung di lingkungan ini. Kamu tetap bisa memakai jalur atestasi simulasi testnet di bawah.",
+      errors: {
+        "not-configured": "Anchor belum dikonfigurasi di lingkungan ini.",
+        toml: "Endpoint SEP-10 anchor tidak ditemukan.",
+        challenge: "Anchor menolak permintaan verifikasi. Coba lagi.",
+        "invalid-challenge": "Tantangan dari anchor tidak valid.",
+        signature: "Tanda tangan dibatalkan.",
+        token: "Anchor menolak tanda tangan. Coba lagi.",
+        network: "Gagal menghubungi anchor. Periksa koneksi lalu coba lagi.",
+        generic: "Verifikasi anchor gagal. Coba lagi.",
+      } as Record<string, string>,
+    },
+    // Step 1.5 — SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
+    kyc: {
+      overline: "01b · Data KYC",
+      heading: "Kirim data KYC ke anchor",
+      description:
+        "Anchor ini mempublikasikan layanan KYC (SEP-12). Isi data singkat berikut untuk diperiksa oleh anchor.",
+      firstName: "Nama depan",
+      lastName: "Nama belakang",
+      email: "Email",
+      cta: "Kirim ke anchor",
+      submitting: "Mengirim ke anchor…",
+      polling: "Memeriksa status di anchor…",
+      status: {
+        NEEDS_INFO: "Anchor meminta data tambahan.",
+        PROCESSING: "Anchor sedang memproses pengajuanmu.",
+        PENDING: "Menunggu keputusan anchor.",
+        ACCEPTED: "Anchor menyetujui KYC-mu. Lanjut ke atestasi tingkat.",
+        REJECTED: "Anchor menolak pengajuan KYC ini.",
+      } as Record<string, string>,
+      errors: {
+        "not-configured": "Anchor belum dikonfigurasi di lingkungan ini.",
+        "kyc-not-configured":
+          "Anchor ini tidak mempublikasikan layanan KYC (SEP-12) — lanjut lewat jalur atestasi simulasi testnet di bawah.",
+        "kyc-rejected": "Anchor menolak pengajuan KYC. Coba lagi.",
+        network: "Gagal menghubungi anchor. Periksa koneksi lalu coba lagi.",
+        generic: "Pengajuan KYC gagal. Coba lagi.",
+      } as Record<string, string>,
+    },
+    // Step 2 — attest (real KYC hand-off, or the simulated testnet stand-in)
+    attest: {
+      overline: "02 · Atestasi tingkat",
+      heading: "Dapatkan tingkat verifikasi",
+      simBadge: "Simulasi testnet",
+      realBadge: "KYC anchor diterima",
+      description:
+        "Di produksi, anchor menyetujui KYC lalu menuliskan tingkatmu. Di testnet, operator (pemegang kunci atestasi) berperan sebagai anchor.",
+      // Attester-holder path (self-serve on testnet)
+      attesterHint:
+        "Wallet ini memegang peran penerbit atestasi — kamu bisa menetapkan tingkat langsung sebagai stand-in anchor.",
+      tierLabel: "Tingkat",
+      tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
+      cta: "Setujui (simulasi KYC)",
+      successTitle: "Tingkat verifikasi ditetapkan!",
+      // Non-attester fallback
+      fallbackTitle: "Menunggu atestasi operator",
+      fallbackBody:
+        "Di testnet, atestasi tingkat diselesaikan oleh operator sebagai pengganti anchor. Kepemilikan wallet-mu sudah terbukti — minta operator menetapkan tingkatmu lewat konsol.",
+      fallbackCta: "Buka konsol operator",
+      alreadyTitle: "Kamu sudah terverifikasi",
+      alreadyBody: "Tak perlu langkah lain. Kamu siap ikut urunan.",
+      exploreCta: "Jelajahi kampanye",
+    },
+    // Shared tx phases
+    submitting: "Mengirim transaksi…",
+    viewOnExplorer: "Lihat transaksi di Explorer",
+    tierError: "Gagal memuat tingkat verifikasi. Coba lagi.",
+  },
+  wallet: {
+    connect: "Hubungkan Wallet",
+    connecting: "Menghubungkan…",
+    notInstalled: "Pasang Freighter",
+    wrongNetworkPill: "Jaringan salah",
+    testnetPill: "Testnet",
+    wrongNetworkBanner:
+      "Freighter tidak terhubung ke Testnet. Alihkan jaringan di Freighter untuk melanjutkan.",
+    connectFailed: "Gagal menghubungkan wallet. Coba lagi.",
+  },
+  explorer: {
+    viewTx: "Lihat transaksi di Explorer",
+    viewContract: "Lihat kontrak di Explorer",
+  },
+  footer: {
+    transparency: "Setiap aksi tercatat on-chain di Stellar Testnet.",
+  },
+  loading: "Memuat…",
+  empty: "Belum ada proyek",
+  errorGeneric: "Terjadi kesalahan. Coba lagi.",
+  retry: "Coba lagi",
+  staleData: "Gagal memuat pembaruan — menampilkan data terakhir.",
+  /**
+   * Shared Bahasa fallback for every contract `Error` variant (mapped by name via
+   * `mapContractError`). Context-specific screens may override individual keys by passing their
+   * own map; anything they omit falls back here, so no rejection ever renders raw internals.
+   */
+  errors: {
+    AlreadyInitialized: "Kontrak sudah diinisialisasi.",
+    NotAdmin: "Hanya admin yang dapat melakukan aksi ini.",
+    NotVerified: "Alamat belum terverifikasi.",
+    RoundClosed: "Ronde sudah ditutup untuk kontribusi baru.",
+    RoundNotOpen: "Ronde sudah tidak dibuka untuk aksi ini.",
+    AlreadyFinalized: "Ronde sudah difinalisasi.",
+    NotFinalized: "Ronde belum difinalisasi.",
+    UnknownProject: "Kampanye tidak ditemukan.",
+    DuplicateProject: "Kampanye sudah terdaftar.",
+    AlreadyDisbursed: "Dana kampanye ini sudah dicairkan.",
+    InvalidAmount: "Jumlah tidak valid.",
+    NothingToMatch: "Belum ada kontribusi untuk dicocokkan.",
+    NotCurator: "Hanya kurator yang dapat melakukan aksi ini.",
+    ProjectNotApproved: "Kampanye belum disetujui kurator.",
+    ProjectNotPending: "Kampanye tidak sedang menunggu kurasi.",
+    AlreadyClaimed: "Bagian ronde ini sudah diklaim.",
+    UnknownRound: "Ronde tidak ditemukan.",
+    RoundAlreadyOpen: "Sudah ada ronde yang dibuka.",
+    CategoryNotInRound: "Kategori kampanye tidak termasuk dalam ronde ini.",
+    TierTooLow: "Tingkat verifikasi belum mencukupi untuk aksi ini.",
+    NothingToClaim: "Tidak ada dana untuk diklaim.",
+    NotOwner: "Hanya pemilik kampanye yang dapat melakukan aksi ini.",
+    NotAttester: "Hanya penerbit atestasi yang dapat melakukan aksi ini.",
+    InvalidCid: "CID gambar tidak valid.",
+    InvalidTitle: "Judul tidak valid.",
+    rejected: "Tanda tangan dibatalkan.",
+    generic: "Transaksi gagal. Coba lagi.",
+  } as Record<string, string>,
+} as const;
