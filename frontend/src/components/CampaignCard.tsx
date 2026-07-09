@@ -48,9 +48,9 @@ export function CampaignCard({
   return (
     <Link
       href={`/campaign/${campaign.id}`}
-      className="group grid overflow-hidden rounded-[2rem] border border-ink/10 bg-paper text-ink shadow-soft transition duration-200 hover:-translate-y-1 hover:border-lime/70 md:grid-cols-[18rem_1fr]"
+      className="group flex flex-col overflow-hidden rounded-[2rem] border border-ink/10 bg-paper text-ink shadow-soft transition duration-200 hover:-translate-y-1 hover:border-lime/70"
     >
-      <div className="relative min-h-64 overflow-hidden">
+      <div className="relative aspect-[16/10] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
@@ -71,11 +71,11 @@ export function CampaignCard({
           <span className="text-xs font-black uppercase tracking-[.12em] text-white/65">
             {visual.location}
           </span>
-          <h3 className="mt-2 text-3xl font-black leading-none">{campaign.title}</h3>
+          <h3 className="mt-2 line-clamp-2 text-2xl font-black leading-none">{campaign.title}</h3>
         </div>
       </div>
 
-      <div className="grid gap-5 p-5 sm:p-6">
+      <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
         <p className="line-clamp-3 text-base font-semibold leading-7 text-ink/62">
           {campaign.story}
         </p>
