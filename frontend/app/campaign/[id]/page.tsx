@@ -5,21 +5,21 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ProjectState } from "@/contract/src";
 import { strings } from "@/strings";
-import { formatIDR, truncateAddress } from "@/lib/format";
+import { formatCompactIDR, formatIDR, truncateAddress } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
+import { getProjectVisual } from "@/lib/projectVisuals";
 import { useCampaign, useOpenRound, usePreviewRound, useRoundProject } from "@/lib/hooks";
-import { CategoryChip } from "@/components/CategoryChip";
 import { ContributePanel } from "@/components/ContributePanel";
 
 const t = strings.campaign;
 
 /**
- * Campaign detail `/campaign/[id]`. A reading column (story) beside a sticky
- * ledger sidebar (lifetime direct + — only in the open round's scope — this-round donor count and
- * the projected quadratic match, the page's single emerald figure). The sidebar carries the inline
- * ContributePanel. Four states: loading skeleton, not-found (unknown/malformed id → home), a
- * non-Approved status notice, and the success layout.
+ * Campaign detail `/campaign/[id]`. A dark hero banner (real uploaded image when set, else a
+ * curated stock photo) over the reading column (story) and a sticky ledger sidebar — lifetime
+ * direct +, only in the open round's scope, this-round donor count and the projected quadratic
+ * match. The sidebar carries the inline ContributePanel. Four states: loading skeleton,
+ * not-found (unknown/malformed id → home), a non-Approved status notice, and the success layout.
  */
 export default function CampaignDetailPage() {
   const params = useParams<{ id: string }>();
@@ -78,99 +78,122 @@ function Content({
   projectedMatch: bigint | undefined;
 }) {
   const thumb = cidToUrl(campaign.image_cid);
-  const { placeholder } = categoryMeta(campaign.category.tag);
+  const visual = getProjectVisual(campaign.id);
+  const { label: categoryLabel } = categoryMeta(campaign.category.tag);
   const approved = campaign.status.tag === "Approved";
   const statusNotice = approved ? null : t.status[campaign.status.tag];
+  const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
 
   return (
-    <main className="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-ink"
-      >
-        <span aria-hidden>←</span>
-        {t.back}
-      </Link>
-
+    <main className="bg-cream text-ink">
       {/* Hero banner */}
-      <div className="relative mt-5 aspect-[16/9] overflow-hidden rounded-2xl border border-line shadow-card sm:aspect-[21/9]">
-        {thumb ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={campaign.title} className="h-full w-full object-cover" />
-        ) : (
-          <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${placeholder}`}>
-            <span className="text-xs font-medium uppercase tracking-widest text-muted">
-              {strings.discovery.noThumbAlt}
-            </span>
+      <section className="relative overflow-hidden bg-ink text-paper">
+        <img
+          className="absolute inset-0 h-full w-full object-cover opacity-45"
+          src={thumb ?? visual.image}
+          alt={campaign.title}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,18,15,.96),rgba(7,18,15,.62)_55%,rgba(7,18,15,.82))]" />
+        <div className="chain-grid absolute inset-0 opacity-60" />
+
+        <div className="relative mx-auto grid max-w-[1500px] gap-8 px-4 py-14 sm:px-7 lg:grid-cols-[1fr_.85fr] lg:px-10">
+          <div>
+            <Link href="/" className="tag">
+              {t.back}
+            </Link>
+            <div className="mt-8 flex flex-wrap gap-2">
+              <span className="tag">{categoryLabel}</span>
+              <span className="tag">{visual.location}</span>
+              {donors !== undefined ? <span className="tag">{donors} {t.donorSuffix}</span> : null}
+            </div>
+            <h1 className="mt-6 max-w-4xl text-[clamp(3rem,7vw,7rem)] font-black uppercase leading-[.88]">
+              {campaign.title}
+            </h1>
+            {statusNotice ? (
+              <p className="mt-6 max-w-2xl rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white/80">
+                {statusNotice}
+              </p>
+            ) : null}
           </div>
-        )}
-        <div className="absolute left-4 top-4">
-          <CategoryChip tag={campaign.category.tag} size="md" />
-        </div>
-      </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_20rem] lg:gap-12">
-        {/* Reading column */}
-        <article>
-          <h1 className="text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-[2.5rem]">
-            {campaign.title}
-          </h1>
-          <p className="mt-3 text-sm text-faint">
-            {t.byOwner}{" "}
-            <span className="tabular font-medium text-muted">
-              {truncateAddress(campaign.owner)}
-            </span>
-          </p>
+          <aside className="glass-dark rounded-[2rem] p-5">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="metric-card bg-paper text-ink">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/42">
+                  {strings.discovery.directShort}
+                </span>
+                <strong className="num tabular mt-2 text-2xl font-black">
+                  {formatCompactIDR(campaign.lifetime_direct)}
+                </strong>
+              </div>
+              <div className="metric-card bg-lime text-ink">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/48">
+                  {t.projectedMatchLabel}
+                </span>
+                <strong className="num tabular mt-2 text-2xl font-black">
+                  {projectedMatch === undefined
+                    ? strings.landing.noMatchYet
+                    : formatCompactIDR(projectedMatch)}
+                </strong>
+              </div>
+              <div className="metric-card bg-white/10 text-paper">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-white/42">
+                  Donor
+                </span>
+                <strong className="num tabular mt-2 text-2xl font-black text-lime">
+                  {donors ?? "—"}
+                </strong>
+              </div>
+              <div className="metric-card bg-white/10 text-paper">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-white/42">
+                  Total
+                </span>
+                <strong className="num tabular mt-2 text-2xl font-black text-lime">
+                  {formatCompactIDR(total)}
+                </strong>
+              </div>
+            </div>
 
-          {statusNotice ? (
-            <p className="mt-6 rounded-xl border border-line bg-paper px-4 py-3 text-sm text-muted">
-              {statusNotice}
+            {!inScope ? (
+              <p className="mt-4 text-center text-xs font-semibold text-white/60">{t.notInRound}</p>
+            ) : null}
+
+            <div className="mt-5">
+              <ContributePanel campaign={campaign} disabled={!approved} />
+            </div>
+            <p className="mt-3 text-center text-xs font-semibold text-white/45">
+              {t.byOwner} <span className="tabular">{truncateAddress(campaign.owner)}</span>
             </p>
-          ) : null}
+          </aside>
+        </div>
+      </section>
 
-          <h2 className="mt-8 text-xs font-semibold uppercase tracking-wide text-faint">
+      {/* Reading column */}
+      <section className="px-4 py-10 sm:px-7 lg:px-10">
+        <div className="mx-auto max-w-[1500px]">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-faint">
             {t.storyHeading}
           </h2>
           <p className="mt-3 max-w-[68ch] whitespace-pre-line text-base leading-relaxed text-muted">
             {campaign.story}
           </p>
-        </article>
+        </div>
+      </section>
 
-        {/* Sticky ledger sidebar */}
-        <aside className="lg:sticky lg:top-6 lg:self-start">
-          <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
-            <p className="text-xs uppercase tracking-wide text-faint">{t.raisedLabel}</p>
-            <p className="tabular mt-1 text-3xl font-bold text-ink">
-              {formatIDR(campaign.lifetime_direct)}
-            </p>
-
-            {inScope ? (
-              <div className="mt-5 border-t border-line pt-5">
-                <p className="text-xs uppercase tracking-wide text-faint">{t.thisRoundHeading}</p>
-                {donors !== undefined ? (
-                  <p className="mt-1 text-sm text-muted">
-                    {donors} {t.donorSuffix}
-                  </p>
-                ) : null}
-                {projectedMatch !== undefined ? (
-                  <div className="mt-3">
-                    <p className="text-xs text-muted">{t.projectedMatchLabel}</p>
-                    <p className="tabular mt-1 inline-flex items-center rounded-full bg-match-soft px-3 py-1 text-lg font-semibold text-match-ink">
-                      +{formatIDR(projectedMatch)}
-                    </p>
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <p className="mt-4 border-t border-line pt-4 text-sm text-faint">{t.notInRound}</p>
-            )}
-
-            <div className="mt-6">
-              <ContributePanel campaign={campaign} disabled={!approved} />
+      <section className="px-4 pb-10 sm:px-7 lg:px-10">
+        <div className="mx-auto grid max-w-[1500px] gap-4 md:grid-cols-3">
+          {[
+            ["Public signal", "Setiap kontribusi menjadi input terbuka untuk quadratic funding."],
+            ["Verified donors", "Alamat yang ikut round harus masuk registry agar demo tidak mudah dimanipulasi."],
+            ["Auditable payout", "Direct dan matched dihitung dari state contract yang sama."],
+          ].map(([title, copy]) => (
+            <div key={title} className="paper rounded-[1.5rem] p-5">
+              <span className="tag tag-light">{title}</span>
+              <p className="mt-4 text-lg font-black leading-tight">{copy}</p>
             </div>
-          </div>
-        </aside>
-      </div>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

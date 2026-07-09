@@ -29,3 +29,27 @@ export function formatCountdown(
   if (m > 0) return `${m}${units.min}`;
   return `< 1${units.min}`;
 }
+
+/** Compact IDR for tight hero/stat surfaces: `Rp1,2jt`, `Rp850rb`, falling back to `formatIDR` under Rp1.000. */
+export function formatCompactIDR(amount: number | bigint): string {
+  const n = Number(typeof amount === "bigint" ? amount : Math.trunc(amount));
+
+  if (n >= 1_000_000_000) {
+    return `Rp${(n / 1_000_000_000).toLocaleString("id-ID", {
+      maximumFractionDigits: 1,
+    })}M`;
+  }
+
+  if (n >= 1_000_000) {
+    const million = n / 1_000_000;
+    return `Rp${million.toLocaleString("id-ID", {
+      maximumFractionDigits: million >= 10 ? 1 : 2,
+    })}jt`;
+  }
+
+  if (n >= 1_000) {
+    return `Rp${Math.round(n / 1_000).toLocaleString("id-ID")}rb`;
+  }
+
+  return formatIDR(n);
+}

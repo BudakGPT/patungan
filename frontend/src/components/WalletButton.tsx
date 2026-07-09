@@ -19,7 +19,7 @@ export function WalletButton() {
         href="https://www.freighter.app/"
         target="_blank"
         rel="noreferrer"
-        className="rounded-md bg-neutral-800 px-3 py-1.5 text-sm text-white hover:bg-neutral-700"
+        className="btn btn-lime min-h-11 px-4 text-sm"
       >
         {strings.wallet.notInstalled}
       </a>
@@ -38,7 +38,7 @@ export function WalletButton() {
           type="button"
           disabled={status === "connecting"}
           onClick={() => void connect()}
-          className="rounded-md bg-neutral-800 px-3 py-1.5 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
+          className="btn btn-lime min-h-11 px-4 text-sm disabled:opacity-60"
         >
           {status === "connecting" ? strings.wallet.connecting : strings.wallet.connect}
         </button>
@@ -63,7 +63,7 @@ export function WalletButton() {
         type="button"
         onClick={disconnect}
         title={address ?? undefined}
-        className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50"
+        className="rounded-full border border-white/20 bg-white/8 px-3 py-1.5 text-sm font-black text-paper hover:bg-white/15"
       >
         {address ? truncate(address) : null}
       </button>

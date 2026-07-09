@@ -16,9 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body>
+      <body className="grain font-sans">
+        <div className="spotlight" />
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="relative z-10 flex min-h-screen flex-col">
             <Header />
             <div className="flex-1">{children}</div>
             <Footer />

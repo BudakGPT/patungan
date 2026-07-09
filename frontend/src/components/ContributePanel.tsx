@@ -25,12 +25,12 @@ type TxState =
 
 /**
  * The one live action of the whole product: an in-place contribute panel that lives in the
- * campaign's ledger sidebar — an inline progressive disclosure
- * rather than a modal. It carries its own gate ladder before the money step: connect wallet →
- * be on Testnet → hold tier ≥ Basic (else route to `/verify`) → only then the preset amounts.
- * On success it optimistically patches `lifetime_direct` in both the detail and list caches (never
- * the round `matched`, which is recomputed on-chain), then invalidates so the round donor count /
- * projected match repoll.
+ * campaign's (dark glass) ledger sidebar — an inline progressive disclosure rather than a modal.
+ * It carries its own gate ladder before the money step: connect wallet → be on Testnet → hold
+ * tier ≥ Basic (else route to `/verify`) → only then the preset amounts. On success it
+ * optimistically patches `lifetime_direct` in both the detail and list caches (never the round
+ * `matched`, which is recomputed on-chain), then invalidates so the round donor count / projected
+ * match repoll.
  */
 export function ContributePanel({
   campaign,
@@ -58,7 +58,7 @@ export function ContributePanel({
         type="button"
         disabled={status === "connecting"}
         onClick={() => void connect()}
-        className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+        className="btn btn-lime w-full disabled:opacity-60"
       >
         {status === "connecting" ? strings.wallet.connecting : strings.wallet.connect}
       </button>
@@ -66,19 +66,16 @@ export function ContributePanel({
   }
 
   if (status === "wrong-network") {
-    return <p className="text-sm text-cat-disaster">{c.wrongNetwork}</p>;
+    return <p className="text-sm font-semibold text-cat-disaster">{c.wrongNetwork}</p>;
   }
 
   // Connected: enforce the tier gate before the amount step.
   if (tierQ.data !== undefined && tierQ.data === Tier.None) {
     return (
-      <div className="rounded-xl border border-line bg-paper px-4 py-4 text-center">
-        <p className="font-medium text-ink">{c.tierGateTitle}</p>
-        <p className="mt-1 text-sm text-muted">{c.tierGateBody}</p>
-        <a
-          href="/verify"
-          className="mt-3 inline-block rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink"
-        >
+      <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-4 text-center">
+        <p className="font-black text-paper">{c.tierGateTitle}</p>
+        <p className="mt-1 text-sm text-white/60">{c.tierGateBody}</p>
+        <a href="/verify" className="btn btn-lime mt-3 inline-flex">
           {c.tierGateCta}
         </a>
       </div>
@@ -87,10 +84,10 @@ export function ContributePanel({
 
   if (tx.phase === "success") {
     return (
-      <div className="rounded-xl border border-match/30 bg-match-soft px-4 py-4 text-center">
-        <p className="font-medium text-match-ink">{c.successTitle}</p>
+      <div className="rounded-xl border border-lime/30 bg-lime/10 px-4 py-4 text-center">
+        <p className="font-black text-lime">{c.successTitle}</p>
         {tx.hash ? (
-          <p className="mt-2 text-sm text-match-ink underline-offset-2">
+          <p className="mt-2 text-sm text-lime underline-offset-2">
             <ExplorerLink hash={tx.hash} label={strings.explorer.viewTx} />
           </p>
         ) : null}
@@ -100,7 +97,7 @@ export function ContributePanel({
             setTx({ phase: "idle" });
             setOpen(false);
           }}
-          className="mt-3 text-sm font-medium text-muted underline underline-offset-2 hover:text-ink"
+          className="mt-3 text-sm font-semibold text-white/60 underline underline-offset-2 hover:text-paper"
         >
           {c.done}
         </button>
@@ -110,11 +107,7 @@ export function ContributePanel({
 
   if (!open) {
     return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink"
-      >
+      <button type="button" onClick={() => setOpen(true)} className="btn btn-lime w-full">
         {c.cta}
       </button>
     );
@@ -163,7 +156,7 @@ export function ContributePanel({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs uppercase tracking-wide text-faint">{c.amountLabel}</p>
+      <p className="text-xs font-black uppercase tracking-wide text-white/45">{c.amountLabel}</p>
       <div className="grid grid-cols-3 gap-2">
         {PRESETS.map((preset) => (
           <button
@@ -171,10 +164,10 @@ export function ContributePanel({
             type="button"
             disabled={pending}
             onClick={() => setAmount(preset)}
-            className={`rounded-xl border px-2 py-2.5 text-sm font-semibold tabular transition-colors disabled:opacity-60 ${
+            className={`tabular rounded-xl border px-2 py-2.5 text-sm font-black transition-colors disabled:opacity-60 ${
               amount === preset
-                ? "border-accent bg-accent-soft text-accent-ink"
-                : "border-line bg-surface text-muted hover:border-accent/40"
+                ? "border-lime bg-lime text-ink"
+                : "border-white/15 bg-white/8 text-paper hover:border-lime/50"
             }`}
           >
             {formatIDR(preset)}
@@ -183,15 +176,10 @@ export function ContributePanel({
       </div>
 
       {tx.phase === "error" ? (
-        <p className="text-sm text-cat-disaster">{tx.message}</p>
+        <p className="text-sm font-semibold text-cat-disaster">{tx.message}</p>
       ) : null}
 
-      <button
-        type="button"
-        disabled={pending}
-        onClick={() => void submit()}
-        className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
-      >
+      <button type="button" disabled={pending} onClick={() => void submit()} className="btn btn-lime w-full disabled:opacity-60">
         {tx.phase === "awaiting-signature"
           ? c.awaiting
           : tx.phase === "submitting"
@@ -203,7 +191,7 @@ export function ContributePanel({
         type="button"
         disabled={pending}
         onClick={() => setOpen(false)}
-        className="w-full text-center text-sm text-muted underline underline-offset-2 hover:text-ink disabled:opacity-60"
+        className="w-full text-center text-sm font-semibold text-white/50 underline underline-offset-2 hover:text-paper disabled:opacity-60"
       >
         {c.cancel}
       </button>

@@ -2,11 +2,12 @@ import type { Config } from "tailwindcss";
 
 /**
  * Patungan design tokens — the system the whole product inherits (discovery, campaign
- * detail, create, operator, dashboard, seasons). Light, civic, public-ledger register:
- * warm paper + cool slate ink, one indigo accent for interaction, and a reserved emerald
- * "match" role for the quadratic-match figure (the platform's one magic number). Category
- * hues are muted tints, never full saturation. OKLCH throughout; `<alpha-value>` so opacity
- * modifiers (`bg-accent/10`) work.
+ * detail, create, operator, dashboard, seasons). `ink`/`paper`/`cream` are the brand's
+ * near-black/near-white/warm-neutral triad (used as both text and background depending on
+ * surface); `accent`/`match`/`cat-*` are the existing functional roles (interaction, the
+ * quadratic-match figure, category tints); `lime`/`green`/`deep`/`sea`/`gold`/`clay` are the
+ * revamped demo UI's accent palette. OKLCH where precise blending matters, hex where a literal
+ * hardcoded value elsewhere in globals.css needs to match exactly.
  */
 const config: Config = {
   content: [
@@ -17,9 +18,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "oklch(0.985 0.005 85 / <alpha-value>)",
+        ink: "#07120f",
+        paper: "#fffaf0",
+        cream: "#f4efe4",
+        lime: "#d7ff5f",
+        green: "#0d8d63",
+        deep: "#083d30",
+        sea: "#17a69a",
+        gold: "#f6be3e",
+        clay: "#cf6746",
+
         surface: "oklch(0.997 0.003 85 / <alpha-value>)",
-        ink: "oklch(0.24 0.02 265 / <alpha-value>)",
         muted: "oklch(0.52 0.015 265 / <alpha-value>)",
         faint: "oklch(0.63 0.012 265 / <alpha-value>)",
         line: "oklch(0.91 0.006 265 / <alpha-value>)",
@@ -44,13 +53,24 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
+          "Instrument Sans",
+          "Inter",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
           "Roboto",
-          "Helvetica Neue",
-          "Arial",
+          "ui-sans-serif",
+          "system-ui",
           "sans-serif",
+        ],
+        mono: [
+          "JetBrains Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          "monospace",
         ],
       },
       maxWidth: {
@@ -60,6 +80,8 @@ const config: Config = {
         card: "0 1px 2px oklch(0.24 0.02 265 / 0.05), 0 1px 3px oklch(0.24 0.02 265 / 0.04)",
         "card-hover":
           "0 6px 16px oklch(0.24 0.02 265 / 0.08), 0 2px 6px oklch(0.24 0.02 265 / 0.05)",
+        award: "0 32px 100px rgba(7, 18, 15, .22)",
+        soft: "0 18px 48px rgba(7, 18, 15, .12)",
       },
       transitionTimingFunction: {
         "out-quint": "cubic-bezier(0.22, 1, 0.36, 1)",

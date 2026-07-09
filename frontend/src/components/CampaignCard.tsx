@@ -3,96 +3,135 @@
 import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
 import { strings } from "@/strings";
-import { formatIDR } from "@/lib/format";
+import { formatCompactIDR, formatIDR } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
-import { CategoryChip } from "./CategoryChip";
+import { getProjectVisual } from "@/lib/projectVisuals";
 import { useRoundProject } from "@/lib/hooks";
 
 const d = strings.discovery;
 
 /**
- * One approved campaign in the discovery grid. Always shows category, title, and lifetime direct
- * raised. The "this round" strip (donor count + projected quadratic match) appears **only** when
- * the campaign is in the open round's scope — out-of-scope cards never show a fake match figure.
- * Links to `/campaign/[id]`.
+ * One approved campaign in the discovery grid. The category, title, and lifetime direct raised
+ * always show. Donor count and projected match come from the open round's per-(round, project)
+ * tally and are only fetched for in-scope campaigns (`useRoundProject`'s `inScope` gate) — an
+ * out-of-scope card naturally renders "—"/no-match copy instead of a fake figure. Falls back to
+ * a curated stock photo when the campaign has no uploaded image. Links to `/campaign/[id]`.
  */
 export function CampaignCard({
   campaign,
   roundId,
   inScope,
   projectedMatch,
+  pool,
 }: {
   campaign: ProjectState;
   roundId: number | null;
   inScope: boolean;
   projectedMatch?: bigint;
+  pool: bigint;
 }) {
   const thumb = cidToUrl(campaign.image_cid);
-  const { placeholder } = categoryMeta(campaign.category.tag);
+  const visual = getProjectVisual(campaign.id);
+  const { label: categoryLabel } = categoryMeta(campaign.category.tag);
 
   // Donor count is only exposed per-round; fetch it just for in-scope cards.
   const rp = useRoundProject(roundId, campaign.id, inScope);
   const donors = rp.data?.[1];
 
+  const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
+  const pct =
+    projectedMatch !== undefined && pool > 0n
+      ? Math.max(Math.min(Number((projectedMatch * 10_000n) / pool) / 100, 100), 5)
+      : 0;
+
   return (
     <Link
       href={`/campaign/${campaign.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-card transition duration-200 ease-out-quint hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-card-hover"
+      className="group grid overflow-hidden rounded-[2rem] border border-ink/10 bg-paper text-ink shadow-soft transition duration-200 hover:-translate-y-1 hover:border-lime/70 md:grid-cols-[18rem_1fr]"
     >
-      <div className="relative aspect-[16/9] overflow-hidden">
-        {thumb ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={thumb}
-            alt={campaign.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 ease-out-quint group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div
-            className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${placeholder}`}
-          >
-            <span className="text-xs font-medium uppercase tracking-widest text-muted">
-              {d.noThumbAlt}
-            </span>
-          </div>
-        )}
-        <div className="absolute left-3 top-3">
-          <CategoryChip tag={campaign.category.tag} />
+      <div className="relative min-h-64 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+          src={thumb ?? visual.image}
+          alt={campaign.title}
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/82 via-ink/15 to-transparent" />
+        <div className="absolute left-4 top-4 flex gap-2">
+          <span className="rounded-full bg-lime px-3 py-1 text-xs font-black text-ink">
+            {String(campaign.id + 1).padStart(2, "0")}
+          </span>
+          <span className="rounded-full bg-paper/90 px-3 py-1 text-xs font-black text-ink">
+            {categoryLabel}
+          </span>
+        </div>
+        <div className="absolute bottom-4 left-4 right-4 text-paper">
+          <span className="text-xs font-black uppercase tracking-[.12em] text-white/65">
+            {visual.location}
+          </span>
+          <h3 className="mt-2 text-3xl font-black leading-none">{campaign.title}</h3>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 font-semibold leading-snug text-ink">
-          {campaign.title}
-        </h3>
+      <div className="grid gap-5 p-5 sm:p-6">
+        <p className="line-clamp-3 text-base font-semibold leading-7 text-ink/62">
+          {campaign.story}
+        </p>
 
-        <div className="mt-3 flex-1" />
-
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-[0.6875rem] uppercase tracking-wide text-faint">
-              {d.directShort}
-            </p>
-            <p className="tabular font-semibold text-ink">
-              {formatIDR(campaign.lifetime_direct)}
-            </p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="metric-card bg-ink text-paper">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-white/38">
+              Donor
+            </span>
+            <strong className="num tabular mt-2 block text-[clamp(1.9rem,2.3vw,2.6rem)] font-black text-lime">
+              {donors ?? "—"}
+            </strong>
           </div>
-          {inScope ? (
-            <div className="text-right">
-              {projectedMatch !== undefined ? (
-                <span className="tabular inline-flex items-center rounded-full bg-match-soft px-2.5 py-1 text-sm font-semibold text-match-ink">
-                  +{formatIDR(projectedMatch)} {d.matchSuffix}
-                </span>
-              ) : null}
-              {donors !== undefined ? (
-                <p className="mt-1 text-xs text-muted">
-                  {donors} {d.donorSuffix}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
+          <div className="metric-card bg-[#eee5d3]">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/42">
+              {d.directShort}
+            </span>
+            <strong className="num tabular mt-2 block text-[clamp(1.42rem,1.45vw,1.9rem)] font-black">
+              {formatCompactIDR(campaign.lifetime_direct)}
+            </strong>
+          </div>
+          <div className="metric-card bg-[#e3f8df]">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/42">
+              Projected
+            </span>
+            <strong className="num tabular mt-2 block text-[clamp(1.42rem,1.45vw,1.9rem)] font-black text-deep">
+              {projectedMatch === undefined
+                ? strings.landing.noMatchYet
+                : formatCompactIDR(projectedMatch)}
+            </strong>
+          </div>
+          <div className="metric-card bg-lime">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/48">
+              Total
+            </span>
+            <strong className="num tabular mt-2 block text-[clamp(1.42rem,1.45vw,1.9rem)] font-black">
+              {formatCompactIDR(total)}
+            </strong>
+          </div>
+        </div>
+
+        <div>
+          <div className="h-4 overflow-hidden rounded-full bg-ink/10">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-green via-sea to-lime"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between gap-3 text-xs font-black uppercase tracking-[.1em] text-ink/42">
+            <span className="tabular">
+              {donors ?? 0} {strings.landing.donorCountSuffix}
+            </span>
+            <span className="tabular">
+              {projectedMatch === undefined ? formatIDR(campaign.lifetime_direct) : formatIDR(total)}
+            </span>
+          </div>
         </div>
       </div>
     </Link>

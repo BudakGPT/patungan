@@ -22,11 +22,26 @@ const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
  */
 export default function ResultsPage() {
   return (
-    <main className="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10">
-      <Suspense fallback={<PageSkeleton />}>
-        <ResultsInner />
-      </Suspense>
-    </main>
+    <>
+      <section className="relative overflow-hidden bg-ink px-4 py-14 text-paper sm:px-7 lg:px-10">
+        <div className="chain-grid absolute inset-0 opacity-50" />
+        <div className="relative mx-auto max-w-[1500px]">
+          <span className="tag">Live reveal</span>
+          <h1 className="mt-4 text-[clamp(3rem,7vw,7rem)] font-black uppercase leading-[.86]">
+            {r.title}
+          </h1>
+          <p className="mt-5 max-w-xl text-lg font-semibold leading-8 text-white/62">
+            {r.verdict}
+          </p>
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-page bg-cream px-4 py-8 sm:px-6 sm:py-10">
+        <Suspense fallback={<PageSkeleton />}>
+          <ResultsInner />
+        </Suspense>
+      </main>
+    </>
   );
 }
 
