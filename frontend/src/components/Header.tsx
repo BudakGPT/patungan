@@ -16,16 +16,15 @@ export function Header() {
   const pathname = usePathname();
   const reduced = useReducedMotion();
 
-  /** Route → nav dot color. The dot IS the wayfinding (one hue per top-level route). */
   const NAV_ITEMS = useMemo(
     () =>
       [
-        { href: "/", label: strings.nav.landing, dot: "bg-lime" },
-        { href: "/seasons", label: strings.nav.seasons, dot: "bg-green" },
-        { href: "/results", label: strings.nav.results, dot: "bg-sea" },
-        { href: "/dashboard", label: strings.nav.dashboard, dot: "bg-clay" },
-        { href: "/account", label: strings.nav.account, dot: "bg-deep" },
-        { href: "/operator", label: strings.nav.operator, dot: "bg-gold" },
+        { href: "/", label: strings.nav.landing },
+        { href: "/seasons", label: strings.nav.seasons },
+        { href: "/results", label: strings.nav.results },
+        { href: "/dashboard", label: strings.nav.dashboard },
+        { href: "/account", label: strings.nav.account },
+        { href: "/operator", label: strings.nav.operator },
       ] as const,
     [strings],
   );
@@ -58,24 +57,29 @@ export function Header() {
             </span>
           </Link>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-6 lg:flex">
             {NAV_ITEMS.map((item) => (
-              <Link key={item.href} href={item.href} className="nav-pill">
-                <span className={`size-2 rounded-full ${item.dot}`} />
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
+              >
                 {item.label}
               </Link>
             ))}
           </div>
 
           <div className="flex items-center gap-2.5">
-            <LocaleToggle />
+            <div className="hidden lg:block">
+              <LocaleToggle />
+            </div>
             <WalletButton />
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-label={open ? "Tutup menu" : "Buka menu"}
-              className="nav-pill lg:hidden"
+              className="icon-btn lg:hidden"
             >
               <MenuIcon open={open} />
             </button>
@@ -104,7 +108,7 @@ export function Header() {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Tutup menu"
-                className="nav-pill"
+                className="icon-btn"
               >
                 <MenuIcon open />
               </button>
@@ -124,7 +128,6 @@ export function Header() {
                       pathname === item.href ? "text-lime" : "text-paper"
                     }`}
                   >
-                    <span className={`size-2.5 shrink-0 self-center rounded-full ${item.dot}`} />
                     <span className="display text-4xl leading-none sm:text-5xl">{item.label}</span>
                     <span className="mono ml-auto self-center text-xs text-white/55">
                       {String(i + 1).padStart(2, "0")}
@@ -139,7 +142,7 @@ export function Header() {
                 <span className="size-1.5 rounded-full bg-lime" />
                 contract: {config.contractId.slice(0, 4)}…{config.contractId.slice(-4)}
               </span>
-              <LocaleToggle />
+              <LocaleToggle openUp />
             </div>
           </motion.div>
         ) : null}

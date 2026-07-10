@@ -552,6 +552,7 @@ export const vi: Strings = {
   wallet: {
     connect: "Kết nối ví",
     connecting: "Đang kết nối…",
+    disconnect: "Ngắt kết nối ví",
     notInstalled: "Cài đặt Freighter",
     wrongNetworkPill: "Sai mạng",
     testnetPill: "Testnet",

@@ -16,7 +16,12 @@ import type { Strings } from "@/strings.id";
 interface TierStyle {
   /** Small pill classes. */ pill: string;
   /** Large status-block accent classes (border + tint). */ block: string;
-  /** Check glyph — ascends None → ✓ → ✓✓. */ mark: string;
+  /** Muted text-only tint for the header's merged wallet-status capsule (no pill chrome of its own). */
+  tint: string;
+  /** Check glyph — ascends None → ✓ → ✓✓. Used by the pill/block, not the header capsule. */
+  mark: string;
+  /** Capped at a single check for the header capsule — no doubling, quieter than `mark`. */
+  inlineMark: string;
   label: string;
   unlocks: string;
 }
@@ -27,7 +32,9 @@ function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
       return {
         pill: "bg-match-soft text-match-ink",
         block: "border-match/30 bg-match-soft",
+        tint: "text-match/70",
         mark: "✓✓",
+        inlineMark: "✓",
         label: tb.tiers.Institution,
         unlocks: tb.unlocks.Institution,
       };
@@ -35,7 +42,9 @@ function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
       return {
         pill: "bg-accent-soft text-accent-ink",
         block: "border-accent/25 bg-accent-soft",
+        tint: "text-accent/70",
         mark: "✓",
+        inlineMark: "✓",
         label: tb.tiers.Basic,
         unlocks: tb.unlocks.Basic,
       };
@@ -43,18 +52,33 @@ function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
       return {
         pill: "bg-paper text-muted",
         block: "border-line bg-paper",
+        tint: "text-paper/55",
         mark: "",
+        inlineMark: "",
         label: tb.tiers.None,
         unlocks: tb.unlocks.None,
       };
   }
 }
 
-/** Inline pill — headers, rows, wallet button. Renders nothing while the tier is still loading. */
-export function TierBadge({ tier }: { tier: Tier | undefined }) {
+/**
+ * Inline pill — headers, rows, wallet button. Renders nothing while the tier is still loading.
+ * `variant: "inline"` drops the pill chrome entirely and just tints the label text — used inside
+ * the header's merged wallet-status capsule, which supplies its own shared border/background.
+ * Every other caller keeps the default light pill untouched.
+ */
+export function TierBadge({ tier, variant = "light" }: { tier: Tier | undefined; variant?: "light" | "inline" }) {
   const { tierBadge: tb } = useStrings();
   if (tier === undefined) return null;
   const s = styleFor(tier, tb);
+  if (variant === "inline") {
+    return (
+      <span className={`inline-flex items-center gap-1 font-semibold ${s.tint}`}>
+        {s.inlineMark ? <span aria-hidden>{s.inlineMark}</span> : null}
+        {s.label}
+      </span>
+    );
+  }
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${s.pill}`}>
       {s.mark ? <span aria-hidden>{s.mark}</span> : null}

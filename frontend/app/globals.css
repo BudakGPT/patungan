@@ -147,40 +147,59 @@
     filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .36));
   }
 
-  .nav-pill {
+  /* Desktop header nav link — plain text, underline marks the active route. */
+  .nav-link {
+    position: relative;
     display: inline-flex;
-    min-height: 3.2rem;
     align-items: center;
-    gap: .62rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 250, 240, .18);
-    background:
-      linear-gradient(180deg, rgba(255, 250, 240, .14), rgba(255, 250, 240, .055)),
-      rgba(7, 18, 15, .52);
-    padding: .55rem .98rem;
-    color: rgba(255, 250, 240, .82);
+    padding-block: .5rem;
+    color: rgba(255, 250, 240, .66);
     font-size: .82rem;
-    font-weight: 900;
+    font-weight: 800;
+    letter-spacing: .01em;
     white-space: nowrap;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .12);
+    transition: color .18s ease;
   }
 
-  .nav-pill {
-    transition: background .18s ease, border-color .18s ease, color .18s ease;
-  }
-
-  .nav-pill:hover {
-    border-color: rgba(215, 255, 95, .38);
-    background:
-      linear-gradient(180deg, rgba(255, 250, 240, .2), rgba(255, 250, 240, .08)),
-      rgba(7, 18, 15, .52);
+  .nav-link:hover {
     color: #fffaf0;
   }
 
-  .nav-pill svg {
-    width: 1.08rem;
-    height: 1.08rem;
-    color: #d7ff5f;
+  .nav-link-active {
+    color: #fffaf0;
+  }
+
+  .nav-link-active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -.1rem;
+    height: 2px;
+    border-radius: 999px;
+    background: #d7ff5f;
+  }
+
+  /* Icon-only control — hamburger toggle, drawer close. No pill chrome. */
+  .icon-btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    color: rgba(255, 250, 240, .8);
+    transition: background .18s ease, color .18s ease;
+  }
+
+  .icon-btn:hover {
+    background: rgba(255, 250, 240, .08);
+    color: #fffaf0;
+  }
+
+  .icon-btn svg {
+    width: 1.15rem;
+    height: 1.15rem;
   }
 
   .btn {

@@ -596,6 +596,7 @@ export const id = {
   wallet: {
     connect: "Hubungkan Wallet",
     connecting: "Menghubungkan…",
+    disconnect: "Putuskan Wallet",
     notInstalled: "Pasang Freighter",
     wrongNetworkPill: "Jaringan salah",
     testnetPill: "Testnet",

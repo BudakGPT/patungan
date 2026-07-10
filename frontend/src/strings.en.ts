@@ -530,6 +530,7 @@ export const en: Strings = {
   wallet: {
     connect: "Connect Wallet",
     connecting: "Connecting…",
+    disconnect: "Disconnect Wallet",
     notInstalled: "Install Freighter",
     wrongNetworkPill: "Wrong network",
     testnetPill: "Testnet",

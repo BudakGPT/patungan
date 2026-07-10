@@ -557,6 +557,7 @@ export const fil: Strings = {
   wallet: {
     connect: "Ikonekta ang Wallet",
     connecting: "Kumokonekta…",
+    disconnect: "Idiskonekta ang Wallet",
     notInstalled: "I-install ang Freighter",
     wrongNetworkPill: "Maling network",
     testnetPill: "Testnet",
