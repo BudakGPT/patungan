@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { useCampaigns, useOpenRound, usePreviewRound, useRoundProjects } from "@/lib/hooks";
 import { ALL_CATEGORIES, categoryMeta, type CategoryTag } from "@/lib/category";
 import { RoundBanner } from "@/components/RoundBanner";
@@ -13,8 +13,6 @@ import { formatCompactIDR, formatIDR } from "@/lib/format";
 import { config } from "@/lib/config";
 import { getProjectVisual, heroVisual as heroBackdrop } from "@/lib/projectVisuals";
 import { CountUp, ParallaxImg, Reveal } from "@/components/motion";
-
-const d = strings.discovery;
 
 type SortKey = "mostBacked" | "newest" | "closingSoon";
 
@@ -33,6 +31,8 @@ function shortAddress(value: string) {
  * round (the Finalized view lives at `/results`).
  */
 export default function DiscoveryPage() {
+  const strings = useStrings();
+  const d = strings.discovery;
   const campaigns = useCampaigns();
   const openRound = useOpenRound();
   const roundId = openRound.data?.id ?? null;
@@ -430,7 +430,7 @@ export default function DiscoveryPage() {
                 active={category === tag}
                 onClick={() => setCategory(tag)}
               >
-                {categoryMeta(tag).label}
+                {categoryMeta(tag, strings.categories).label}
               </FilterChip>
             ))}
           </div>
@@ -586,6 +586,7 @@ function EmptyPanel({
 }
 
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
+  const strings = useStrings();
   return (
     <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>

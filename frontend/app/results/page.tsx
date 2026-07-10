@@ -4,13 +4,11 @@ import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { RoundState } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { formatIDR } from "@/lib/format";
 import { CategoryChip } from "@/components/CategoryChip";
 import { useRounds, useCampaigns, usePreviewRound, useRoundProjects } from "@/lib/hooks";
 import { CountUp, Reveal } from "@/components/motion";
-
-const r = strings.results;
 
 const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
 
@@ -22,6 +20,8 @@ const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
  * is client-side (wallet-free reads), so `useSearchParams` needs a Suspense boundary to build.
  */
 export default function ResultsPage() {
+  const strings = useStrings();
+  const r = strings.results;
   return (
     <>
       <section className="relative overflow-hidden bg-ink px-4 py-14 text-paper sm:px-7 lg:px-10">
@@ -53,6 +53,8 @@ export default function ResultsPage() {
 }
 
 function ResultsInner() {
+  const strings = useStrings();
+  const r = strings.results;
   const rounds = useRounds();
   const searchParams = useSearchParams();
   const paramRaw = searchParams.get("round");
@@ -85,6 +87,8 @@ function ResultsInner() {
 }
 
 function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState[] }) {
+  const strings = useStrings();
+  const r = strings.results;
   const preview = usePreviewRound(round.id);
   const campaigns = useCampaigns();
 
@@ -207,6 +211,8 @@ function ResultRow({
   donors: number;
   scale: number;
 }) {
+  const strings = useStrings();
+  const r = strings.results;
   const directPct = scale > 0 ? (Number(direct) / scale) * 100 : 0;
   const matchedPct = scale > 0 ? (Number(matched) / scale) * 100 : 0;
   const winner = index === 0;
@@ -283,6 +289,8 @@ function Header({
   rounds: RoundState[];
   finalized: boolean;
 }) {
+  const strings = useStrings();
+  const r = strings.results;
   const router = useRouter();
   const ordered = [...rounds].sort((a, b) => b.id - a.id);
 
@@ -356,6 +364,7 @@ function PageSkeleton() {
 }
 
 function EmptyPanel() {
+  const { results: r } = useStrings();
   return (
     <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{r.empty}</p>
@@ -365,6 +374,7 @@ function EmptyPanel() {
 }
 
 function NotFound({ title, body }: { title: string; body: string }) {
+  const { results: r } = useStrings();
   return (
     <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{title}</p>
@@ -380,6 +390,7 @@ function NotFound({ title, body }: { title: string; body: string }) {
 }
 
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
+  const strings = useStrings();
   return (
     <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>

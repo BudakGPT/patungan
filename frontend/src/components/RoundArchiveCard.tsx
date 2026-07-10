@@ -3,13 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { RoundState } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { formatIDR, truncateAddress, formatCountdown } from "@/lib/format";
-import { categoryMeta } from "@/lib/category";
 import { CategoryChip } from "./CategoryChip";
 import { usePreviewRound } from "@/lib/hooks";
-
-const s = strings.seasons;
 
 /**
  * One round in the `/seasons` archive. A full-width ledger row, not a grid card:
@@ -27,6 +24,8 @@ export function RoundArchiveCard({
   /** project id → campaign title, so the leaderboard names campaigns without a per-row read. */
   titleOf: Map<number, string>;
 }) {
+  const strings = useStrings();
+  const s = strings.seasons;
   const status = round.status.tag;
   const pillTone =
     status === "Open"
@@ -87,6 +86,8 @@ export function RoundArchiveCard({
 
 /** Top-3 matched campaigns for a finalized round, from the round's QF split. */
 function Leaderboard({ roundId, titleOf }: { roundId: number; titleOf: Map<number, string> }) {
+  const strings = useStrings();
+  const s = strings.seasons;
   const preview = usePreviewRound(roundId);
 
   if (preview.data === undefined) {
@@ -131,6 +132,8 @@ function Leaderboard({ roundId, titleOf }: { roundId: number; titleOf: Map<numbe
 
 /** The open round's live line: a countdown to `round_end` and a "projection running" note. */
 function OpenLine({ round }: { round: RoundState }) {
+  const strings = useStrings();
+  const s = strings.seasons;
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);

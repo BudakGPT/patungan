@@ -12,10 +12,8 @@ import { useCampaigns, useRounds, useRoundProject } from "@/lib/hooks";
 import { formatIDR } from "@/lib/format";
 import { categoryMeta } from "@/lib/category";
 import { mapContractError } from "@/lib/errors";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { ExplorerLink } from "@/components/ExplorerLink";
-
-const d = strings.dashboard;
 
 /**
  * Owner dashboard `/dashboard`. A reconciliation ledger, not a discovery grid:
@@ -26,6 +24,8 @@ const d = strings.dashboard;
  * project owner, so every claim signs with the connected wallet.
  */
 export default function DashboardPage() {
+  const strings = useStrings();
+  const d = strings.dashboard;
   const { address, status, connect } = useWallet();
 
   return (
@@ -70,6 +70,8 @@ function Gate({
   onConnect: () => Promise<void>;
   children: React.ReactNode;
 }) {
+  const strings = useStrings();
+  const d = strings.dashboard;
   if (status === "not-installed" || status === "disconnected" || status === "connecting") {
     return (
       <Panel>
@@ -96,6 +98,8 @@ function Gate({
 }
 
 function OwnedCampaigns({ owner }: { owner: string }) {
+  const strings = useStrings();
+  const d = strings.dashboard;
   const campaigns = useCampaigns();
   const rounds = useRounds();
 
@@ -162,7 +166,9 @@ function CampaignLedger({
   campaign: ProjectState;
   finalized: RoundState[];
 }) {
-  const { label, chip } = categoryMeta(campaign.category.tag);
+  const strings = useStrings();
+  const d = strings.dashboard;
+  const { label, chip } = categoryMeta(campaign.category.tag, strings.categories);
 
   return (
     <article className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">
@@ -205,6 +211,7 @@ function CampaignLedger({
 }
 
 function StatusPill({ status }: { status: string }) {
+  const { dashboard: d } = useStrings();
   const tone =
     status === "Approved"
       ? "bg-match-soft text-match-ink"
@@ -229,6 +236,7 @@ function RoundClaimLine({
   projectId: number;
   owner: string;
 }) {
+  const { dashboard: d } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
   const rp = useRoundProject(round.id, projectId);
@@ -333,6 +341,7 @@ function DirectClaim({
   owner: string;
   amount: bigint;
 }) {
+  const { dashboard: d } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
   const succeeded = action.tx.phase === "success";
@@ -413,6 +422,7 @@ type TxState =
  * result on success, `undefined` on failure — the caller then invalidates the affected reads.
  */
 function useAction() {
+  const strings = useStrings();
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
   const pending = tx.phase === "awaiting" || tx.phase === "submitting";
 
@@ -430,13 +440,13 @@ function useAction() {
         },
       });
       if (sent.result.isErr()) {
-        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr()) });
+        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr(), strings.errors) });
         return undefined;
       }
       setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
       return sent.result.unwrap();
     } catch (err) {
-      setTx({ phase: "error", message: mapContractError(err) });
+      setTx({ phase: "error", message: mapContractError(err, strings.errors) });
       return undefined;
     }
   }

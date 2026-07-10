@@ -2,9 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { upload, IpfsUploadError } from "@/lib/ipfs";
-import { strings } from "@/strings";
-
-const im = strings.campaign.create.image;
+import { useStrings } from "@/lib/locale";
 
 type UploadState =
   | { phase: "idle" }
@@ -27,6 +25,8 @@ export function ImageUpload({
   onChange: (cid: string | null) => void;
   disabled?: boolean;
 }) {
+  const strings = useStrings();
+  const im = strings.campaign.create.image;
   const inputRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<UploadState>({ phase: "idle" });
   const [preview, setPreview] = useState<string | null>(null);

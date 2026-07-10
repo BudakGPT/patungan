@@ -2,7 +2,7 @@
 
 import { useWallet } from "@/lib/wallet";
 import { useTier } from "@/lib/hooks";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { TierBadge } from "./TierBadge";
 
 function truncate(address: string): string {
@@ -10,6 +10,7 @@ function truncate(address: string): string {
 }
 
 export function WalletButton() {
+  const strings = useStrings();
   const { status, address, connectError, connect, disconnect } = useWallet();
   const { data: tier } = useTier(address);
 

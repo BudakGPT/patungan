@@ -13,10 +13,9 @@ import { useConfig, useOpenRound, useCampaigns, useTier } from "@/lib/hooks";
 import { formatIDR, truncateAddress, formatCountdown } from "@/lib/format";
 import { ALL_CATEGORIES, categoryMeta, type CategoryTag } from "@/lib/category";
 import { mapContractError } from "@/lib/errors";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { ExplorerLink } from "@/components/ExplorerLink";
 
-const o = strings.operator;
 const STELLAR_ADDR = /^G[A-Z2-7]{55}$/;
 
 /**
@@ -29,6 +28,8 @@ const STELLAR_ADDR = /^G[A-Z2-7]{55}$/;
  * action carries its own four-state tx cycle so one success never blanks another.
  */
 export default function OperatorPage() {
+  const strings = useStrings();
+  const o = strings.operator;
   const { address, status, connect } = useWallet();
   const configQ = useConfig();
 
@@ -83,6 +84,8 @@ function Gate({
   onConnect: () => Promise<void>;
   children: React.ReactNode;
 }) {
+  const strings = useStrings();
+  const o = strings.operator;
   if (status === "not-installed" || status === "disconnected" || status === "connecting") {
     return (
       <Panel>
@@ -129,6 +132,7 @@ function Console({
   address: string;
   roles: { admin: boolean; curator: boolean; attester: boolean };
 }) {
+  const { operator: o } = useStrings();
   const openRound = useOpenRound();
   const round = openRound.data ?? null;
 
@@ -165,6 +169,8 @@ function StatusStrip({
   address: string;
   roles: { admin: boolean; curator: boolean; attester: boolean };
 }) {
+  const strings = useStrings();
+  const o = strings.operator;
   const openRound = useOpenRound();
   const round = openRound.data ?? null;
   const roleList = [
@@ -206,7 +212,7 @@ function StatusStrip({
                 {" · "}
                 {round.categories.length === 0
                   ? o.status.scopeAll
-                  : round.categories.map((c) => categoryMeta(c.tag).label).join(", ")}
+                  : round.categories.map((c) => categoryMeta(c.tag, strings.categories).label).join(", ")}
               </p>
             </>
           ) : (
@@ -227,6 +233,8 @@ function OpenRoundSection({
   round: import("@/contract/src").RoundState | null;
   sponsor: string;
 }) {
+  const strings = useStrings();
+  const o = strings.operator;
   const queryClient = useQueryClient();
   const action = useAction();
   const [endLocal, setEndLocal] = useState("");
@@ -298,7 +306,7 @@ function OpenRoundSection({
             <div className="mt-2 flex flex-wrap gap-2">
               {ALL_CATEGORIES.map((tag) => {
                 const active = cats.has(tag);
-                const { label, chip } = categoryMeta(tag);
+                const { label, chip } = categoryMeta(tag, strings.categories);
                 return (
                   <button
                     key={tag}
@@ -344,6 +352,7 @@ function FundPoolSection({
   round: import("@/contract/src").RoundState | null;
   funder: string;
 }) {
+  const { operator: o } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
   const tierQ = useTier(funder);
@@ -423,6 +432,7 @@ function FundPoolSection({
 /* ── 3 · Finalize ───────────────────────────────────────────────────────────────────────── */
 
 function FinalizeSection({ round }: { round: import("@/contract/src").RoundState | null }) {
+  const { operator: o } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
   const [confirming, setConfirming] = useState(false);
@@ -515,6 +525,8 @@ function FinalizeSection({ round }: { round: import("@/contract/src").RoundState
 /* ── 4 · Curation queue ─────────────────────────────────────────────────────────────────── */
 
 function CurationSection() {
+  const strings = useStrings();
+  const o = strings.operator;
   const campaigns = useCampaigns();
   const pending = useMemo(
     () => (campaigns.data ?? []).filter((c) => c.status.tag === "Pending"),
@@ -548,9 +560,11 @@ function CurationSection() {
 }
 
 function CurationRow({ campaign }: { campaign: ProjectState }) {
+  const strings = useStrings();
+  const o = strings.operator;
   const queryClient = useQueryClient();
   const action = useAction();
-  const { label, chip } = categoryMeta(campaign.category.tag);
+  const { label, chip } = categoryMeta(campaign.category.tag, strings.categories);
 
   async function decide(kind: "approve" | "reject") {
     if (action.pending) return;
@@ -617,6 +631,7 @@ function CurationRow({ campaign }: { campaign: ProjectState }) {
 /* ── 5 · Verify fallback ────────────────────────────────────────────────────────────────── */
 
 function VerifySection() {
+  const { operator: o } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
   const [addr, setAddr] = useState("");
@@ -715,6 +730,7 @@ type TxState =
  * Returns the unwrapped result on success (used by open_round's new id) or `undefined` on failure.
  */
 function useAction() {
+  const strings = useStrings();
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
   const pending = tx.phase === "awaiting" || tx.phase === "submitting";
 
@@ -733,13 +749,16 @@ function useAction() {
         },
       });
       if (sent.result.isErr()) {
-        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr(), messages) });
+        setTx({
+          phase: "error",
+          message: mapContractError(sent.result.unwrapErr(), strings.errors, messages),
+        });
         return undefined;
       }
       setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
       return sent.result.unwrap();
     } catch (err) {
-      setTx({ phase: "error", message: mapContractError(err, messages) });
+      setTx({ phase: "error", message: mapContractError(err, strings.errors, messages) });
       return undefined;
     }
   }
@@ -757,6 +776,8 @@ function TxFeedback({
   successTitle: string;
   onReset: () => void;
 }) {
+  const strings = useStrings();
+  const o = strings.operator;
   if (tx.phase === "success") {
     return (
       <div className="rounded-xl border border-match/30 bg-match-soft px-4 py-3">
@@ -798,6 +819,7 @@ function PrimaryButton({
   tx: TxState;
   label: string;
 }) {
+  const { operator: o } = useStrings();
   if (tx.phase === "success") return null;
   return (
     <button

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ProjectState } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { formatCompactIDR, formatIDR, truncateAddress } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
@@ -13,8 +13,6 @@ import { useCampaign, useOpenRound, usePreviewRound, useRoundProject } from "@/l
 import { ContributePanel } from "@/components/ContributePanel";
 import { ParallaxImg, Reveal } from "@/components/motion";
 import { config } from "@/lib/config";
-
-const t = strings.campaign;
 
 /**
  * Campaign detail `/campaign/[id]`. A dark hero banner (real uploaded image when set, else a
@@ -79,9 +77,11 @@ function Content({
   donors: number | undefined;
   projectedMatch: bigint | undefined;
 }) {
+  const strings = useStrings();
+  const t = strings.campaign;
   const thumb = cidToUrl(campaign.image_cid);
   const visual = getProjectVisual(campaign.id);
-  const { label: categoryLabel } = categoryMeta(campaign.category.tag);
+  const { label: categoryLabel } = categoryMeta(campaign.category.tag, strings.categories);
   const approved = campaign.status.tag === "Approved";
   const statusNotice = approved ? null : t.status[campaign.status.tag];
   const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
@@ -298,6 +298,7 @@ function DetailSkeleton() {
 }
 
 function NotFound() {
+  const { campaign: t } = useStrings();
   return (
     <main className="mx-auto max-w-page px-4 py-24 sm:px-6">
       <div className="mx-auto max-w-md rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">

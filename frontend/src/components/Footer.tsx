@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { config } from "@/lib/config";
 import { ContractExplorerLink } from "./ExplorerLink";
 
@@ -10,6 +12,7 @@ const shortId = (v: string) => `${v.slice(0, 4)}…${v.slice(-4)}`;
  * every claim in the UI, signed off with an oversized wordmark bleeding out of the frame.
  */
 export function Footer() {
+  const strings = useStrings();
   return (
     <footer className="mt-auto overflow-hidden border-t border-lime/20 bg-ink text-paper">
       <div className="mx-auto max-w-[1500px] px-4 pt-12 sm:px-7 lg:px-10">

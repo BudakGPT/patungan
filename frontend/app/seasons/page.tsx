@@ -2,11 +2,9 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { useRounds, useCampaigns } from "@/lib/hooks";
 import { RoundArchiveCard } from "@/components/RoundArchiveCard";
-
-const s = strings.seasons;
 
 /**
  * Seasons archive `/seasons`. A reverse-chronological ledger of every matching
@@ -16,6 +14,8 @@ const s = strings.seasons;
  * `useCampaigns` supplies the id→title map for the finalized leaderboards.
  */
 export default function SeasonsPage() {
+  const strings = useStrings();
+  const s = strings.seasons;
   const rounds = useRounds();
   const campaigns = useCampaigns();
 
@@ -85,10 +85,11 @@ function SkeletonList() {
 }
 
 function EmptyPanel() {
+  const strings = useStrings();
   return (
     <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
-      <p className="text-base font-semibold text-ink">{s.empty}</p>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{s.emptyHint}</p>
+      <p className="text-base font-semibold text-ink">{strings.seasons.empty}</p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{strings.seasons.emptyHint}</p>
       <Link
         href="/"
         className="mt-5 inline-block text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
@@ -100,6 +101,7 @@ function EmptyPanel() {
 }
 
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
+  const strings = useStrings();
   return (
     <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>

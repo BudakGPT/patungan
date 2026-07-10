@@ -1,28 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { config } from "@/lib/config";
 import { WalletButton } from "./WalletButton";
 import { NetworkBanner } from "./NetworkBanner";
-
-/** Route → nav dot color. The dot IS the wayfinding (one hue per top-level route). */
-const NAV_ITEMS = [
-  { href: "/", label: strings.nav.landing, dot: "bg-lime" },
-  { href: "/seasons", label: strings.nav.seasons, dot: "bg-green" },
-  { href: "/results", label: strings.nav.results, dot: "bg-sea" },
-  { href: "/dashboard", label: strings.nav.dashboard, dot: "bg-clay" },
-  { href: "/account", label: strings.nav.account, dot: "bg-deep" },
-  { href: "/operator", label: strings.nav.operator, dot: "bg-gold" },
-] as const;
+import { LocaleToggle } from "./LocaleToggle";
 
 export function Header() {
+  const strings = useStrings();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const reduced = useReducedMotion();
+
+  /** Route → nav dot color. The dot IS the wayfinding (one hue per top-level route). */
+  const NAV_ITEMS = useMemo(
+    () =>
+      [
+        { href: "/", label: strings.nav.landing, dot: "bg-lime" },
+        { href: "/seasons", label: strings.nav.seasons, dot: "bg-green" },
+        { href: "/results", label: strings.nav.results, dot: "bg-sea" },
+        { href: "/dashboard", label: strings.nav.dashboard, dot: "bg-clay" },
+        { href: "/account", label: strings.nav.account, dot: "bg-deep" },
+        { href: "/operator", label: strings.nav.operator, dot: "bg-gold" },
+      ] as const,
+    [strings],
+  );
 
   // Close the drawer on navigation and lock body scroll while it's open.
   useEffect(() => setOpen(false), [pathname]);
@@ -62,6 +68,7 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            <LocaleToggle />
             <WalletButton />
             <button
               type="button"
@@ -127,11 +134,12 @@ export function Header() {
               ))}
             </nav>
 
-            <div className="px-6 pb-8 sm:px-9">
+            <div className="flex flex-wrap items-center gap-2 px-6 pb-8 sm:px-9">
               <span className="hash-chip">
                 <span className="size-1.5 rounded-full bg-lime" />
                 contract: {config.contractId.slice(0, 4)}…{config.contractId.slice(-4)}
               </span>
+              <LocaleToggle />
             </div>
           </motion.div>
         ) : null}

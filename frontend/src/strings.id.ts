@@ -1,5 +1,5 @@
-/** All UI copy lives here (Bahasa-first). Components import from this module, never inline strings. */
-export const strings = {
+/** Bahasa Indonesia UI copy — the default locale. Components read this via `useStrings()`, never import it directly. */
+export const id = {
   appName: "Patungan",
   nav: {
     landing: "Beranda",
@@ -12,7 +12,7 @@ export const strings = {
   landing: {
     title: "Patungan",
     subtitle: "Urunan bersama, dicocokkan secara adil.",
-    poolLabel: "Dana padanan",
+    poolLabel: "Dana pendamping",
     sponsorLabel: "Disponsori oleh",
     sponsorName: "Pemprov Jawa Timur",
     statusOpen: "Dibuka",
@@ -52,16 +52,16 @@ export const strings = {
     season: "Musim Pencocokan",
     live: "Berlangsung",
     scopeAll: "Semua kategori",
-    scopeLabel: "Kategori dalam ronde",
+    scopeLabel: "Kategori dalam musim",
     endsInLabel: "Berakhir dalam",
-    endedLabel: "Ronde berakhir",
-    noRound: "Belum ada ronde pencocokan aktif",
-    noRoundHint: "Donasi langsung tetap dibuka. Ronde berikutnya segera hadir.",
+    endedLabel: "Musim berakhir",
+    noRound: "Belum ada musim pencocokan aktif",
+    noRoundHint: "Donasi langsung tetap dibuka. Musim berikutnya segera hadir.",
     countdown: { day: "h", hour: "j", min: "m", ended: "Berakhir" },
     // Card
     donorSuffix: "pendukung",
     directShort: "Langsung",
-    matchSuffix: "padanan",
+    matchSuffix: "pendamping",
     noThumbAlt: "Tanpa gambar",
     // Onboarding "how it works" strip — QF explainer for cold visitors
     howItWorks: {
@@ -70,7 +70,7 @@ export const strings = {
         {
           n: "01",
           title: "Donasi langsung, kapan saja",
-          body: "Pilih kampanye yang kamu percaya, lalu beri donasi langsung — tanpa menunggu ronde.",
+          body: "Pilih kampanye yang kamu percaya, lalu beri donasi langsung — tanpa menunggu musim.",
         },
         {
           n: "02",
@@ -79,8 +79,8 @@ export const strings = {
         },
         {
           n: "03",
-          title: "Dana padanan dibagi tiap musim",
-          body: "Di akhir tiap ronde, dana sponsor dibagikan mengikuti sinyal itu secara kuadratik.",
+          title: "Dana pendamping dibagi tiap musim",
+          body: "Di akhir tiap musim, dana sponsor dibagikan mengikuti sinyal itu secara kuadratik.",
         },
       ],
       viz: {
@@ -102,9 +102,9 @@ export const strings = {
     raisedLabel: "Total donasi langsung",
     thisRoundHeading: "Musim pencocokan ini",
     donorSuffix: "pendukung",
-    projectedMatchLabel: "Proyeksi padanan kuadratik",
+    projectedMatchLabel: "Proyeksi dana pendamping kuadratik",
     notInRound:
-      "Belum termasuk ronde pencocokan aktif — donasi langsung tetap dilipatkan pada ronde berikutnya.",
+      "Belum termasuk musim pencocokan aktif — donasi langsung tetap dilipatkan pada musim berikutnya.",
     /** Notice shown when a non-Approved campaign is opened directly (owner-shared link). */
     status: {
       Pending: "Kampanye ini masih menunggu kurasi. Donasi dibuka setelah disetujui kurator.",
@@ -139,7 +139,7 @@ export const strings = {
         dropPrompt: "Seret gambar ke sini atau pilih berkas",
         dropHint: "PNG atau JPG, disematkan ke IPFS",
         pickFile: "Pilih berkas",
-        uploading: "Menyematkan ke IPFS…",
+        uploading: "Mengunggah gambar…",
         replace: "Ganti gambar",
         remove: "Hapus",
         cidLabel: "CID",
@@ -167,7 +167,7 @@ export const strings = {
       createAnother: "Ajukan kampanye lain",
     },
     contribute: {
-      cta: "Ikut urunan",
+      cta: "Ikut patungan",
       amountLabel: "Pilih jumlah",
       confirm: "Kirim & tanda tangani",
       awaiting: "Buka Freighter untuk menandatangani…",
@@ -186,7 +186,7 @@ export const strings = {
     backToLanding: "Kembali ke beranda",
     notFound: "Proyek tidak ditemukan.",
     raisedLabel: "Terkumpul",
-    contributeCta: "Ikut urunan",
+    contributeCta: "Ikut patungan",
     roundClosedCta: "Round ditutup",
     stories: {
       0: "Atap Sekolah SDN 2 bocor setiap musim hujan. Urunan ini mengganti atap seng agar anak-anak belajar dengan aman dan kering.",
@@ -207,7 +207,7 @@ export const strings = {
     cancel: "Batal",
     errors: {
       NotVerified: "Alamat belum terverifikasi.",
-      RoundClosed: "Round sudah ditutup untuk kontribusi baru.",
+      RoundClosed: "Musim sudah ditutup untuk kontribusi baru.",
       UnknownProject: "Proyek tidak ditemukan.",
       InvalidAmount: "Jumlah tidak valid.",
       rejected: "Tanda tangan dibatalkan.",
@@ -221,9 +221,9 @@ export const strings = {
   seasons: {
     title: "Arsip musim",
     subtitle:
-      "Setiap ronde pencocokan yang pernah dibuka, dari yang terbaru. Ronde yang selesai menampilkan kampanye dengan padanan terbesar.",
+      "Setiap musim pencocokan yang pernah dibuka, dari yang terbaru. Musim yang selesai menampilkan kampanye dengan dana pendamping terbesar.",
     seasonLabel: (id: number) => `Musim #${id}`,
-    poolLabel: "Dana padanan",
+    poolLabel: "Dana pendamping",
     sponsorLabel: "Sponsor",
     scopeLabel: "Kategori",
     scopeAll: "Semua kategori",
@@ -239,13 +239,13 @@ export const strings = {
     liveProjection: "Proyeksi pencocokan berjalan",
     countdown: { day: "h", hour: "j", min: "m", ended: "Berakhir" },
     // Finalized leaderboard
-    topHeading: "Padanan terbesar",
+    topHeading: "Pendamping terbesar",
     noMatches: "Tidak ada kampanye yang dicocokkan musim ini.",
-    cancelledNote: "Ronde ini dibatalkan sebelum finalisasi. Dana dikembalikan ke sponsor.",
+    cancelledNote: "Musim ini dibatalkan sebelum finalisasi. Dana dikembalikan ke sponsor.",
     viewResults: "Lihat hasil",
     // States
     empty: "Belum ada musim pencocokan.",
-    emptyHint: "Musim pertama akan muncul di sini setelah sponsor membuka ronde.",
+    emptyHint: "Musim pertama akan muncul di sini setelah sponsor membukanya.",
   },
   /**
    * Round-scoped results `/results?round=` — the quadratic split reveal for one
@@ -254,23 +254,23 @@ export const strings = {
   results: {
     title: "Hasil pencocokan",
     seasonLabel: (id: number) => `Musim #${id}`,
-    notFinalized: "Ronde belum difinalisasi. Berikut proyeksi pencocokan berdasarkan kontribusi saat ini.",
-    finalized: "Hasil final ronde ini.",
+    notFinalized: "Musim belum difinalisasi. Berikut proyeksi pencocokan berdasarkan kontribusi saat ini.",
+    finalized: "Hasil final musim ini.",
     roundPickerLabel: "Musim",
     directLabel: "Langsung",
-    matchedLabel: "Padanan",
+    matchedLabel: "Pendamping",
     donorSuffix: "pendukung",
-    poolLabel: "Dana padanan",
-    totalMatchedLabel: "Total padanan dibagikan",
-    verdict: "Dana padanan mengikuti jumlah pendukung, bukan besar donasi.",
+    poolLabel: "Dana pendamping",
+    totalMatchedLabel: "Total dana pendamping dibagikan",
+    verdict: "Dana pendamping mengikuti jumlah pendukung, bukan besar donasi.",
     // States
     empty: "Belum ada kontribusi untuk dicocokkan musim ini.",
-    emptyHint: "Hasil akan muncul setelah kampanye menerima donasi dalam ronde ini.",
+    emptyHint: "Hasil akan muncul setelah kampanye menerima donasi dalam musim ini.",
     notFoundTitle: "Musim tidak ditemukan",
-    notFoundBody: "Ronde ini mungkin belum ada, atau tautannya keliru.",
+    notFoundBody: "Musim ini mungkin belum ada, atau tautannya keliru.",
     backToSeasons: "Lihat arsip musim",
     noRounds: "Belum ada musim pencocokan.",
-    barLabel: "Perbandingan donasi langsung dan padanan",
+    barLabel: "Perbandingan donasi langsung dan dana pendamping",
   },
   /**
    * Operator/sponsor console `/operator` — the deepest, most privileged surface.
@@ -280,11 +280,11 @@ export const strings = {
   operator: {
     title: "Konsol Operator",
     subtitle:
-      "Jalankan satu musim pencocokan penuh: buka ronde, isi dana, kurasi kampanye, lalu finalisasi.",
+      "Jalankan satu musim pencocokan penuh: buka musim, isi dana, kurasi kampanye, lalu finalisasi.",
     // Gate ladder
     connectPrompt: "Hubungkan wallet operator untuk mengakses konsol ini.",
     notRole:
-      "Wallet yang terhubung bukan pemegang peran operator (admin, kurator, atau penerbit atestasi).",
+      "Wallet yang terhubung bukan pemegang peran operator (admin, kurator, atau verifikator).",
     wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
     // Shared tx phases
     awaiting: "Buka Freighter untuk menandatangani…",
@@ -295,10 +295,10 @@ export const strings = {
       roles: "Peran",
       roleAdmin: "Admin",
       roleCurator: "Kurator",
-      roleAttester: "Penerbit atestasi",
-      liveRound: "Ronde berjalan",
-      noRound: "Belum ada ronde terbuka",
-      poolLabel: "Dana padanan",
+      roleAttester: "Verifikator",
+      liveRound: "Musim berjalan",
+      noRound: "Belum ada musim terbuka",
+      poolLabel: "Dana pendamping",
       scopeAll: "Semua kategori",
       endsLabel: "Berakhir",
       ended: "Berakhir",
@@ -307,48 +307,48 @@ export const strings = {
     lifecycleHeading: "Musim pencocokan",
     governanceHeading: "Tata kelola",
     // Section overlines / step numbers
-    step: { open: "01 · Buka ronde", fund: "02 · Isi dana", finalize: "03 · Finalisasi" },
+    step: { open: "01 · Buka musim", fund: "02 · Isi dana", finalize: "03 · Finalisasi" },
     // 1 · Open round
     open: {
-      heading: "Buka ronde pencocokan",
+      heading: "Buka musim pencocokan",
       description:
-        "Mulai musim baru: tetapkan tanggal berakhir dan kategori yang dicocokkan. Hanya satu ronde bisa terbuka pada satu waktu.",
+        "Mulai musim baru: tetapkan tanggal berakhir dan kategori yang dicocokkan. Hanya satu musim bisa terbuka pada satu waktu.",
       endLabel: "Tanggal berakhir",
       endHelper: "Ditampilkan sebagai hitung mundur ke donatur.",
-      categoriesLabel: "Kategori dalam ronde",
+      categoriesLabel: "Kategori dalam musim",
       categoriesHint: "Kosongkan untuk mencocokkan semua kategori.",
-      cta: "Buka ronde",
-      successTitle: "Ronde dibuka!",
-      alreadyOpen: (id: number) => `Ronde #${id} sedang berjalan. Finalisasi dulu untuk membuka yang baru.`,
+      cta: "Buka musim",
+      successTitle: "Musim dibuka!",
+      alreadyOpen: (id: number) => `Musim #${id} sedang berjalan. Finalisasi dulu untuk membuka yang baru.`,
       invalidDate: "Pilih tanggal berakhir di masa depan.",
     },
     // 2 · Fund pool
     fund: {
-      heading: "Isi dana padanan",
+      heading: "Isi dana pendamping",
       description:
-        "Setor dana ke kolam pencocokan ronde berjalan. Butuh verifikasi tingkat Institution.",
+        "Setor dana pendamping untuk musim yang sedang berjalan. Butuh verifikasi tingkat Institution.",
       amountLabel: "Jumlah dana (IDR)",
       echoLabel: "Akan menyetor",
       cta: "Kirim dana",
-      successTitle: "Dana padanan terkirim!",
+      successTitle: "Dana pendamping terkirim!",
       invalidAmount: "Masukkan jumlah bulat positif.",
-      needsRound: "Buka ronde dulu sebelum mengisi dana.",
+      needsRound: "Buka musim dulu sebelum mengisi dana.",
       tierGateTitle: "Perlu tingkat Institution",
       tierGateBody:
-        "Hanya wallet terverifikasi Institution yang boleh mengisi dana padanan. Gunakan konsol verifikasi di bawah untuk menaikkan tingkat wallet ini.",
+        "Hanya wallet terverifikasi Institution yang boleh mengisi dana pendamping. Gunakan konsol verifikasi di bawah untuk menaikkan tingkat wallet ini.",
     },
     // 3 · Finalize
     finalize: {
-      heading: "Finalisasi ronde",
+      heading: "Finalisasi musim",
       description:
-        "Menutup ronde untuk kontribusi baru dan menghitung pencocokan kuadratik. Tidak bisa dibatalkan.",
-      cta: "Finalisasi ronde",
+        "Menutup musim untuk kontribusi baru dan menghitung pencocokan kuadratik. Tidak bisa dibatalkan.",
+      cta: "Finalisasi musim",
       confirmMessage: "Finalisasi tidak bisa dibatalkan. Lanjutkan?",
       confirmCta: "Ya, finalisasi sekarang",
       cancelCta: "Batal",
-      successTitle: "Ronde difinalisasi!",
+      successTitle: "Musim difinalisasi!",
       viewResults: "Lihat hasil",
-      needsRound: "Belum ada ronde terbuka untuk difinalisasi.",
+      needsRound: "Belum ada musim terbuka untuk difinalisasi.",
     },
     // 4 · Curation queue
     curation: {
@@ -379,14 +379,14 @@ export const strings = {
     viewOnExplorer: "Lihat transaksi di Explorer",
     /** Error overrides specific to operator actions; anything omitted falls back to shared strings.errors. */
     errors: {
-      RoundAlreadyOpen: "Sudah ada ronde yang berjalan.",
-      RoundNotOpen: "Ronde sudah tidak dibuka untuk aksi ini.",
-      AlreadyFinalized: "Ronde sudah difinalisasi.",
+      RoundAlreadyOpen: "Sudah ada musim yang berjalan.",
+      RoundNotOpen: "Musim sudah tidak dibuka untuk aksi ini.",
+      AlreadyFinalized: "Musim sudah difinalisasi.",
       NothingToMatch: "Belum ada kontribusi untuk dicocokkan.",
       TierTooLow: "Tingkat verifikasi belum mencukupi (butuh Institution).",
       NotAdmin: "Hanya admin yang dapat melakukan aksi ini.",
       NotCurator: "Hanya kurator yang dapat melakukan aksi ini.",
-      NotAttester: "Hanya penerbit atestasi yang dapat melakukan aksi ini.",
+      NotAttester: "Hanya verifikator yang dapat melakukan aksi ini.",
       ProjectNotPending: "Kampanye tidak sedang menunggu kurasi.",
       InvalidAmount: "Jumlah tidak valid.",
       rejected: "Tanda tangan dibatalkan.",
@@ -401,14 +401,14 @@ export const strings = {
   dashboard: {
     title: "Dasbor saya",
     subtitle:
-      "Kampanye yang kamu ajukan, total donasi yang terkumpul, dan pencairan dana padanan tiap musim.",
+      "Kampanye yang kamu ajukan, total donasi yang terkumpul, dan pencairan dana pendamping tiap musim.",
     createCta: "Ajukan kampanye",
     // Gate ladder (owners need no verification tier — just a Testnet wallet)
     connectPrompt: "Hubungkan wallet Testnet untuk melihat kampanyemu.",
     wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
     // Empty state
     empty: "Kamu belum punya kampanye.",
-    emptyHint: "Ajukan kampanye pertamamu untuk mulai menerima donasi dan dana padanan.",
+    emptyHint: "Ajukan kampanye pertamamu untuk mulai menerima donasi dan dana pendamping.",
     // Per-campaign
     statusPill: {
       Pending: "Menunggu kurasi",
@@ -425,11 +425,11 @@ export const strings = {
       label: (id: number) => `Musim #${id}`,
       directLabel: "Langsung",
       donorSuffix: "pendukung",
-      matchedLabel: "Padanan",
-      claim: "Klaim padanan",
+      matchedLabel: "Pendamping",
+      claim: "Klaim dana pendamping",
       claiming: "Mengklaim…",
-      claimed: "Terklaim",
-      nothing: "Tanpa padanan musim ini",
+      claimed: "Sudah diklaim",
+      nothing: "Tanpa dana pendamping musim ini",
     },
     // Campaign-level claim of donations received while no round was open
     direct: {
@@ -490,7 +490,7 @@ export const strings = {
     unlocks: {
       None: "Verifikasi untuk mulai ikut urunan dan mengajukan kampanye.",
       Basic: "Kamu bisa ikut urunan dan mengajukan kampanye.",
-      Institution: "Kamu bisa ikut urunan, mengajukan kampanye, dan mengisi dana padanan.",
+      Institution: "Kamu bisa ikut urunan, mengajukan kampanye, dan mengisi dana pendamping.",
     } as Record<string, string>,
   },
   /**
@@ -509,7 +509,7 @@ export const strings = {
     ladderHeading: "Yang terbuka di tiap tingkat",
     ladder: [
       { tier: "Basic", unlock: "Ikut urunan & ajukan kampanye" },
-      { tier: "Institution", unlock: "Isi dana padanan sebagai sponsor" },
+      { tier: "Institution", unlock: "Isi dana pendamping sebagai sponsor" },
     ],
     // Step 1 — SEP-10 ownership
     sep10: {
@@ -521,10 +521,10 @@ export const strings = {
       pending: "Menghubungi anchor…",
       awaiting: "Buka Freighter untuk menandatangani…",
       successTitle: "Kepemilikan terbukti",
-      successBody: "Anchor menerbitkan token sesi. Lanjut ke atestasi tingkat.",
+      successBody: "Anchor menerbitkan token sesi. Lanjut ke penetapan tingkat.",
       notConfiguredTitle: "Anchor belum dikonfigurasi",
       notConfiguredBody:
-        "Belum ada anchor SEP-10 yang tersambung di lingkungan ini. Kamu tetap bisa memakai jalur atestasi simulasi testnet di bawah.",
+        "Belum ada anchor SEP-10 yang tersambung di lingkungan ini. Kamu tetap bisa memakai jalur penetapan tingkat simulasi testnet di bawah.",
       errors: {
         "not-configured": "Anchor belum dikonfigurasi di lingkungan ini.",
         toml: "Endpoint SEP-10 anchor tidak ditemukan.",
@@ -552,13 +552,13 @@ export const strings = {
         NEEDS_INFO: "Anchor meminta data tambahan.",
         PROCESSING: "Anchor sedang memproses pengajuanmu.",
         PENDING: "Menunggu keputusan anchor.",
-        ACCEPTED: "Anchor menyetujui KYC-mu. Lanjut ke atestasi tingkat.",
+        ACCEPTED: "Anchor menyetujui KYC-mu. Lanjut ke penetapan tingkat.",
         REJECTED: "Anchor menolak pengajuan KYC ini.",
       } as Record<string, string>,
       errors: {
         "not-configured": "Anchor belum dikonfigurasi di lingkungan ini.",
         "kyc-not-configured":
-          "Anchor ini tidak mempublikasikan layanan KYC (SEP-12) — lanjut lewat jalur atestasi simulasi testnet di bawah.",
+          "Anchor ini tidak mempublikasikan layanan KYC (SEP-12) — lanjut lewat jalur penetapan tingkat simulasi testnet di bawah.",
         "kyc-rejected": "Anchor menolak pengajuan KYC. Coba lagi.",
         network: "Gagal menghubungi anchor. Periksa koneksi lalu coba lagi.",
         generic: "Pengajuan KYC gagal. Coba lagi.",
@@ -566,23 +566,23 @@ export const strings = {
     },
     // Step 2 — attest (real KYC hand-off, or the simulated testnet stand-in)
     attest: {
-      overline: "02 · Atestasi tingkat",
+      overline: "02 · Penetapan tingkat",
       heading: "Dapatkan tingkat verifikasi",
       simBadge: "Simulasi testnet",
       realBadge: "KYC anchor diterima",
       description:
-        "Di produksi, anchor menyetujui KYC lalu menuliskan tingkatmu. Di testnet, operator (pemegang kunci atestasi) berperan sebagai anchor.",
+        "Di produksi, anchor menyetujui KYC lalu menuliskan tingkatmu. Di testnet, operator (pemegang peran verifikator) berperan sebagai anchor.",
       // Attester-holder path (self-serve on testnet)
       attesterHint:
-        "Wallet ini memegang peran penerbit atestasi — kamu bisa menetapkan tingkat langsung sebagai stand-in anchor.",
+        "Wallet ini memegang peran verifikator — kamu bisa menetapkan tingkat langsung sebagai stand-in anchor.",
       tierLabel: "Tingkat",
       tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
       cta: "Setujui (simulasi KYC)",
       successTitle: "Tingkat verifikasi ditetapkan!",
       // Non-attester fallback
-      fallbackTitle: "Menunggu atestasi operator",
+      fallbackTitle: "Menunggu penetapan tingkat oleh operator",
       fallbackBody:
-        "Di testnet, atestasi tingkat diselesaikan oleh operator sebagai pengganti anchor. Kepemilikan wallet-mu sudah terbukti — minta operator menetapkan tingkatmu lewat konsol.",
+        "Di testnet, penetapan tingkat diselesaikan oleh operator sebagai pengganti anchor. Kepemilikan wallet-mu sudah terbukti — minta operator menetapkan tingkatmu lewat konsol.",
       fallbackCta: "Buka konsol operator",
       alreadyTitle: "Kamu sudah terverifikasi",
       alreadyBody: "Tak perlu langkah lain. Kamu siap ikut urunan.",
@@ -624,10 +624,10 @@ export const strings = {
     AlreadyInitialized: "Kontrak sudah diinisialisasi.",
     NotAdmin: "Hanya admin yang dapat melakukan aksi ini.",
     NotVerified: "Alamat belum terverifikasi.",
-    RoundClosed: "Ronde sudah ditutup untuk kontribusi baru.",
-    RoundNotOpen: "Ronde sudah tidak dibuka untuk aksi ini.",
-    AlreadyFinalized: "Ronde sudah difinalisasi.",
-    NotFinalized: "Ronde belum difinalisasi.",
+    RoundClosed: "Musim sudah ditutup untuk kontribusi baru.",
+    RoundNotOpen: "Musim sudah tidak dibuka untuk aksi ini.",
+    AlreadyFinalized: "Musim sudah difinalisasi.",
+    NotFinalized: "Musim belum difinalisasi.",
     UnknownProject: "Kampanye tidak ditemukan.",
     DuplicateProject: "Kampanye sudah terdaftar.",
     AlreadyDisbursed: "Dana kampanye ini sudah dicairkan.",
@@ -636,17 +636,19 @@ export const strings = {
     NotCurator: "Hanya kurator yang dapat melakukan aksi ini.",
     ProjectNotApproved: "Kampanye belum disetujui kurator.",
     ProjectNotPending: "Kampanye tidak sedang menunggu kurasi.",
-    AlreadyClaimed: "Bagian ronde ini sudah diklaim.",
-    UnknownRound: "Ronde tidak ditemukan.",
-    RoundAlreadyOpen: "Sudah ada ronde yang dibuka.",
-    CategoryNotInRound: "Kategori kampanye tidak termasuk dalam ronde ini.",
+    AlreadyClaimed: "Bagian musim ini sudah diklaim.",
+    UnknownRound: "Musim tidak ditemukan.",
+    RoundAlreadyOpen: "Sudah ada musim yang dibuka.",
+    CategoryNotInRound: "Kategori kampanye tidak termasuk dalam musim ini.",
     TierTooLow: "Tingkat verifikasi belum mencukupi untuk aksi ini.",
     NothingToClaim: "Tidak ada dana untuk diklaim.",
     NotOwner: "Hanya pemilik kampanye yang dapat melakukan aksi ini.",
-    NotAttester: "Hanya penerbit atestasi yang dapat melakukan aksi ini.",
+    NotAttester: "Hanya verifikator yang dapat melakukan aksi ini.",
     InvalidCid: "CID gambar tidak valid.",
     InvalidTitle: "Judul tidak valid.",
     rejected: "Tanda tangan dibatalkan.",
     generic: "Transaksi gagal. Coba lagi.",
   } as Record<string, string>,
-} as const;
+};
+
+export type Strings = typeof id;

@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { formatCompactIDR, formatIDR } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
 import { useRoundProject } from "@/lib/hooks";
-
-const d = strings.discovery;
 
 /**
  * One approved campaign in the discovery grid. The category, title, and lifetime direct raised
@@ -31,9 +29,11 @@ export function CampaignCard({
   projectedMatch?: bigint;
   pool: bigint;
 }) {
+  const strings = useStrings();
+  const d = strings.discovery;
   const thumb = cidToUrl(campaign.image_cid);
   const visual = getProjectVisual(campaign.id);
-  const { label: categoryLabel } = categoryMeta(campaign.category.tag);
+  const { label: categoryLabel } = categoryMeta(campaign.category.tag, strings.categories);
 
   // Donor count is only exposed per-round; fetch it just for in-scope cards.
   const rp = useRoundProject(roundId, campaign.id, inScope);

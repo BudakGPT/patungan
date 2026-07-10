@@ -11,11 +11,9 @@ import { useWallet } from "@/lib/wallet";
 import { useTier } from "@/lib/hooks";
 import { mapContractError } from "@/lib/errors";
 import { ALL_CATEGORIES, categoryMeta, type CategoryTag } from "@/lib/category";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { ImageUpload } from "@/components/ImageUpload";
 import { ExplorerLink } from "@/components/ExplorerLink";
-
-const t = strings.campaign.create;
 
 const MAX_TITLE = 96;
 const MAX_STORY = 1024;
@@ -39,6 +37,8 @@ type TxState =
  * linking to the new (Pending) campaign page. Four tx states throughout.
  */
 export default function CampaignCreatePage() {
+  const { campaign } = useStrings();
+  const t = campaign.create;
   const { address, status, connect } = useWallet();
   const tierQ = useTier(address);
 
@@ -82,6 +82,8 @@ function Gate({
   onConnect: () => Promise<void>;
   children: React.ReactNode;
 }) {
+  const strings = useStrings();
+  const t = strings.campaign.create;
   if (status === "not-installed" || status === "disconnected" || status === "connecting") {
     return (
       <Panel>
@@ -134,6 +136,8 @@ function Gate({
 }
 
 function CreateForm({ owner }: { owner: string }) {
+  const strings = useStrings();
+  const t = strings.campaign.create;
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
@@ -190,7 +194,7 @@ function CreateForm({ owner }: { owner: string }) {
       });
 
       if (sent.result.isErr()) {
-        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr()) });
+        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr(), strings.errors) });
         return;
       }
 
@@ -199,7 +203,7 @@ function CreateForm({ owner }: { owner: string }) {
       void queryClient.invalidateQueries({ queryKey: ["campaigns"] });
       setTx({ phase: "success", id: newId, hash: sent.sendTransactionResponse?.hash ?? "" });
     } catch (err) {
-      setTx({ phase: "error", message: mapContractError(err) });
+      setTx({ phase: "error", message: mapContractError(err, strings.errors) });
     }
   }
 
@@ -271,7 +275,7 @@ function CreateForm({ owner }: { owner: string }) {
         <div className="mt-2 flex flex-wrap gap-2">
           {ALL_CATEGORIES.map((tag) => {
             const active = category === tag;
-            const { label, chip } = categoryMeta(tag);
+            const { label, chip } = categoryMeta(tag, strings.categories);
             return (
               <button
                 key={tag}

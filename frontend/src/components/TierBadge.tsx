@@ -1,7 +1,8 @@
 "use client";
 
 import { Tier } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
+import type { Strings } from "@/strings.id";
 
 /**
  * Tier-aware verification badge — the ascending-trust signal reused across the
@@ -9,10 +10,8 @@ import { strings } from "@/strings";
  * the badge just states the fact), `Basic` wears the interaction accent (indigo), `Institution` the
  * reserved match/emerald (the "highest" hue, same one that carries the quadratic-match figure).
  * Two variants share one token table: an inline pill for headers/rows and a large status block for
- * the `/verify` hero. Copy is Bahasa-first via `strings.tierBadge`.
+ * the `/verify` hero. Copy comes from the active locale's `strings.tierBadge`.
  */
-
-const tb = strings.tierBadge;
 
 interface TierStyle {
   /** Small pill classes. */ pill: string;
@@ -22,7 +21,7 @@ interface TierStyle {
   unlocks: string;
 }
 
-function styleFor(tier: Tier): TierStyle {
+function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
   switch (tier) {
     case Tier.Institution:
       return {
@@ -53,8 +52,9 @@ function styleFor(tier: Tier): TierStyle {
 
 /** Inline pill — headers, rows, wallet button. Renders nothing while the tier is still loading. */
 export function TierBadge({ tier }: { tier: Tier | undefined }) {
+  const { tierBadge: tb } = useStrings();
   if (tier === undefined) return null;
-  const s = styleFor(tier);
+  const s = styleFor(tier, tb);
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${s.pill}`}>
       {s.mark ? <span aria-hidden>{s.mark}</span> : null}
@@ -69,7 +69,8 @@ export function TierBadge({ tier }: { tier: Tier | undefined }) {
  * without a legend.
  */
 export function TierStatusBlock({ tier }: { tier: Tier }) {
-  const s = styleFor(tier);
+  const { tierBadge: tb } = useStrings();
+  const s = styleFor(tier, tb);
   return (
     <div className={`rounded-2xl border px-5 py-4 sm:px-6 sm:py-5 ${s.block}`}>
       <p className="text-xs font-semibold uppercase tracking-wide text-faint">{tb.currentLabel}</p>

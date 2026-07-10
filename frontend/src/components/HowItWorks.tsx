@@ -1,6 +1,6 @@
-import { strings } from "@/strings";
+"use client";
 
-const h = strings.discovery.howItWorks;
+import { useStrings } from "@/lib/locale";
 
 /**
  * Onboarding "how it works" strip — the QF explainer for cold visitors on `/`, set directly on
@@ -9,6 +9,8 @@ const h = strings.discovery.howItWorks;
  * emerald. Pure static copy from `strings`, so there is no data view and no loading/error state.
  */
 export function HowItWorks() {
+  const strings = useStrings();
+  const h = strings.discovery.howItWorks;
   return (
     <section aria-label={h.overline} className="mt-14 border-t-2 border-ink pt-8">
       <p className="mono text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
@@ -36,7 +38,8 @@ export function HowItWorks() {
  * sentence and the dots themselves are `aria-hidden`.
  */
 function CrowdVsWhale() {
-  const v = h.viz;
+  const strings = useStrings();
+  const v = strings.discovery.howItWorks.viz;
   return (
     <div className="mt-4 flex items-center gap-4 border-t border-ink/10 pt-4">
       <figure className="flex flex-col items-start gap-1.5">

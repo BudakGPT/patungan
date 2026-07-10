@@ -2,7 +2,7 @@
 
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 
 /**
  * Renders the four data-view states: loading, error, empty, success.
@@ -20,6 +20,7 @@ export function QueryState<T>({
   isEmpty?: (data: T) => boolean;
   children: (data: T) => ReactNode;
 }) {
+  const strings = useStrings();
   if (query.data !== undefined) {
     return (
       <>

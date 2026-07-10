@@ -1,10 +1,10 @@
 import type { Category } from "@/contract/src";
-import { strings } from "@/strings";
 
 /**
- * Presentation for each on-chain `Category` tag: the Bahasa label (from strings) plus the muted
- * tint classes the design system reserves per category. One source of truth so the chip, the
- * card placeholder, and any later filter render the same hue. Unknown tags degrade to neutral.
+ * Presentation for each on-chain `Category` tag: the locale label (passed in by the caller via
+ * `useStrings().categories`) plus the muted tint classes the design system reserves per category.
+ * One source of truth so the chip, the card placeholder, and any later filter render the same hue.
+ * Unknown tags degrade to neutral.
  */
 export type CategoryTag = Category["tag"];
 
@@ -31,12 +31,12 @@ const META: Record<CategoryTag, Omit<CategoryMeta, "label">> = {
   },
 };
 
-export function categoryMeta(tag: string): CategoryMeta {
+export function categoryMeta(tag: string, categories: Record<string, string>): CategoryMeta {
   const m = META[tag as CategoryTag] ?? {
     chip: "text-muted bg-line/40",
     placeholder: "from-line/50 to-line",
   };
-  return { label: strings.categories[tag] ?? tag, ...m };
+  return { label: categories[tag] ?? tag, ...m };
 }
 
 /** The three on-chain categories, in display order — powers the filter chip row. */

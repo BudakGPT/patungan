@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { RoundState } from "@/contract/src";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { formatIDR, truncateAddress, formatCountdown } from "@/lib/format";
 import { categoryMeta } from "@/lib/category";
-
-const d = strings.discovery;
 
 /**
  * The current matching "season" as a status band — the page's one Committed-accent surface and
@@ -17,6 +15,7 @@ const d = strings.discovery;
  * background refetch).
  */
 export function RoundBanner({ query }: { query: UseQueryResult<RoundState | null> }) {
+  const strings = useStrings();
   if (query.data === undefined) {
     if (query.isError) return <EmptyBand hint={strings.errorGeneric} />;
     return (
@@ -24,20 +23,23 @@ export function RoundBanner({ query }: { query: UseQueryResult<RoundState | null
     );
   }
   const round = query.data;
-  if (round === null) return <EmptyBand hint={d.noRoundHint} />;
+  if (round === null) return <EmptyBand hint={strings.discovery.noRoundHint} />;
   return <ActiveBand round={round} stale={query.isError} />;
 }
 
 function EmptyBand({ hint }: { hint: string }) {
+  const strings = useStrings();
   return (
     <div className="rounded-2xl border border-line bg-surface px-6 py-7 shadow-card">
-      <p className="text-base font-medium text-ink">{d.noRound}</p>
+      <p className="text-base font-medium text-ink">{strings.discovery.noRound}</p>
       <p className="mt-1 text-sm text-muted">{hint}</p>
     </div>
   );
 }
 
 function ActiveBand({ round, stale }: { round: RoundState; stale: boolean }) {
+  const strings = useStrings();
+  const d = strings.discovery;
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -91,7 +93,7 @@ function ActiveBand({ round, stale }: { round: RoundState; stale: boolean }) {
                   key={c.tag}
                   className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-bold text-white/80"
                 >
-                  {categoryMeta(c.tag).label}
+                  {categoryMeta(c.tag, strings.categories).label}
                 </span>
               ))
             )}

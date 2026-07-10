@@ -9,10 +9,8 @@ import { useContributions, useCampaigns, useTier } from "@/lib/hooks";
 import type { Contribution } from "@/lib/events";
 import { formatIDR } from "@/lib/format";
 import { categoryMeta } from "@/lib/category";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { ExplorerLink } from "@/components/ExplorerLink";
-
-const a = strings.account;
 
 /**
  * Contributor account `/account`. The "me" surface: my verification tier, my
@@ -22,6 +20,8 @@ const a = strings.account;
  * the impact figure is a header band, never a hero-metric card.
  */
 export default function AccountPage() {
+  const strings = useStrings();
+  const a = strings.account;
   const { address, status, connect } = useWallet();
 
   return (
@@ -54,6 +54,8 @@ function Gate({
   onConnect: () => Promise<void>;
   children: React.ReactNode;
 }) {
+  const strings = useStrings();
+  const a = strings.account;
   if (status === "not-installed" || status === "disconnected" || status === "connecting") {
     return (
       <Panel>
@@ -88,6 +90,8 @@ interface Group {
 }
 
 function AccountBody({ owner }: { owner: string }) {
+  const strings = useStrings();
+  const a = strings.account;
   const contributions = useContributions(owner);
   const campaigns = useCampaigns();
   const tier = useTier(owner);
@@ -192,6 +196,8 @@ function SummaryBand({
   gifts: number;
   tier: Tier | undefined;
 }) {
+  const strings = useStrings();
+  const a = strings.account;
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 border-y border-line py-5">
       <div>
@@ -228,9 +234,11 @@ function SummaryBand({
 /* ── One campaign's giving: header row + hairline-separated gift statement ────────────────── */
 
 function CampaignGroup({ group }: { group: Group }) {
+  const strings = useStrings();
+  const a = strings.account;
   const { campaign, projectId, gifts, total } = group;
   const tag = campaign?.category.tag ?? "";
-  const { label, chip } = categoryMeta(tag);
+  const { label, chip } = categoryMeta(tag, strings.categories);
 
   return (
     <article className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">

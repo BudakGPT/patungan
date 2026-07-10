@@ -21,11 +21,9 @@ import {
 } from "@/lib/anchor";
 import { anchorConfigured } from "@/lib/config";
 import { mapContractError } from "@/lib/errors";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { TierStatusBlock } from "@/components/TierBadge";
 import { ExplorerLink } from "@/components/ExplorerLink";
-
-const v = strings.verify;
 
 /**
  * Verification flow `/verify` — a linear three-beat trust ladder that answers, in
@@ -36,6 +34,8 @@ const v = strings.verify;
  * Each step carries its own four-state cycle so one success never blanks another.
  */
 export default function VerifyPage() {
+  const strings = useStrings();
+  const v = strings.verify;
   const { address, status, connect } = useWallet();
   const connecting = status === "connecting";
 
@@ -74,6 +74,7 @@ export default function VerifyPage() {
 }
 
 function VerifyFlow({ address }: { address: string }) {
+  const { verify: v } = useStrings();
   const tierQ = useTier(address);
   const configQ = useConfig();
   const tier = tierQ.data;
@@ -116,6 +117,7 @@ function VerifyFlow({ address }: { address: string }) {
 /* ── Tier ladder — the two rungs above None and what each unlocks ────────────────────────── */
 
 function TierLadder({ tier }: { tier: Tier }) {
+  const { verify: v } = useStrings();
   const rungs: Array<{ tier: string; unlock: string; reached: boolean }> = [
     { ...v.ladder[0], reached: tier >= Tier.Basic },
     { ...v.ladder[1], reached: tier >= Tier.Institution },
@@ -168,6 +170,7 @@ function Sep10Step({
   address: string;
   onAuthenticated: (jwt: string) => void;
 }) {
+  const { verify: v } = useStrings();
   const [state, setState] = useState<Sep10State>({ phase: "idle" });
   const running = state.phase === "running";
 
@@ -234,6 +237,7 @@ function KycStep({
   jwt: string;
   onAccepted: () => void;
 }) {
+  const { verify: v } = useStrings();
   const [state, setState] = useState<KycState>({ phase: "checking" });
   const [kycServer, setKycServer] = useState<string | null>(null);
   const [fields, setFields] = useState<KycFields>({
@@ -356,6 +360,7 @@ function AttestStep({
   isAttester: boolean;
   kycAccepted: boolean;
 }) {
+  const { verify: v } = useStrings();
   return (
     <ActionPanel
       overline={v.attest.overline}
@@ -386,6 +391,8 @@ function AttestStep({
 
 /** Attester-holding wallet: attest its own tier directly as the testnet anchor stand-in. */
 function SelfAttest({ address }: { address: string }) {
+  const strings = useStrings();
+  const v = strings.verify;
   const queryClient = useQueryClient();
   const action = useAction();
   const [tier, setTier] = useState<Tier>(Tier.Basic);
@@ -459,6 +466,7 @@ function SelfAttest({ address }: { address: string }) {
 
 /** Non-attester wallet: the honest testnet model — an operator completes the attestation. */
 function OperatorFallback() {
+  const { verify: v } = useStrings();
   return (
     <Note tone="muted" title={v.attest.fallbackTitle}>
       {v.attest.fallbackBody}
@@ -484,6 +492,7 @@ type TxState =
   | { phase: "error"; message: string };
 
 function useAction() {
+  const strings = useStrings();
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
   const pending = tx.phase === "awaiting" || tx.phase === "submitting";
 

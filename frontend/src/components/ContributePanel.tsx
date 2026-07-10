@@ -10,10 +10,9 @@ import { useWallet } from "@/lib/wallet";
 import { useTier } from "@/lib/hooks";
 import { formatIDR } from "@/lib/format";
 import { mapContractError } from "@/lib/errors";
-import { strings } from "@/strings";
+import { useStrings } from "@/lib/locale";
 import { ExplorerLink } from "./ExplorerLink";
 
-const c = strings.campaign.contribute;
 const PRESETS = [10_000, 50_000, 100_000] as const;
 
 type TxState =
@@ -39,6 +38,8 @@ export function ContributePanel({
   campaign: ProjectState;
   disabled?: boolean;
 }) {
+  const strings = useStrings();
+  const c = strings.campaign.contribute;
   const { address, status, connect } = useWallet();
   const tierQ = useTier(address);
   const queryClient = useQueryClient();
@@ -130,7 +131,7 @@ export function ContributePanel({
       });
 
       if (sent.result.isErr()) {
-        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr()) });
+        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr(), strings.errors) });
         return;
       }
 
@@ -150,7 +151,7 @@ export function ContributePanel({
 
       setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
     } catch (err) {
-      setTx({ phase: "error", message: mapContractError(err) });
+      setTx({ phase: "error", message: mapContractError(err, strings.errors) });
     }
   }
 
