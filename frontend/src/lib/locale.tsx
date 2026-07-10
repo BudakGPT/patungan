@@ -3,12 +3,15 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { id } from "@/strings.id";
 import { en } from "@/strings.en";
+import { fil } from "@/strings.fil";
+import { vi } from "@/strings.vi";
 import type { Strings } from "@/strings.id";
 
-export type Locale = "id" | "en";
+export type Locale = "id" | "en" | "fil" | "vi";
 
 const STORAGE_KEY = "patungan:locale";
-const catalog: Record<Locale, Strings> = { id, en };
+const catalog: Record<Locale, Strings> = { id, en, fil, vi };
+const LOCALES = Object.keys(catalog) as Locale[];
 
 interface LocaleContextValue {
   locale: Locale;
@@ -20,8 +23,13 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 function detectLocale(): Locale {
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === "id" || stored === "en") return stored;
-  return window.navigator.language.toLowerCase().startsWith("en") ? "en" : "id";
+  if (stored && LOCALES.includes(stored as Locale)) return stored as Locale;
+
+  const lang = window.navigator.language.toLowerCase();
+  if (lang.startsWith("en")) return "en";
+  if (lang.startsWith("vi")) return "vi";
+  if (lang.startsWith("fil") || lang.startsWith("tl")) return "fil";
+  return "id";
 }
 
 /**

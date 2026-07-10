@@ -2,13 +2,13 @@
 
 import { useLocale } from "@/lib/locale";
 
-/** ID/EN pill, styled to match the header's dark-chrome pills (WalletButton, nav-pill). */
+/** Locale pill, styled to match the header's dark-chrome pills (WalletButton, nav-pill). */
 export function LocaleToggle() {
   const { locale, setLocale } = useLocale();
 
   return (
     <div className="flex items-center overflow-hidden rounded-full border border-white/20 bg-white/8 text-sm font-black text-paper">
-      {(["id", "en"] as const).map((l) => (
+      {(["id", "en", "fil", "vi"] as const).map((l) => (
         <button
           key={l}
           type="button"

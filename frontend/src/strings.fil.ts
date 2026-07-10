@@ -1,0 +1,612 @@
+import type { Strings } from "./strings.id";
+
+/** Filipino UI copy — opt-in locale, shape-checked against `strings.id.ts`. */
+export const fil: Strings = {
+  appName: "Patungan",
+  nav: {
+    landing: "Home",
+    seasons: "Mga Season",
+    results: "Resulta",
+    dashboard: "Dashboard",
+    account: "Account",
+    operator: "Operator",
+  },
+  landing: {
+    title: "Patungan",
+    subtitle: "Sabayang ambag, patas na tinutumbasan.",
+    poolLabel: "Pondo sa pagtutumbas",
+    sponsorLabel: "Isinponsor ng",
+    sponsorName: "Pemprov Jawa Timur",
+    statusOpen: "Bukas",
+    statusFinalized: "Tapos na",
+    roundEndLabel: "Magtatapos",
+    notInitialized: "Wala pang bukas na round",
+    waitingSponsor: "Naghihintay ng sponsor",
+    donorCountSuffix: "tagasuporta",
+    projectedMatchLabel: "Inaasahang tutumbasin",
+    finalMatchLabel: "Panghuling tinumbasan",
+    noMatchYet: "—",
+  },
+  categories: {
+    DevelopingRegions: "Umuunlad na Rehiyon",
+    DisasterRelief: "Tulong sa Sakuna",
+    EducationHealth: "Edukasyon at Kalusugan",
+  } as Record<string, string>,
+  discovery: {
+    heading: "Tuklasin ang mga kampanya",
+    tagline: "Maliliit na ambag mula sa maraming tao, patas na tinutumbasan.",
+    searchPlaceholder: "Maghanap ng kampanya…",
+    sortLabel: "Ayusin",
+    sort: {
+      mostBacked: "Pinakasuportado",
+      newest: "Pinakabago",
+      closingSoon: "Malapit nang magsara",
+    },
+    allFilter: "Lahat",
+    createCta: "Magsumite ng kampanya",
+    resultCount: (n: number) => `${n} kampanya`,
+    emptyApproved: "Wala pang aprubadong kampanya.",
+    emptyFiltered: "Walang kampanyang tumugma sa filter na ito.",
+    resetFilters: "I-reset ang mga filter",
+    // Season / round banner
+    season: "Season ng Pagtutumbas",
+    live: "Live",
+    scopeAll: "Lahat ng kategorya",
+    scopeLabel: "Kategorya ngayong season",
+    endsInLabel: "Magtatapos sa",
+    endedLabel: "Tapos na ang season",
+    noRound: "Walang aktibong season ng pagtutumbas",
+    noRoundHint: "Bukas pa rin ang direktang donasyon. Malapit nang dumating ang susunod na season.",
+    countdown: { day: "a", hour: "o", min: "m", ended: "Tapos na" },
+    // Card
+    donorSuffix: "tagasuporta",
+    directShort: "Direkta",
+    matchSuffix: "tumbasan",
+    noThumbAlt: "Walang larawan",
+    // Onboarding "how it works" strip — QF explainer for cold visitors
+    howItWorks: {
+      overline: "Paano ito gumagana",
+      steps: [
+        {
+          n: "01",
+          title: "Direktang magdonasyon, kahit kailan",
+          body: "Pumili ng kampanyang pinagkakatiwalaan mo, tapos magdonasyon nang direkta — hindi na kailangang maghintay ng season.",
+        },
+        {
+          n: "02",
+          title: "Bilang ng tao, hindi laki ng ambag",
+          body: "Mas malakas ang senyales ng maraming maliliit na donor kaysa sa isang malaking donor.",
+        },
+        {
+          n: "03",
+          title: "Hinahati ang pondo sa pagtutumbas bawat season",
+          body: "Sa pagtatapos ng bawat season, hinahati ang pondo ng sponsor ayon sa senyales na iyon, nang kuwadratiko.",
+        },
+      ],
+      viz: {
+        crowd: "maraming maliliit na donor",
+        whale: "isang malaking donor",
+        beats: "mas malakas kaysa",
+        sr: "Mas malakas ang maraming maliliit na donor kaysa sa isang malaking donor.",
+      },
+    },
+  },
+  campaign: {
+    back: "Bumalik sa pagtuklas",
+    notFoundTitle: "Hindi nahanap ang kampanya",
+    notFoundBody: "Maaaring wala pang kampanyang ito, o mali ang link.",
+    backHome: "Bumalik sa home",
+    byOwner: "Pinapatakbo ni",
+    storyHeading: "Tungkol sa kampanyang ito",
+    raisedLabel: "Kabuuang direktang donasyon",
+    thisRoundHeading: "Season ng pagtutumbas na ito",
+    donorSuffix: "tagasuporta",
+    projectedMatchLabel: "Inaasahang kuwadratikong tumbasan",
+    notInRound:
+      "Hindi pa bahagi ng aktibong season ng pagtutumbas — mabibilang pa rin ang direktang donasyon sa tumbasan ng susunod na season.",
+    /** Notice shown when a non-Approved campaign is opened directly (owner-shared link). */
+    status: {
+      Pending: "Naghihintay pa ang kampanyang ito ng kurasyon. Bubukas ang donasyon kapag inaprubahan ng kurador.",
+      Rejected: "Hindi ito pumasa sa kurasyon at hindi na maaaring tumanggap ng donasyon.",
+      Cancelled: "Nakansela na ang kampanyang ito.",
+    } as Record<string, string>,
+    create: {
+      back: "Bumalik sa pagtuklas",
+      heading: "Magsumite ng kampanya",
+      subtitle:
+        "Ikwento ang iyong kampanya, mag-upload ng isang larawan, tapos isumite para sa kurasyon. Kapag inaprubahan ng kurador, magiging publiko ang kampanya at makakatanggap na ng donasyon.",
+      // Gate ladder (mirrors the contribute gate)
+      connectPrompt: "Ikonekta ang Testnet wallet para magsumite ng kampanya.",
+      wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
+      tierGateTitle: "I-verify muna",
+      tierGateBody: "Kailangan mo ng Basic-tier na beripikasyon para magsumite ng kampanya.",
+      tierGateCta: "I-verify ngayon",
+      // Fields
+      titleLabel: "Pamagat ng kampanya",
+      titlePlaceholder: "hal. Malinis na balon para sa Dusun Sumber",
+      categoryLabel: "Kategorya",
+      storyLabel: "Kwento ng kampanya",
+      storyPlaceholder: "Ipaliwanag kung sino ang matutulungan, ano ang pinopondohan, at bakit ito mahalaga.",
+      payoutLabel: "Address ng payout",
+      payoutHelper: "Default: ang wallet mo. Ipapadala sa address na ito ang naipong pondo.",
+      payoutReset: "Gamitin ang wallet ko",
+      imageLabel: "Larawan ng kampanya",
+      // Image dropzone
+      image: {
+        dropPrompt: "I-drag ang larawan dito o pumili ng file",
+        dropHint: "PNG o JPG, ikakabit sa IPFS",
+        pickFile: "Pumili ng file",
+        uploading: "Ina-upload ang larawan…",
+        replace: "Palitan ang larawan",
+        remove: "Alisin",
+        cidLabel: "CID",
+        errorFallback: "Hindi na-pin ang larawan. Subukan ulit.",
+        previewAlt: "Preview ng larawan ng kampanya",
+      },
+      // Client-side validation
+      invalid: {
+        titleRequired: "Kailangan ang pamagat.",
+        titleTooLong: "Pinakamataas na 96 karakter ang pamagat.",
+        storyRequired: "Kailangan ang kwento.",
+        storyTooLong: "Pinakamataas na 1024 karakter ang kwento.",
+        payoutInvalid: "Hindi valid na Stellar address (dapat magsimula sa G, 56 karakter).",
+        imageRequired: "Mag-upload ng isang larawan ng kampanya.",
+      } as Record<string, string>,
+      // Submit tx
+      submit: "Isumite para sa kurasyon",
+      awaiting: "Buksan ang Freighter para pumirma…",
+      submitting: "Ipinapadala ang transaksyon…",
+      // Success
+      successTitle: "Naisumite ang kampanya — naghihintay ng kurasyon",
+      successBody:
+        "Naitala na ang kampanya mo on-chain na may status na Naghihintay ng kurasyon. Kapag inaprubahan ng kurador, magiging publiko ito at makakatanggap na ng donasyon.",
+      viewCampaign: "Tingnan ang kampanya",
+      createAnother: "Magsumite ng isa pang kampanya",
+    },
+    contribute: {
+      cta: "Sumali sa patungan",
+      amountLabel: "Piliin ang halaga",
+      confirm: "Ipadala at pirmahan",
+      awaiting: "Buksan ang Freighter para pumirma…",
+      submitting: "Ipinapadala ang transaksyon…",
+      successTitle: "Salamat — naitala na ang ambag mo on-chain.",
+      done: "Tapos na",
+      cancel: "Kanselahin",
+      connectPrompt: "Ikonekta ang Testnet wallet para sumali sa ambagan.",
+      wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
+      tierGateTitle: "I-verify muna",
+      tierGateBody: "Kailangan mo ng Basic-tier na beripikasyon para sumali sa ambagan.",
+      tierGateCta: "I-verify ngayon",
+    },
+  },
+  project: {
+    backToLanding: "Bumalik sa home",
+    notFound: "Hindi nahanap ang proyekto.",
+    raisedLabel: "Naipon",
+    contributeCta: "Sumali sa patungan",
+    roundClosedCta: "Sarado ang round",
+    stories: {
+      0: "Tumutulo ang bubong ng SDN 2 Elementary School tuwing tag-ulan. Papalitan ng pondong ito ang seng na bubong para makapag-aral nang ligtas at tuyo ang mga bata.",
+      1: "Nagbibigay ng sariwang gulay ang community garden ng RW 5 sa posyandu. Bibili ang pondong ito ng binhi at simpleng kagamitan sa pagsasaka.",
+      2: "Malayo ang nilalakbay ng mga residente ng Dusun Sumber araw-araw para sa malinis na tubig. Babayaran ng pondong ito ang paghuhukay ng balon para sa komunidad.",
+    } as Record<number, string>,
+  },
+  contribute: {
+    title: "Umambag para sa",
+    amountLabel: "Piliin ang halaga",
+    connectFirst: "Ikonekta ang Testnet wallet para magpatuloy.",
+    confirmCta: "Ipadala at pirmahan",
+    awaitingSignature: "Buksan ang Freighter para pumirma…",
+    submitting: "Ipinapadala ang transaksyon…",
+    successTitle: "Matagumpay ang ambag!",
+    viewOnExplorer: "Tingnan ang transaksyon sa Explorer",
+    close: "Isara",
+    cancel: "Kanselahin",
+    errors: {
+      NotVerified: "Hindi pa na-verify ang address na ito.",
+      RoundClosed: "Sarado na ang season na ito sa bagong ambag.",
+      UnknownProject: "Hindi nahanap ang proyekto.",
+      InvalidAmount: "Hindi valid na halaga.",
+      rejected: "Nakansela ang pagpirma.",
+      generic: "Nabigo ang transaksyon. Subukan ulit.",
+    } as Record<string, string>,
+  },
+  seasons: {
+    title: "Archive ng mga season",
+    subtitle:
+      "Bawat season ng pagtutumbas na nabuksan na, mula sa pinakabago. Ipinapakita ng mga tapos nang season ang mga kampanyang may pinakamalaking tumbasan.",
+    seasonLabel: (id: number) => `Season #${id}`,
+    poolLabel: "Pondo sa pagtutumbas",
+    sponsorLabel: "Sponsor",
+    scopeLabel: "Kategorya",
+    scopeAll: "Lahat ng kategorya",
+    // Status pills (reuse the dashboard tones)
+    status: {
+      Open: "Live",
+      Finalized: "Tapos na",
+      Cancelled: "Nakansela",
+    } as Record<string, string>,
+    // Open round line
+    liveEndsIn: "Magtatapos sa",
+    liveEnded: "Naghihintay ng finalisasyon",
+    liveProjection: "Live na proyeksyon ng pagtutumbas",
+    countdown: { day: "a", hour: "o", min: "m", ended: "Tapos na" },
+    // Finalized leaderboard
+    topHeading: "Pinakamalaking tumbasan",
+    noMatches: "Walang kampanyang natumbasan season na ito.",
+    cancelledNote: "Nakansela ang season na ito bago ma-finalize. Ibinalik ang pondo sa sponsor.",
+    viewResults: "Tingnan ang resulta",
+    // States
+    empty: "Wala pang season ng pagtutumbas.",
+    emptyHint: "Lalabas dito ang unang season kapag nagbukas na ang isang sponsor.",
+  },
+  results: {
+    title: "Resulta ng pagtutumbas",
+    seasonLabel: (id: number) => `Season #${id}`,
+    notFinalized: "Hindi pa na-finalize ang season na ito. Narito ang inaasahang tumbasan base sa kasalukuyang ambag.",
+    finalized: "Panghuling resulta ng season na ito.",
+    roundPickerLabel: "Season",
+    directLabel: "Direkta",
+    matchedLabel: "Tinumbasan",
+    donorSuffix: "tagasuporta",
+    poolLabel: "Pondo sa pagtutumbas",
+    totalMatchedLabel: "Kabuuang naipamahaging pondo sa pagtutumbas",
+    verdict: "Sumusunod ang pondo sa pagtutumbas sa bilang ng tagasuporta, hindi sa laki ng ambag.",
+    // States
+    empty: "Wala pang ambag na tutumbasin season na ito.",
+    emptyHint: "Lalabas ang resulta kapag nakatanggap na ng donasyon ang mga kampanya season na ito.",
+    notFoundTitle: "Hindi nahanap ang season",
+    notFoundBody: "Maaaring wala pang season na ito, o mali ang link.",
+    backToSeasons: "Tingnan ang archive ng mga season",
+    noRounds: "Wala pang season ng pagtutumbas.",
+    barLabel: "Paghahambing ng direktang donasyon at pondo sa pagtutumbas",
+  },
+  operator: {
+    title: "Operator Console",
+    subtitle:
+      "Patakbuhin ang isang buong season ng pagtutumbas: buksan ang round, punuan ng pondo, kurasyunin ang mga kampanya, tapos i-finalize.",
+    // Gate ladder
+    connectPrompt: "Ikonekta ang operator wallet para ma-access ang console na ito.",
+    notRole: "Ang nakakonektang wallet ay hindi hawak ng operator role (admin, kurador, o verifier).",
+    wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
+    // Shared tx phases
+    awaiting: "Buksan ang Freighter para pumirma…",
+    submitting: "Ipinapadala ang transaksyon…",
+    // Status strip — the anchor every action is read against
+    status: {
+      connectedAs: "Nakakonekta bilang",
+      roles: "Mga Role",
+      roleAdmin: "Admin",
+      roleCurator: "Kurador",
+      roleAttester: "Verifier",
+      liveRound: "Live na season",
+      noRound: "Walang bukas na season",
+      poolLabel: "Pondo sa pagtutumbas",
+      scopeAll: "Lahat ng kategorya",
+      endsLabel: "Magtatapos",
+      ended: "Tapos na",
+    },
+    // Region headings
+    lifecycleHeading: "Season ng pagtutumbas",
+    governanceHeading: "Pamamahala",
+    // Section overlines / step numbers
+    step: { open: "01 · Buksan ang season", fund: "02 · Punuan ng pondo", finalize: "03 · Finalize" },
+    // 1 · Open round
+    open: {
+      heading: "Magbukas ng season ng pagtutumbas",
+      description:
+        "Simulan ang bagong season: itakda ang petsa ng pagtatapos at ang mga kategoryang tutumbasin. Isang season lang ang maaaring bukas sa isang pagkakataon.",
+      endLabel: "Petsa ng pagtatapos",
+      endHelper: "Ipinapakita sa mga donor bilang countdown.",
+      categoriesLabel: "Kategorya ngayong season",
+      categoriesHint: "Iwanang blangko para tumbasan ang lahat ng kategorya.",
+      cta: "Buksan ang season",
+      successTitle: "Nabuksan ang season!",
+      alreadyOpen: (id: number) => `Tumatakbo na ang Season #${id}. I-finalize muna bago magbukas ng bago.`,
+      invalidDate: "Pumili ng petsa ng pagtatapos sa hinaharap.",
+    },
+    // 2 · Fund pool
+    fund: {
+      heading: "Punuan ang pondo sa pagtutumbas",
+      description:
+        "Mag-deposito ng pondo sa pagtutumbas para sa season na kasalukuyang tumatakbo. Kailangan ng Institution-tier na beripikasyon.",
+      amountLabel: "Halaga ng pondo (IDR)",
+      echoLabel: "Ide-deposito",
+      cta: "Ipadala ang pondo",
+      successTitle: "Naipadala ang pondo sa pagtutumbas!",
+      invalidAmount: "Maglagay ng positibong buong numero.",
+      needsRound: "Magbukas muna ng season bago punuan ng pondo.",
+      tierGateTitle: "Kailangan ng Institution tier",
+      tierGateBody:
+        "Institution-verified na wallet lang ang makakapunong ng pondo sa pagtutumbas. Gamitin ang verification console sa ibaba para itaas ang tier ng wallet na ito.",
+    },
+    // 3 · Finalize
+    finalize: {
+      heading: "I-finalize ang season",
+      description: "Isasara ang season sa bagong ambag at kakalkulahin ang kuwadratikong tumbasan. Hindi na maibabalik.",
+      cta: "I-finalize ang season",
+      confirmMessage: "Hindi na maibabalik ang finalisasyon. Magpatuloy?",
+      confirmCta: "Oo, i-finalize na ngayon",
+      cancelCta: "Kanselahin",
+      successTitle: "Na-finalize ang season!",
+      viewResults: "Tingnan ang resulta",
+      needsRound: "Walang bukas na season na i-finafinalize.",
+    },
+    // 4 · Curation queue
+    curation: {
+      heading: "Pila ng kurasyon",
+      description: "Naghihintay ng aprubasyon ang mga bagong kampanya bago maging publiko at makatanggap ng donasyon.",
+      empty: "Walang kampanyang naghihintay ng kurasyon.",
+      pendingBadge: "Naghihintay",
+      approve: "Aprubahan",
+      reject: "Tanggihan",
+      approving: "Ina-aprubahan…",
+      rejecting: "Tinatanggihan…",
+      byOwner: "Ni",
+      approvedToast: "Inaprubahan ang kampanya.",
+      rejectedToast: "Tinanggihan ang kampanya.",
+    },
+    // 5 · Verify fallback
+    verify: {
+      heading: "Manual na beripikasyon",
+      description: "Magtakda ng verification tier para sa isang address — ang testnet stand-in path para sa KYC anchor.",
+      addressLabel: "Wallet address (G…)",
+      tierLabel: "Tier",
+      tiers: { None: "Wala", Basic: "Basic", Institution: "Institution" } as Record<string, string>,
+      cta: "Itakda ang tier",
+      successTitle: "Naitakda ang verification tier!",
+      invalidAddress: "Hindi valid na Stellar address (dapat magsimula sa G, 56 karakter).",
+    },
+    viewOnExplorer: "Tingnan ang transaksyon sa Explorer",
+    /** Error overrides specific to operator actions; anything omitted falls back to shared strings.errors. */
+    errors: {
+      RoundAlreadyOpen: "May tumatakbo nang season.",
+      RoundNotOpen: "Hindi na bukas ang season na ito para sa aksyong ito.",
+      AlreadyFinalized: "Na-finalize na ang season na ito.",
+      NothingToMatch: "Wala pang ambag na tutumbasin.",
+      TierTooLow: "Hindi sapat ang verification tier (kailangan ng Institution).",
+      NotAdmin: "Admin lang ang makakagawa nito.",
+      NotCurator: "Kurador lang ang makakagawa nito.",
+      NotAttester: "Verifier lang ang makakagawa nito.",
+      ProjectNotPending: "Hindi naghihintay ng kurasyon ang kampanyang ito.",
+      InvalidAmount: "Hindi valid na halaga.",
+      rejected: "Nakansela ang pagpirma.",
+      generic: "Nabigo ang transaksyon. Subukan ulit.",
+    } as Record<string, string>,
+  },
+  dashboard: {
+    title: "Aking dashboard",
+    subtitle: "Mga kampanyang isinumite mo, kabuuang naipong donasyon, at ang tumbasang bayad ng bawat season.",
+    createCta: "Magsumite ng kampanya",
+    // Gate ladder (owners need no verification tier — just a Testnet wallet)
+    connectPrompt: "Ikonekta ang Testnet wallet para makita ang mga kampanya mo.",
+    wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
+    // Empty state
+    empty: "Wala ka pang kampanya.",
+    emptyHint: "Isumite ang una mong kampanya para magsimulang tumanggap ng donasyon at pondo sa pagtutumbas.",
+    // Per-campaign
+    statusPill: {
+      Pending: "Naghihintay ng kurasyon",
+      Approved: "Aktibo",
+      Rejected: "Tinanggihan",
+      Cancelled: "Nakansela",
+    } as Record<string, string>,
+    lifetimeLabel: "Kabuuang direktang donasyon",
+    seasonsHeading: "Mga bayad kada season",
+    seasonsLoading: "Nilo-load ang mga bayad…",
+    noSeasons: "Hindi pa naging bahagi ang kampanyang ito ng na-finalize na season ng pagtutumbas.",
+    // Per finalized round
+    round: {
+      label: (id: number) => `Season #${id}`,
+      directLabel: "Direkta",
+      donorSuffix: "tagasuporta",
+      matchedLabel: "Tinumbasan",
+      claim: "I-claim ang pondo sa pagtutumbas",
+      claiming: "Kina-claim…",
+      claimed: "Na-claim na",
+      nothing: "Walang tumbasan season na ito",
+    },
+    // Campaign-level claim of donations received while no round was open
+    direct: {
+      heading: "Donasyong labas sa season",
+      body: "Mga donasyong pumasok habang walang aktibong season — puwedeng i-claim anumang oras.",
+      claim: "I-claim ang direktang donasyon",
+      claiming: "Kina-claim…",
+      claimed: "Naipamahagi na ang direktang donasyon.",
+    },
+    // Shared tx phases
+    awaiting: "Buksan ang Freighter para pumirma…",
+    submitting: "Ipinapadala ang transaksyon…",
+    claimedTitle: "Matagumpay na na-claim ang pondo!",
+    viewOnExplorer: "Tingnan ang transaksyon sa Explorer",
+  },
+  account: {
+    title: "Aking mga ambag",
+    subtitle: "Ang kasaysayan ng iyong direktang donasyon, muling binuo mula sa mga on-chain na tala — pinagsama-sama ayon sa kampanya.",
+    // Gate ladder (a contributor only needs a Testnet wallet to see their own history)
+    connectPrompt: "Ikonekta ang Testnet wallet para makita ang kasaysayan ng ambag mo.",
+    wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
+    // Header ledger figure (quiet total, not a hero card)
+    tierLabel: "Beripikasyon",
+    tier: { None: "Hindi pa na-verify", Basic: "Basic", Institution: "Institution" } as Record<
+      string,
+      string
+    >,
+    impactLabel: "Kabuuang epekto ko",
+    campaignCount: (n: number) => `${n} kampanya`,
+    giftCount: (n: number) => `${n} donasyon`,
+    // Per-campaign group
+    myTotalLabel: "Mga donasyon ko",
+    unknownCampaign: (id: number) => `Kampanya #${id}`,
+    viewCampaign: "Tingnan ang kampanya",
+    viewTx: "Tingnan sa Explorer",
+    // Empty state
+    empty: "Wala ka pang naidonasyon.",
+    emptyHint: "Lalabas dito ang unang donasyon mo, direktang naitala mula sa on-chain na transaksyon.",
+    exploreCta: "Tuklasin ang mga kampanya",
+    // Retention caveat — testnet RPC prunes old events; keep the reconstruction honest.
+    retentionNote: "Mga donasyon lang sa loob ng retention window ng Testnet RPC ang maipapakita.",
+  },
+  /** Tier-aware verification badge labels + one-line unlock captions (`TierBadge`). */
+  tierBadge: {
+    currentLabel: "Ang verification tier mo",
+    tiers: {
+      None: "Hindi na-verify",
+      Basic: "Basic verified",
+      Institution: "Institution verified",
+    } as Record<string, string>,
+    unlocks: {
+      None: "Mag-verify para makapag-ambag at makapagsumite ng kampanya.",
+      Basic: "Puwede kang mag-ambag at magsumite ng kampanya.",
+      Institution: "Puwede kang mag-ambag, magsumite ng kampanya, at magpunô ng pondo sa pagtutumbas.",
+    } as Record<string, string>,
+  },
+  verify: {
+    title: "Beripikasyon",
+    subtitle:
+      "Mag-verify nang isang beses para ma-unlock ang pag-ambag at pagsumite ng kampanya. Hindi kailanman naka-store dito ang datos ng pagkakakilanlan mo — ang tier ng beripikasyon lang ang naitatala on-chain.",
+    // Gate ladder
+    connectPrompt: "Ikonekta ang Testnet wallet para magsimula ng beripikasyon.",
+    wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
+    // What each tier unlocks — the ladder rail
+    ladderHeading: "Ang na-a-unlock sa bawat tier",
+    ladder: [
+      { tier: "Basic", unlock: "Mag-ambag at magsumite ng kampanya" },
+      { tier: "Institution", unlock: "Magpunô ng pondo sa pagtutumbas bilang sponsor" },
+    ],
+    // Step 1 — SEP-10 ownership
+    sep10: {
+      overline: "01 · Patunay ng pagmamay-ari",
+      heading: "Patunayan na sa iyo ang wallet na ito",
+      description:
+        "Pirmahan ang hamon mula sa anchor (SEP-10) para patunayan ang pagmamay-ari ng wallet. Walang pondong gagalaw.",
+      cta: "Simulan ang patunay ng pagmamay-ari",
+      pending: "Kinokontak ang anchor…",
+      awaiting: "Buksan ang Freighter para pumirma…",
+      successTitle: "Napatunayan ang pagmamay-ari",
+      successBody: "Naglabas ang anchor ng session token. Magpatuloy sa pagtatakda ng tier.",
+      notConfiguredTitle: "Hindi pa naka-configure ang anchor",
+      notConfiguredBody:
+        "Wala pang nakakonektang SEP-10 anchor sa environment na ito. Magagamit mo pa rin ang simulated testnet tier-assignment path sa ibaba.",
+      errors: {
+        "not-configured": "Walang naka-configure na anchor sa environment na ito.",
+        toml: "Hindi nahanap ang SEP-10 endpoint ng anchor.",
+        challenge: "Tinanggihan ng anchor ang kahilingan sa beripikasyon. Subukan ulit.",
+        "invalid-challenge": "Hindi valid ang hamon ng anchor.",
+        signature: "Nakansela ang pagpirma.",
+        token: "Tinanggihan ng anchor ang pirma. Subukan ulit.",
+        network: "Hindi naabot ang anchor. Suriin ang koneksyon at subukan ulit.",
+        generic: "Nabigo ang beripikasyon ng anchor. Subukan ulit.",
+      } as Record<string, string>,
+    },
+    // Step 1.5 — SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
+    kyc: {
+      overline: "01b · Detalye ng KYC",
+      heading: "Ipadala ang detalye ng KYC sa anchor",
+      description: "Naglalathala ang anchor na ito ng serbisyong KYC (SEP-12). Punan ang ilang detalye para suriin ng anchor.",
+      firstName: "Pangalan",
+      lastName: "Apelyido",
+      email: "Email",
+      cta: "Ipadala sa anchor",
+      submitting: "Ipinapadala sa anchor…",
+      polling: "Sinusuri ang status sa anchor…",
+      status: {
+        NEEDS_INFO: "Kailangan ng anchor ng dagdag na impormasyon.",
+        PROCESSING: "Pinoproseso ng anchor ang isinumite mo.",
+        PENDING: "Naghihintay ng desisyon ng anchor.",
+        ACCEPTED: "Tinanggap ng anchor ang KYC mo. Magpatuloy sa pagtatakda ng tier.",
+        REJECTED: "Tinanggihan ng anchor ang KYC submission na ito.",
+      } as Record<string, string>,
+      errors: {
+        "not-configured": "Walang naka-configure na anchor sa environment na ito.",
+        "kyc-not-configured":
+          "Hindi naglalathala ng serbisyong KYC (SEP-12) ang anchor na ito — magpatuloy sa pamamagitan ng simulated testnet tier-assignment path sa ibaba.",
+        "kyc-rejected": "Tinanggihan ng anchor ang KYC submission. Subukan ulit.",
+        network: "Hindi naabot ang anchor. Suriin ang koneksyon at subukan ulit.",
+        generic: "Nabigo ang KYC submission. Subukan ulit.",
+      } as Record<string, string>,
+    },
+    // Step 2 — attest (real KYC hand-off, or the simulated testnet stand-in)
+    attest: {
+      overline: "02 · Pagtatakda ng tier",
+      heading: "Kunin ang iyong verification tier",
+      simBadge: "Testnet simulation",
+      realBadge: "Tinanggap ang KYC ng anchor",
+      description:
+        "Sa production, inaaprubahan ng anchor ang KYC at pagkatapos ay isusulat ang tier mo. Sa testnet, ang operator (may hawak na verifier role) ang humahalili sa anchor.",
+      // Attester-holder path (self-serve on testnet)
+      attesterHint: "Hawak ng wallet na ito ang verifier role — puwede kang magtakda ng tier nang direkta bilang anchor stand-in.",
+      tierLabel: "Tier",
+      tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
+      cta: "Aprubahan (simulated KYC)",
+      successTitle: "Naitakda ang verification tier!",
+      // Non-attester fallback
+      fallbackTitle: "Naghihintay ng pagtatakda ng tier ng operator",
+      fallbackBody:
+        "Sa testnet, ang operator ang humahawak ng pagtatakda ng tier bilang kapalit ng anchor. Napatunayan na ang pagmamay-ari ng wallet mo — hilingin sa operator na itakda ang tier mo sa pamamagitan ng console.",
+      fallbackCta: "Buksan ang operator console",
+      alreadyTitle: "Na-verify ka na",
+      alreadyBody: "Wala nang ibang gagawin. Handa ka nang mag-ambag.",
+      exploreCta: "Tuklasin ang mga kampanya",
+    },
+    // Shared tx phases
+    submitting: "Ipinapadala ang transaksyon…",
+    viewOnExplorer: "Tingnan ang transaksyon sa Explorer",
+    tierError: "Nabigong i-load ang verification tier. Subukan ulit.",
+  },
+  wallet: {
+    connect: "Ikonekta ang Wallet",
+    connecting: "Kumokonekta…",
+    notInstalled: "I-install ang Freighter",
+    wrongNetworkPill: "Maling network",
+    testnetPill: "Testnet",
+    wrongNetworkBanner: "Hindi nakakonekta ang Freighter sa Testnet. Ilipat ang network sa Freighter para magpatuloy.",
+    connectFailed: "Nabigong ikonekta ang wallet. Subukan ulit.",
+  },
+  explorer: {
+    viewTx: "Tingnan ang transaksyon sa Explorer",
+    viewContract: "Tingnan ang contract sa Explorer",
+  },
+  footer: {
+    transparency: "Bawat aksyon ay naitatala on-chain sa Stellar Testnet.",
+  },
+  loading: "Nilo-load…",
+  empty: "Wala pang proyekto",
+  errorGeneric: "May naganap na error. Subukan ulit.",
+  retry: "Subukan ulit",
+  staleData: "Hindi na-load ang mga update — ipinapakita ang huling nakuhang datos.",
+  /**
+   * Shared Filipino fallback for every contract `Error` variant (mapped by name via
+   * `mapContractError`). Context-specific screens may override individual keys by passing their
+   * own map; anything they omit falls back here, so no rejection ever renders raw internals.
+   */
+  errors: {
+    AlreadyInitialized: "Na-initialize na ang contract.",
+    NotAdmin: "Admin lang ang makakagawa nito.",
+    NotVerified: "Hindi pa na-verify ang address na ito.",
+    RoundClosed: "Sarado na ang season na ito sa bagong ambag.",
+    RoundNotOpen: "Hindi na bukas ang season na ito para sa aksyong ito.",
+    AlreadyFinalized: "Na-finalize na ang season na ito.",
+    NotFinalized: "Hindi pa na-finalize ang season na ito.",
+    UnknownProject: "Hindi nahanap ang kampanya.",
+    DuplicateProject: "Nakarehistro na ang kampanyang ito.",
+    AlreadyDisbursed: "Naipamahagi na ang pondo ng kampanyang ito.",
+    InvalidAmount: "Hindi valid na halaga.",
+    NothingToMatch: "Wala pang ambag na tutumbasin.",
+    NotCurator: "Kurador lang ang makakagawa nito.",
+    ProjectNotApproved: "Hindi pa inaprubahan ng kurador ang kampanyang ito.",
+    ProjectNotPending: "Hindi naghihintay ng kurasyon ang kampanyang ito.",
+    AlreadyClaimed: "Na-claim na ang bahagi ng season na ito.",
+    UnknownRound: "Hindi nahanap ang season.",
+    RoundAlreadyOpen: "May bukas nang season.",
+    CategoryNotInRound: "Hindi bahagi ng season na ito ang kategorya ng kampanyang ito.",
+    TierTooLow: "Hindi sapat ang verification tier para sa aksyong ito.",
+    NothingToClaim: "Walang pondong i-claim.",
+    NotOwner: "May-ari lang ng kampanya ang makakagawa nito.",
+    NotAttester: "Verifier lang ang makakagawa nito.",
+    InvalidCid: "Hindi valid na image CID.",
+    InvalidTitle: "Hindi valid na pamagat.",
+    rejected: "Nakansela ang pagpirma.",
+    generic: "Nabigo ang transaksyon. Subukan ulit.",
+  } as Record<string, string>,
+};
