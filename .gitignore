@@ -35,6 +35,9 @@ PATH-TO-PRODUCT.md
 BACKLOG-v2.md
 ISSUE-v2.md
 PROGRESS-v2.md
+frontend/.impeccable/
+frontend/DESIGN.md
+frontend/PRODUCT.md
 
 # ---- OS / editor ----
 .DS_Store

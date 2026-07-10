@@ -48,48 +48,48 @@ function ActiveBand({ round, stale }: { round: RoundState; stale: boolean }) {
   const scope = round.categories.length === 0 ? null : round.categories;
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-accent text-on-accent shadow-card-hover">
+    <div className="overflow-hidden rounded-[1.5rem] bg-ink text-paper shadow-award">
       <div className="flex flex-col gap-6 px-6 py-6 sm:px-8 sm:py-7 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-on-accent/75">
+          <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-[.16em] text-lime">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-on-accent/70" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-on-accent" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime/70" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-lime" />
             </span>
             {d.season} #{round.id} · {d.live}
           </div>
-          <p className="mt-3 text-sm text-on-accent/75">{strings.landing.poolLabel}</p>
-          <p className="tabular text-[2.25rem] font-bold leading-none tracking-tight sm:text-5xl">
+          <p className="mt-4 text-xs font-black uppercase tracking-[.14em] text-white/55">
+            {strings.landing.poolLabel}
+          </p>
+          <p className="tabular mt-1 text-[2.25rem] font-black leading-none tracking-tight text-lime sm:text-5xl">
             {formatIDR(round.pool)}
           </p>
-          <p className="mt-3 text-sm text-on-accent/80">
+          <p className="mt-3 text-sm font-semibold text-white/60">
             {strings.landing.sponsorLabel}{" "}
-            <span className="tabular font-medium text-on-accent">
-              {truncateAddress(round.sponsor)}
-            </span>
+            <span className="mono text-white/85">{truncateAddress(round.sponsor)}</span>
           </p>
         </div>
 
         <div className="flex flex-col gap-3 md:items-end md:text-right">
           <div>
-            <p className="text-xs uppercase tracking-widest text-on-accent/70">
+            <p className="text-xs font-black uppercase tracking-[.14em] text-white/55">
               {countdown ? d.endsInLabel : d.endedLabel}
             </p>
-            <p className="tabular mt-1 text-xl font-semibold">
+            <p className="tabular mt-1 text-2xl font-black">
               {countdown ?? d.countdown.ended}
             </p>
           </div>
-          <div className="flex flex-wrap gap-1.5 md:justify-end">
-            <span className="text-xs text-on-accent/70">{d.scopeLabel}:</span>
+          <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
+            <span className="text-xs font-semibold text-white/55">{d.scopeLabel}:</span>
             {scope === null ? (
-              <span className="rounded-full bg-on-accent/15 px-2 py-0.5 text-xs font-medium">
+              <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-bold text-white/80">
                 {d.scopeAll}
               </span>
             ) : (
               scope.map((c) => (
                 <span
                   key={c.tag}
-                  className="rounded-full bg-on-accent/15 px-2 py-0.5 text-xs font-medium"
+                  className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 text-xs font-bold text-white/80"
                 >
                   {categoryMeta(c.tag).label}
                 </span>
@@ -99,7 +99,7 @@ function ActiveBand({ round, stale }: { round: RoundState; stale: boolean }) {
         </div>
       </div>
       {stale ? (
-        <p className="bg-accent-ink/40 px-6 py-1 text-center text-[0.6875rem] text-on-accent/80 sm:px-8">
+        <p className="bg-white/10 px-6 py-1 text-center text-[0.6875rem] text-white/70 sm:px-8">
           {strings.staleData}
         </p>
       ) : null}

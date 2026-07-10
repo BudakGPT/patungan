@@ -1,30 +1,55 @@
+/**
+ * Curated local photography for campaigns without an uploaded image, keyed to the seeded
+ * campaign ids (0–4) and cycled for anything beyond. Files live in `public/projects/` so the
+ * demo never depends on a third-party CDN or hotlink policy.
+ */
 const visuals = [
   {
-    image:
-      "https://cloudfront-us-east-1.images.arcpublishing.com/radiofreeasia/BIBYFOKS5ZOP5AGPRCYE4CKRGA.jpg",
-    location: "Blitar, Jawa Timur",
-    tag: "Crowd-backed",
+    // 0 · Atap Sekolah SDN 2 Cianjur
+    image: "/projects/school.jpg",
+    location: "Cianjur, Jawa Barat",
     story:
       "Perbaikan atap kelas dan talang air sebelum musim hujan agar siswa bisa belajar aman.",
   },
   {
-    image:
-      "https://img.antaranews.com/cache/1200x800/2020/08/04/AC732DD5-3DB1-4AE8-AC65-9E86ECC76966.jpeg.webp",
+    // 1 · Sumur Bor Dusun Sumber
+    image: "/projects/well.jpg",
     location: "Lombok Timur, NTB",
-    tag: "Community",
     story:
-      "Bibit, kompos, dan irigasi tetes untuk kebun komunitas yang dikelola kelompok ibu desa.",
+      "Sumur bor komunitas memangkas 3 km perjalanan warga demi air bersih setiap hari.",
   },
   {
-    image:
-      "https://www.greenpeace.org/static/planet4-indonesia-stateless/2023/06/7ba40bcd-gp0stwr23.jpg",
+    // 2 · Dapur Umum Banjir Demak
+    image: "/projects/flood.jpg",
     location: "Demak, Jawa Tengah",
-    tag: "Whale-funded",
     story:
-      "Pompa dan instalasi air bersih untuk keluarga di area pesisir yang rawan kekeringan.",
+      "Dapur umum menyediakan makan hangat bagi keluarga terdampak banjir rob.",
+  },
+  {
+    // 3 · Kebun Pangan Warga RW 5
+    image: "/projects/garden.jpg",
+    location: "Blitar, Jawa Timur",
+    story:
+      "Bibit, kompos, dan irigasi tetes untuk kebun pangan yang dikelola warga.",
+  },
+  {
+    // 4 · smoke-test / overflow
+    image: "/projects/village.jpg",
+    location: "Blitar, Jawa Timur",
+    story:
+      "Kampanye komunitas yang dikurasi bersama warga desa.",
+  },
+  {
+    image: "/projects/classroom.jpg",
+    location: "Sumedang, Jawa Barat",
+    story:
+      "Program belajar bersama untuk anak-anak usia sekolah dasar.",
   },
 ] as const;
 
+/** Landing hero backdrop — local for the same no-hotlink reason. */
+export const heroVisual = { image: "/projects/hero.jpg" } as const;
+
 export function getProjectVisual(id: number) {
-  return visuals[id] ?? visuals[0];
+  return visuals[((id % visuals.length) + visuals.length) % visuals.length];
 }

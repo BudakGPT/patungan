@@ -156,7 +156,7 @@ export function ContributePanel({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-black uppercase tracking-wide text-white/45">{c.amountLabel}</p>
+      <p className="text-xs font-black uppercase tracking-wide text-white/55">{c.amountLabel}</p>
       <div className="grid grid-cols-3 gap-2">
         {PRESETS.map((preset) => (
           <button

@@ -28,9 +28,16 @@ function bareCid(cid: string): string {
   return cid.replace(/^ipfs:\/\/(ipfs\/)?/, "").replace(/^\/+/, "");
 }
 
+/**
+ * The seed script's stand-in CID (scripts/seed.ts) — a syntactically valid CIDv1 that isn't a
+ * real campaign photo. Treated as "no image" so curated local photography renders instead.
+ */
+const SEED_PLACEHOLDER_CID = "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi";
+
 /** Resolve an on-chain CID to a browser-loadable gateway URL. Read-only — never throws. */
 export function cidToUrl(cid: string): string {
   const c = bareCid(cid.trim());
+  if (!c || c === SEED_PLACEHOLDER_CID) return "";
   return c ? `${gatewayBase()}${c}` : "";
 }
 

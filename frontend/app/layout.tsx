@@ -1,8 +1,27 @@
 import type { Metadata } from "next";
+import { Archivo, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+/**
+ * One grotesque carries the whole system (body 400 → display 900, with the width
+ * axis for hero type); mono is reserved for on-chain artifacts. Self-hosted via
+ * next/font so the demo never depends on a font CDN.
+ */
+const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Patungan",
@@ -15,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" className={`${archivo.variable} ${jetbrainsMono.variable}`}>
       <body className="grain font-sans">
         <div className="spotlight" />
         <Providers>

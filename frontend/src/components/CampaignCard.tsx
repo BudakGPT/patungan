@@ -54,11 +54,11 @@ export function CampaignCard({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-          src={thumb ?? visual.image}
+          src={thumb || visual.image}
           alt={campaign.title}
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/82 via-ink/15 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent" />
         <div className="absolute left-4 top-4 flex gap-2">
           <span className="rounded-full bg-lime px-3 py-1 text-xs font-black text-ink">
             {String(campaign.id + 1).padStart(2, "0")}
@@ -76,13 +76,13 @@ export function CampaignCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
-        <p className="line-clamp-3 text-base font-semibold leading-7 text-ink/62">
+        <p className="line-clamp-3 text-base font-semibold leading-7 text-ink/70">
           {campaign.story}
         </p>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="metric-card bg-ink text-paper">
-            <span className="text-xs font-black uppercase tracking-[.12em] text-white/38">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-white/60">
               Donor
             </span>
             <strong className="num tabular mt-2 block text-[clamp(1.9rem,2.3vw,2.6rem)] font-black text-lime">
@@ -90,7 +90,7 @@ export function CampaignCard({
             </strong>
           </div>
           <div className="metric-card bg-[#eee5d3]">
-            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/42">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
               {d.directShort}
             </span>
             <strong className="num tabular mt-2 block text-[clamp(1.42rem,1.45vw,1.9rem)] font-black">
@@ -98,7 +98,7 @@ export function CampaignCard({
             </strong>
           </div>
           <div className="metric-card bg-[#e3f8df]">
-            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/42">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
               Projected
             </span>
             <strong className="num tabular mt-2 block text-[clamp(1.42rem,1.45vw,1.9rem)] font-black text-deep">
@@ -108,7 +108,7 @@ export function CampaignCard({
             </strong>
           </div>
           <div className="metric-card bg-lime">
-            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/48">
+            <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
               Total
             </span>
             <strong className="num tabular mt-2 block text-[clamp(1.42rem,1.45vw,1.9rem)] font-black">
@@ -124,7 +124,7 @@ export function CampaignCard({
               style={{ width: `${pct}%` }}
             />
           </div>
-          <div className="mt-2 flex justify-between gap-3 text-xs font-black uppercase tracking-[.1em] text-ink/42">
+          <div className="mt-2 flex justify-between gap-3 text-xs font-black uppercase tracking-[.1em] text-ink/65">
             <span className="tabular">
               {donors ?? 0} {strings.landing.donorCountSuffix}
             </span>

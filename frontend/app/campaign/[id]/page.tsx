@@ -11,6 +11,8 @@ import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
 import { useCampaign, useOpenRound, usePreviewRound, useRoundProject } from "@/lib/hooks";
 import { ContributePanel } from "@/components/ContributePanel";
+import { ParallaxImg, Reveal } from "@/components/motion";
+import { config } from "@/lib/config";
 
 const t = strings.campaign;
 
@@ -88,27 +90,32 @@ function Content({
     <main className="bg-cream text-ink">
       {/* Hero banner */}
       <section className="relative overflow-hidden bg-ink text-paper">
-        <img
-          className="absolute inset-0 h-full w-full object-cover opacity-45"
-          src={thumb ?? visual.image}
+        <ParallaxImg
+          className="h-[112%] w-full object-cover opacity-45"
+          src={thumb || visual.image}
           alt={campaign.title}
+          drift={40}
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,18,15,.96),rgba(7,18,15,.62)_55%,rgba(7,18,15,.82))]" />
         <div className="chain-grid absolute inset-0 opacity-60" />
 
         <div className="relative mx-auto grid max-w-[1500px] gap-8 px-4 py-14 sm:px-7 lg:grid-cols-[1fr_.85fr] lg:px-10">
           <div>
-            <Link href="/" className="tag">
-              {t.back}
-            </Link>
-            <div className="mt-8 flex flex-wrap gap-2">
-              <span className="tag">{categoryLabel}</span>
-              <span className="tag">{visual.location}</span>
-              {donors !== undefined ? <span className="tag">{donors} {t.donorSuffix}</span> : null}
-            </div>
-            <h1 className="mt-6 max-w-4xl text-[clamp(3rem,7vw,7rem)] font-black uppercase leading-[.88]">
-              {campaign.title}
-            </h1>
+            <Reveal mode="load" y={16}>
+              <Link href="/" className="tag">
+                {t.back}
+              </Link>
+              <div className="mt-8 flex flex-wrap gap-2">
+                <span className="tag">{categoryLabel}</span>
+                <span className="tag">{visual.location}</span>
+                {donors !== undefined ? <span className="tag">{donors} {t.donorSuffix}</span> : null}
+              </div>
+            </Reveal>
+            <Reveal mode="load" delay={0.1} y={40}>
+              <h1 className="display mt-6 max-w-4xl text-[clamp(2.8rem,6.4vw,6.4rem)] leading-[.88]">
+                {campaign.title}
+              </h1>
+            </Reveal>
             {statusNotice ? (
               <p className="mt-6 max-w-2xl rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white/80">
                 {statusNotice}
@@ -116,10 +123,11 @@ function Content({
             ) : null}
           </div>
 
+          <Reveal mode="load" delay={0.22} y={36} className="lg:self-start">
           <aside className="glass-dark rounded-[2rem] p-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="metric-card bg-paper text-ink">
-                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/42">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
                   {strings.discovery.directShort}
                 </span>
                 <strong className="num tabular mt-2 text-2xl font-black">
@@ -127,7 +135,7 @@ function Content({
                 </strong>
               </div>
               <div className="metric-card bg-lime text-ink">
-                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/48">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
                   {t.projectedMatchLabel}
                 </span>
                 <strong className="num tabular mt-2 text-2xl font-black">
@@ -137,7 +145,7 @@ function Content({
                 </strong>
               </div>
               <div className="metric-card bg-white/10 text-paper">
-                <span className="text-xs font-black uppercase tracking-[.12em] text-white/42">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-white/60">
                   Donor
                 </span>
                 <strong className="num tabular mt-2 text-2xl font-black text-lime">
@@ -145,7 +153,7 @@ function Content({
                 </strong>
               </div>
               <div className="metric-card bg-white/10 text-paper">
-                <span className="text-xs font-black uppercase tracking-[.12em] text-white/42">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-white/60">
                   Total
                 </span>
                 <strong className="num tabular mt-2 text-2xl font-black text-lime">
@@ -161,37 +169,107 @@ function Content({
             <div className="mt-5">
               <ContributePanel campaign={campaign} disabled={!approved} />
             </div>
-            <p className="mt-3 text-center text-xs font-semibold text-white/45">
+            <p className="mt-3 text-center text-xs font-semibold text-white/55">
               {t.byOwner} <span className="tabular">{truncateAddress(campaign.owner)}</span>
             </p>
           </aside>
+          </Reveal>
         </div>
       </section>
 
-      {/* Reading column */}
-      <section className="px-4 py-10 sm:px-7 lg:px-10">
-        <div className="mx-auto max-w-[1500px]">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-faint">
-            {t.storyHeading}
-          </h2>
-          <p className="mt-3 max-w-[68ch] whitespace-pre-line text-base leading-relaxed text-muted">
-            {campaign.story}
-          </p>
-        </div>
-      </section>
-
-      <section className="px-4 pb-10 sm:px-7 lg:px-10">
-        <div className="mx-auto grid max-w-[1500px] gap-4 md:grid-cols-3">
-          {[
-            ["Public signal", "Setiap kontribusi menjadi input terbuka untuk quadratic funding."],
-            ["Verified donors", "Alamat yang ikut round harus masuk registry agar demo tidak mudah dimanipulasi."],
-            ["Auditable payout", "Direct dan matched dihitung dari state contract yang sama."],
-          ].map(([title, copy]) => (
-            <div key={title} className="paper rounded-[1.5rem] p-5">
-              <span className="tag tag-light">{title}</span>
-              <p className="mt-4 text-lg font-black leading-tight">{copy}</p>
+      {/* Reading column + campaign photo */}
+      <section className="px-4 py-12 sm:px-7 lg:px-10 lg:py-16">
+        <div className="mx-auto grid max-w-[1500px] items-start gap-10 lg:grid-cols-[1.1fr_.9fr]">
+          <Reveal>
+            <div>
+              <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">
+                {t.storyHeading}
+              </h2>
+              <p className="mt-4 max-w-[68ch] whitespace-pre-line text-lg font-medium leading-8 text-ink/85">
+                {campaign.story}
+              </p>
+              <p className="mt-6 max-w-[68ch] text-base leading-relaxed text-muted">
+                {visual.story}
+              </p>
             </div>
-          ))}
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <figure className="overflow-hidden rounded-[1.5rem] shadow-soft">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className="aspect-[4/3] w-full object-cover"
+                src={thumb || visual.image}
+                alt={`${campaign.title} — ${visual.location}`}
+              />
+              <figcaption className="bg-ink px-5 py-3 text-xs font-black uppercase tracking-[.12em] text-white/70">
+                {visual.location}
+              </figcaption>
+            </figure>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* The chain behind this page: how a contribution flows, plus the raw artifacts. */}
+      <section className="px-4 pb-14 sm:px-7 lg:px-10">
+        <div className="mx-auto max-w-[1500px] overflow-hidden rounded-[2rem] bg-ink text-paper">
+          <div className="grid gap-0 lg:grid-cols-[1fr_1fr]">
+            <div className="p-6 sm:p-9">
+              <span className="text-xs font-black uppercase tracking-[.16em] text-lime/85">
+                Jejak on-chain
+              </span>
+              <h2 className="mt-3 text-2xl font-black sm:text-3xl">
+                Ke mana Rp50 ribu-mu pergi
+              </h2>
+              <ol className="mt-6 space-y-5">
+                {[
+                  ["contribute()", "Donasimu tercatat di contract dengan alamat, jumlah, dan ledger."],
+                  ["preview_matches()", "Kontribusimu menaikkan bobot (Σ√c)² kampanye ini — sinyal publik, bukan janji."],
+                  ["finalize()", "Di akhir musim, matching pool dibagi mengikuti sinyal itu. Bisa diaudit siapa pun."],
+                ].map(([fn, copy], i) => (
+                  <Reveal key={fn} delay={i * 0.08}>
+                    <li className="flex gap-4">
+                      <span className="mono mt-0.5 shrink-0 text-sm font-bold text-lime/85">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span>
+                        <span className="mono block text-sm font-bold text-white/85">{fn}</span>
+                        <span className="mt-1 block text-sm font-semibold leading-6 text-white/60">
+                          {copy}
+                        </span>
+                      </span>
+                    </li>
+                  </Reveal>
+                ))}
+              </ol>
+            </div>
+
+            <div className="border-t border-white/10 p-6 sm:p-9 lg:border-l lg:border-t-0">
+              <span className="text-xs font-black uppercase tracking-[.16em] text-white/55">
+                Artefak kampanye #{campaign.id}
+              </span>
+              <dl className="mt-6 space-y-4 text-sm">
+                {[
+                  ["owner", campaign.owner],
+                  ["payout", campaign.payout],
+                  ["contract", config.contractId],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex flex-wrap items-baseline justify-between gap-2 border-b border-white/10 pb-3">
+                    <dt className="font-black uppercase tracking-[.12em] text-white/55">{label}</dt>
+                    <dd className="mono text-white/85">{truncateAddress(value)}</dd>
+                  </div>
+                ))}
+                <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-white/10 pb-3">
+                  <dt className="font-black uppercase tracking-[.12em] text-white/55">kategori</dt>
+                  <dd className="font-bold text-white/85">{categoryLabel}</dd>
+                </div>
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <dt className="font-black uppercase tracking-[.12em] text-white/55">created ledger</dt>
+                  <dd className="mono text-white/85">{String(campaign.created_ledger)}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
         </div>
       </section>
     </main>

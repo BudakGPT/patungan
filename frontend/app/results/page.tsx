@@ -8,6 +8,7 @@ import { strings } from "@/strings";
 import { formatIDR } from "@/lib/format";
 import { CategoryChip } from "@/components/CategoryChip";
 import { useRounds, useCampaigns, usePreviewRound, useRoundProjects } from "@/lib/hooks";
+import { CountUp, Reveal } from "@/components/motion";
 
 const r = strings.results;
 
@@ -26,13 +27,19 @@ export default function ResultsPage() {
       <section className="relative overflow-hidden bg-ink px-4 py-14 text-paper sm:px-7 lg:px-10">
         <div className="chain-grid absolute inset-0 opacity-50" />
         <div className="relative mx-auto max-w-[1500px]">
-          <span className="tag">Live reveal</span>
-          <h1 className="mt-4 text-[clamp(3rem,7vw,7rem)] font-black uppercase leading-[.86]">
-            {r.title}
-          </h1>
-          <p className="mt-5 max-w-xl text-lg font-semibold leading-8 text-white/62">
-            {r.verdict}
-          </p>
+          <Reveal mode="load" y={16}>
+            <span className="tag">Live reveal</span>
+          </Reveal>
+          <Reveal mode="load" delay={0.08} y={40}>
+            <h1 className="display mt-4 text-[clamp(2.8rem,6.4vw,6.4rem)] leading-[.86]">
+              {r.title}
+            </h1>
+          </Reveal>
+          <Reveal mode="load" delay={0.18}>
+            <p className="mt-5 max-w-xl text-lg font-semibold leading-8 text-white/65">
+              {r.verdict}
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -144,7 +151,7 @@ function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState
         ) : (
           <>
             {preview.isError ? (
-              <p className="mb-3 text-xs text-amber-700">{strings.staleData}</p>
+              <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
             ) : null}
             <ul className="space-y-3" aria-label={r.barLabel}>
               {rows.map((row, i) => (
@@ -202,40 +209,65 @@ function ResultRow({
 }) {
   const directPct = scale > 0 ? (Number(direct) / scale) * 100 : 0;
   const matchedPct = scale > 0 ? (Number(matched) / scale) * 100 : 0;
+  const winner = index === 0;
 
   return (
-    <li className="rounded-2xl border border-line bg-surface p-5 shadow-card">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          {campaign ? <CategoryChip tag={campaign.category} /> : null}
-          <h3 className="mt-1.5 truncate text-base font-semibold text-ink">
-            {campaign?.title ?? `#${fallbackId}`}
-          </h3>
-          <p className="mt-0.5 text-xs text-muted">
-            {donors} {r.donorSuffix}
-          </p>
-        </div>
-        <div className="flex shrink-0 items-baseline gap-5 text-right">
-          <div>
-            <p className="text-[0.6875rem] uppercase tracking-wide text-faint">{r.directLabel}</p>
-            <p className="tabular font-semibold text-ink">{formatIDR(direct)}</p>
-          </div>
-          <div>
-            <p className="text-[0.6875rem] uppercase tracking-wide text-faint">{r.matchedLabel}</p>
-            <p className="tabular font-bold text-match-ink">+{formatIDR(matched)}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-line/40">
-        <div
-          className="flex h-full origin-left motion-safe:animate-bar-in"
-          style={{ animationDelay: `${index * 45}ms` }}
+    <li>
+      <Reveal
+        delay={index * 0.07}
+        y={20}
+        className={`flex gap-4 rounded-2xl border p-5 shadow-card sm:gap-6 ${
+          winner ? "border-match/30 bg-match-soft/60" : "border-line bg-surface"
+        }`}
+      >
+        <span
+          className={`display select-none text-4xl leading-none sm:text-5xl ${
+            winner ? "text-match-ink" : "text-line-strong"
+          }`}
+          aria-hidden
         >
-          <div className="h-full bg-ink/25" style={{ width: `${directPct}%` }} />
-          <div className="h-full bg-match" style={{ width: `${matchedPct}%` }} />
+          {String(index + 1).padStart(2, "0")}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              {campaign ? <CategoryChip tag={campaign.category} /> : null}
+              <h3 className="mt-1.5 truncate text-base font-semibold text-ink">
+                {campaign?.title ?? `#${fallbackId}`}
+              </h3>
+              <p className="tabular mt-1 text-xl font-black text-match-ink">
+                {donors}{" "}
+                <span className="text-xs font-bold uppercase tracking-[.08em]">
+                  {r.donorSuffix}
+                </span>
+              </p>
+            </div>
+            <div className="flex shrink-0 items-baseline gap-5 text-right">
+              <div>
+                <p className="text-[0.6875rem] uppercase tracking-wide text-faint">{r.directLabel}</p>
+                <p className="tabular font-semibold text-ink">{formatIDR(direct)}</p>
+              </div>
+              <div>
+                <p className="text-[0.6875rem] uppercase tracking-wide text-faint">{r.matchedLabel}</p>
+                <p className="tabular text-lg font-black text-match-ink">
+                  +<CountUp value={Number(matched)} format={(n) => formatIDR(Math.round(n))} />
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-line/40">
+            <div
+              className="flex h-full origin-left motion-safe:animate-bar-in"
+              style={{ animationDelay: `${index * 45}ms` }}
+            >
+              <div className="h-full bg-ink/25" style={{ width: `${directPct}%` }} />
+              <div className="h-full bg-match" style={{ width: `${matchedPct}%` }} />
+            </div>
+          </div>
         </div>
-      </div>
+      </Reveal>
     </li>
   );
 }
