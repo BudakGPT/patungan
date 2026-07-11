@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint --max-warnings 0",
     "typecheck": "tsc --noEmit",
-    "check:alpha": "node scripts/check-alpha-steps.mjs"
+    "check:alpha": "node scripts/check-alpha-steps.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@stellar/freighter-api": "^6.0.1",
@@ -20,14 +22,21 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.10"
   }
 }
