@@ -8,8 +8,52 @@ export const id = {
     dashboard: "Dasbor",
     account: "Akun",
     operator: "Operator",
+    openMenu: "Buka menu",
+    closeMenu: "Tutup menu",
+    mainMenu: "Menu utama",
   },
   landing: {
+    heroTags: ["Aplikasi pembayaran & konsumen", "Diaspora PMI/TKI", "Pencocokan kuadratik"],
+    heroLede:
+      "Rp50 ribu dari banyak perantau bukan cuma donasi. Di Patungan, setiap kontribusi menjadi sinyal publik yang menarik dana sponsor ke proyek desa paling didukung.",
+    heroPoolLabel: "Dana pendamping",
+    heroDonorLabel: "Pendukung",
+    heroStatusLabel: "Status",
+    waitingPool: "Menunggu",
+    primaryCta: "Lihat proyek",
+    secondaryCta: "Lihat hasil",
+    liveProjectBadge: "Proyek live",
+    waitingProjectTitle: "Menunggu data proyek",
+    heroTopLine: (n: number) => `${n} pendukung menarik dana pendamping terbesar.`,
+    heroTopLineEmpty: "Hubungkan deployment untuk melihat data live.",
+    matchEngineLabel: "Mesin pencocokan",
+    matchEngineTitle: "Finalisasi Soroban",
+    crowdShareLabel: "Porsi teratas",
+    ofPoolSuffix: "dari dana pendamping",
+    proofTag: "Lapisan bukti Soroban",
+    proofBody:
+      "Bumbu blockchain-nya bukan tempelan: contract menyaksikan kontribusi, registry membatasi sybil, dan payout keluar dari math yang bisa diaudit.",
+    proofComment: "jalur satu musim pencocokan",
+    proofSteps: [
+      {
+        title: "Escrow dana pendamping",
+        copy: "Sponsor deposit ke contract, bukan ke rekening panitia.",
+      },
+      {
+        title: "Satu identitas, satu suara",
+        copy: "Registri terverifikasi membatasi sybil: satu identitas, satu suara.",
+      },
+      {
+        title: "Donasi tertanda",
+        copy: "Setiap urunan tercatat dengan donor, project_id, amount, dan ledger.",
+      },
+      {
+        title: "Alokasi kuadratik",
+        copy: "Contract menghitung (Σ√c)² per kampanye dan membagi dana pendamping — yang menang jumlah orang, bukan satu whale.",
+      },
+    ],
+    directoryComment: "direktori publik — semua kampanye terverifikasi kurator",
+    seasonRef: (id: string | number) => `musim #${id}`,
     title: "Patungan",
     subtitle: "Urunan bersama, dicocokkan secara adil.",
     poolLabel: "Dana pendamping",
@@ -57,10 +101,13 @@ export const id = {
     endedLabel: "Musim berakhir",
     noRound: "Belum ada musim pencocokan aktif",
     noRoundHint: "Donasi langsung tetap dibuka. Musim berikutnya segera hadir.",
-    countdown: { day: "h", hour: "j", min: "m", ended: "Berakhir" },
+    countdown: { day: " hr", hour: " jam", min: " mnt", ended: "Berakhir" },
     // Card
     donorSuffix: "pendukung",
+    donorLabel: "Pendukung",
     directShort: "Langsung",
+    projectedShort: "Proyeksi",
+    totalShort: "Total",
     matchSuffix: "pendamping",
     noThumbAlt: "Tanpa gambar",
     // Onboarding "how it works" strip — QF explainer for cold visitors
@@ -121,7 +168,7 @@ export const id = {
       connectPrompt: "Hubungkan wallet Testnet untuk mengajukan kampanye.",
       wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
       tierGateTitle: "Verifikasi dulu",
-      tierGateBody: "Kamu perlu verifikasi tingkat Basic untuk mengajukan kampanye.",
+      tierGateBody: "Kamu perlu verifikasi tingkat Dasar untuk mengajukan kampanye.",
       tierGateCta: "Verifikasi sekarang",
       // Fields
       titleLabel: "Judul kampanye",
@@ -166,9 +213,32 @@ export const id = {
       viewCampaign: "Lihat kampanye",
       createAnother: "Ajukan kampanye lain",
     },
+    /** The "Jejak on-chain" panel: how one contribution flows through the contract. `fn` names
+     * render inline as machine artifacts; only the human copy localizes. */
+    jejak: {
+      tag: "Jejak on-chain",
+      heading: "Ke mana Rp50 ribu-mu pergi",
+      steps: [
+        "Donasimu tercatat di contract dengan alamat, jumlah, dan ledger.",
+        "Kontribusimu menaikkan bobot (Σ√c)² kampanye ini — sinyal publik, bukan janji.",
+        "Di akhir musim, dana pendamping dibagi mengikuti sinyal itu. Bisa diaudit siapa pun.",
+      ],
+      artifactsLabel: (id: number) => `Artefak kampanye #${id}`,
+      categoryLabel: "kategori",
+    },
+    /** The public backer ledger under the story — recent `contrib` events for this campaign. */
+    ledger: {
+      heading: "Catatan pendukung",
+      body: "Setiap urunan untuk kampanye ini, langsung dari event log contract.",
+      empty: "Belum ada donasi dalam jendela retensi RPC.",
+      retention: "Hanya donasi dalam jendela retensi RPC Testnet yang ditampilkan.",
+    },
     contribute: {
       cta: "Ikut patungan",
       amountLabel: "Pilih jumlah",
+      customChip: "Jumlah lain",
+      customPlaceholder: "cth. 25000",
+      customInvalid: "Masukkan jumlah bulat positif.",
       confirm: "Kirim & tanda tangani",
       awaiting: "Buka Freighter untuk menandatangani…",
       submitting: "Mengirim transaksi…",
@@ -178,7 +248,7 @@ export const id = {
       connectPrompt: "Hubungkan wallet Testnet untuk ikut urunan.",
       wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
       tierGateTitle: "Verifikasi dulu",
-      tierGateBody: "Kamu perlu verifikasi tingkat Basic untuk ikut urunan.",
+      tierGateBody: "Kamu perlu verifikasi tingkat Dasar untuk ikut urunan.",
       tierGateCta: "Verifikasi sekarang",
     },
   },
@@ -237,7 +307,7 @@ export const id = {
     liveEndsIn: "Berakhir dalam",
     liveEnded: "Menunggu finalisasi",
     liveProjection: "Proyeksi pencocokan berjalan",
-    countdown: { day: "h", hour: "j", min: "m", ended: "Berakhir" },
+    countdown: { day: " hr", hour: " jam", min: " mnt", ended: "Berakhir" },
     // Finalized leaderboard
     topHeading: "Pendamping terbesar",
     noMatches: "Tidak ada kampanye yang dicocokkan musim ini.",
@@ -271,6 +341,7 @@ export const id = {
     backToSeasons: "Lihat arsip musim",
     noRounds: "Belum ada musim pencocokan.",
     barLabel: "Perbandingan donasi langsung dan dana pendamping",
+    slowLoad: "Data on-chain memuat lebih lama dari biasanya.",
   },
   /**
    * Operator/sponsor console `/operator` — the deepest, most privileged surface.
@@ -326,16 +397,16 @@ export const id = {
     fund: {
       heading: "Isi dana pendamping",
       description:
-        "Setor dana pendamping untuk musim yang sedang berjalan. Butuh verifikasi tingkat Institution.",
+        "Setor dana pendamping untuk musim yang sedang berjalan. Butuh verifikasi tingkat Institusi.",
       amountLabel: "Jumlah dana (IDR)",
       echoLabel: "Akan menyetor",
       cta: "Kirim dana",
       successTitle: "Dana pendamping terkirim!",
       invalidAmount: "Masukkan jumlah bulat positif.",
       needsRound: "Buka musim dulu sebelum mengisi dana.",
-      tierGateTitle: "Perlu tingkat Institution",
+      tierGateTitle: "Perlu tingkat Institusi",
       tierGateBody:
-        "Hanya wallet terverifikasi Institution yang boleh mengisi dana pendamping. Gunakan konsol verifikasi di bawah untuk menaikkan tingkat wallet ini.",
+        "Hanya wallet terverifikasi Institusi yang boleh mengisi dana pendamping. Gunakan konsol verifikasi di bawah untuk menaikkan tingkat wallet ini.",
     },
     // 3 · Finalize
     finalize: {
@@ -371,7 +442,7 @@ export const id = {
         "Tetapkan tingkat verifikasi untuk sebuah alamat — jalur pengganti testnet untuk KYC anchor.",
       addressLabel: "Alamat wallet (G…)",
       tierLabel: "Tingkat",
-      tiers: { None: "Tidak ada", Basic: "Basic", Institution: "Institution" } as Record<string, string>,
+      tiers: { None: "Tidak ada", Basic: "Dasar", Institution: "Institusi" } as Record<string, string>,
       cta: "Tetapkan tingkat",
       successTitle: "Tingkat verifikasi ditetapkan!",
       invalidAddress: "Alamat Stellar tidak valid (diawali G, 56 karakter).",
@@ -383,7 +454,7 @@ export const id = {
       RoundNotOpen: "Musim sudah tidak dibuka untuk aksi ini.",
       AlreadyFinalized: "Musim sudah difinalisasi.",
       NothingToMatch: "Belum ada kontribusi untuk dicocokkan.",
-      TierTooLow: "Tingkat verifikasi belum mencukupi (butuh Institution).",
+      TierTooLow: "Tingkat verifikasi belum mencukupi (butuh Institusi).",
       NotAdmin: "Hanya admin yang dapat melakukan aksi ini.",
       NotCurator: "Hanya kurator yang dapat melakukan aksi ini.",
       NotAttester: "Hanya verifikator yang dapat melakukan aksi ini.",
@@ -458,7 +529,7 @@ export const id = {
     wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
     // Header ledger figure (quiet total, not a hero card)
     tierLabel: "Verifikasi",
-    tier: { None: "Belum terverifikasi", Basic: "Basic", Institution: "Institution" } as Record<
+    tier: { None: "Belum terverifikasi", Basic: "Dasar", Institution: "Institusi" } as Record<
       string,
       string
     >,
@@ -484,8 +555,8 @@ export const id = {
     currentLabel: "Tingkat verifikasi kamu",
     tiers: {
       None: "Belum terverifikasi",
-      Basic: "Terverifikasi Basic",
-      Institution: "Terverifikasi Institution",
+      Basic: "Terverifikasi Dasar",
+      Institution: "Terverifikasi Institusi",
     } as Record<string, string>,
     unlocks: {
       None: "Verifikasi untuk mulai ikut urunan dan mengajukan kampanye.",
@@ -508,8 +579,8 @@ export const id = {
     // What each tier unlocks — the ladder rail
     ladderHeading: "Yang terbuka di tiap tingkat",
     ladder: [
-      { tier: "Basic", unlock: "Ikut urunan & ajukan kampanye" },
-      { tier: "Institution", unlock: "Isi dana pendamping sebagai sponsor" },
+      { tier: "Dasar", unlock: "Ikut urunan & ajukan kampanye" },
+      { tier: "Institusi", unlock: "Isi dana pendamping sebagai sponsor" },
     ],
     // Step 1 — SEP-10 ownership
     sep10: {
@@ -576,7 +647,7 @@ export const id = {
       attesterHint:
         "Wallet ini memegang peran verifikator — kamu bisa menetapkan tingkat langsung sebagai stand-in anchor.",
       tierLabel: "Tingkat",
-      tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
+      tiers: { Basic: "Dasar", Institution: "Institusi" } as Record<string, string>,
       cta: "Setujui (simulasi KYC)",
       successTitle: "Tingkat verifikasi ditetapkan!",
       // Non-attester fallback
@@ -610,6 +681,12 @@ export const id = {
   },
   footer: {
     transparency: "Setiap aksi tercatat on-chain di Stellar Testnet.",
+  },
+  /** Branded top-level 404 (`app/not-found.tsx`). */
+  notFound: {
+    title: "Halaman tidak ditemukan",
+    body: "Rute ini tidak ada di ledger. Periksa tautannya, atau kembali ke beranda.",
+    cta: "Kembali ke beranda",
   },
   loading: "Memuat…",
   empty: "Belum ada proyek",
