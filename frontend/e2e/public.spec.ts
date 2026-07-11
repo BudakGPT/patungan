@@ -55,7 +55,7 @@ for (const locale of ["id", "en"] as const) {
     });
 
     test("campaign sort menu opens and commits a selection", async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/campaigns");
       const trigger = page.getByRole("button", { name: copy[locale].sortLabel });
       await trigger.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
       await trigger.click();

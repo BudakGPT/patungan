@@ -5,6 +5,7 @@ export const en: Strings = {
   appName: "Patungan",
   nav: {
     landing: "Home",
+    campaigns: "Campaigns",
     seasons: "Seasons",
     results: "Results",
     dashboard: "Dashboard",

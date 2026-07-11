@@ -5,6 +5,7 @@ export const fil: Strings = {
   appName: "Patungan",
   nav: {
     landing: "Home",
+    campaigns: "Mga Kampanya",
     seasons: "Mga Season",
     results: "Resulta",
     dashboard: "Dashboard",

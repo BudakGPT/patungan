@@ -108,7 +108,7 @@ function Content({
         <div className="relative mx-auto grid max-w-[1500px] gap-8 px-4 py-14 sm:px-7 lg:grid-cols-[1fr_.85fr] lg:px-10">
           <div>
             <Reveal mode="load" y={16}>
-              <Link href="/" className="tag">
+              <Link href="/campaigns" className="tag">
                 {t.back}
               </Link>
               <div className="mt-8 flex flex-wrap gap-2">

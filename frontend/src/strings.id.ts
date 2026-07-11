@@ -3,6 +3,7 @@ export const id = {
   appName: "Patungan",
   nav: {
     landing: "Beranda",
+    campaigns: "Kampanye",
     seasons: "Musim",
     results: "Hasil",
     dashboard: "Dasbor",

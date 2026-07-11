@@ -5,6 +5,7 @@ export const vi: Strings = {
   appName: "Patungan",
   nav: {
     landing: "Trang chủ",
+    campaigns: "Chiến dịch",
     seasons: "Mùa",
     results: "Kết quả",
     dashboard: "Bảng điều khiển",
