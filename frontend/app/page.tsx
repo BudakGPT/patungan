@@ -6,10 +6,12 @@ import type { ProjectState } from "@/contract/src";
 import { useStrings } from "@/lib/locale";
 import { useCampaigns, useOpenRound, usePreviewRound, useRoundProjects } from "@/lib/hooks";
 import { ALL_CATEGORIES, categoryMeta, type CategoryTag } from "@/lib/category";
+import { isDemoArtifact } from "@/lib/demo";
 import { RoundBanner } from "@/components/RoundBanner";
 import { HowItWorks } from "@/components/HowItWorks";
 import { CampaignCard } from "@/components/CampaignCard";
-import { formatCompactIDR, formatIDR } from "@/lib/format";
+import { formatCompactIDR, formatIDR, truncateAddress } from "@/lib/format";
+import { brand } from "@/brand";
 import { config } from "@/lib/config";
 import { getProjectVisual, heroVisual as heroBackdrop } from "@/lib/projectVisuals";
 import { CountUp, ParallaxImg, Reveal } from "@/components/motion";
@@ -18,10 +20,6 @@ type SortKey = "mostBacked" | "newest" | "closingSoon";
 
 /** bigint-safe descending comparator. */
 const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
-
-function shortAddress(value: string) {
-  return `${value.slice(0, 4)}...${value.slice(-4)}`;
-}
 
 /**
  * Discovery `/` — a marketing hero over live chain state, followed by the public directory:
@@ -33,6 +31,7 @@ function shortAddress(value: string) {
 export default function DiscoveryPage() {
   const strings = useStrings();
   const d = strings.discovery;
+  const l = strings.landing;
   const campaigns = useCampaigns();
   const openRound = useOpenRound();
   const roundId = openRound.data?.id ?? null;
@@ -54,7 +53,10 @@ export default function DiscoveryPage() {
   }, [preview.data]);
 
   const approved = useMemo(
-    () => (campaigns.data ?? []).filter((c) => c.status.tag === "Approved"),
+    () =>
+      (campaigns.data ?? []).filter(
+        (c) => c.status.tag === "Approved" && !isDemoArtifact(c.title),
+      ),
     [campaigns.data],
   );
 
@@ -117,20 +119,22 @@ export default function DiscoveryPage() {
     <>
       <section className="relative min-h-[calc(100vh-6rem)] overflow-hidden">
         <ParallaxImg
-          className="h-[112%] w-full object-cover opacity-60"
+          className="h-[112%] w-full object-cover opacity-70"
           src={heroBackdrop.image}
           alt="Petani menggarap sawah terasering di Indonesia"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(215,255,95,.18),transparent_32rem),linear-gradient(90deg,rgba(7,18,15,.96),rgba(7,18,15,.58)_48%,rgba(7,18,15,.76))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(215,255,95,.18),transparent_32rem),linear-gradient(90deg,rgba(7,18,15,.94),rgba(7,18,15,.48)_48%,rgba(7,18,15,.68))]" />
         <div className="chain-grid absolute inset-0 opacity-70" />
 
         <div className="relative mx-auto grid min-h-[calc(100vh-6rem)] max-w-[1500px] items-end gap-8 px-4 pb-8 pt-12 sm:px-7 lg:grid-cols-[1.05fr_.95fr] lg:px-10 lg:pb-10">
           <div>
             <Reveal mode="load" y={18}>
               <div className="flex flex-wrap gap-2">
-                <span className="tag">Payment & Consumer App</span>
-                <span className="tag">PMI/TKI diaspora</span>
-                <span className="tag">Quadratic matching</span>
+                {l.heroTags.map((tag) => (
+                  <span key={tag} className="tag">
+                    {tag}
+                  </span>
+                ))}
               </div>
             </Reveal>
 
@@ -148,29 +152,29 @@ export default function DiscoveryPage() {
             <div className="mt-8 grid gap-5 lg:grid-cols-[.9fr_1.1fr]">
               <Reveal mode="load" delay={0.26}>
                 <p className="max-w-xl text-lg font-semibold leading-8 text-white/75">
-                  Rp50 ribu dari banyak perantau bukan cuma donasi. Di Patungan,
-                  setiap kontribusi menjadi sinyal publik yang menarik pool sponsor
-                  ke proyek desa paling didukung.
+                  {l.heroLede}
                 </p>
               </Reveal>
 
               <Reveal mode="load" delay={0.34}>
+                {/* Lime marks only the number the chain attests live — the donor count.
+                    Money and status stay paper (One Verdict Rule). */}
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="glass-dark rounded-3xl p-4">
                     <span className="text-xs font-black uppercase tracking-[.14em] text-white/60">
-                      Pool
+                      {l.heroPoolLabel}
                     </span>
-                    <strong className="num mt-2 block text-[1.45rem] font-black text-lime">
+                    <strong className="num mt-2 block text-[1.45rem] font-black text-paper">
                       {pool > 0n ? (
                         <CountUp value={Number(pool)} format={formatCompactIDR} />
                       ) : (
-                        "Waiting"
+                        l.waitingPool
                       )}
                     </strong>
                   </div>
                   <div className="glass-dark rounded-3xl p-4">
                     <span className="text-xs font-black uppercase tracking-[.14em] text-white/60">
-                      Donor
+                      {l.heroDonorLabel}
                     </span>
                     <strong className="num mt-2 block text-[1.45rem] font-black text-lime">
                       <CountUp value={donorCount} />
@@ -178,9 +182,9 @@ export default function DiscoveryPage() {
                   </div>
                   <div className="glass-dark rounded-3xl p-4">
                     <span className="text-xs font-black uppercase tracking-[.14em] text-white/60">
-                      Status
+                      {l.heroStatusLabel}
                     </span>
-                    <strong className="num mt-2 block text-[1.45rem] font-black text-lime">
+                    <strong className="num mt-2 block text-[1.45rem] font-black text-paper">
                       {statusLabel}
                     </strong>
                   </div>
@@ -192,21 +196,21 @@ export default function DiscoveryPage() {
               <div className="mt-6 flex flex-wrap gap-2">
                 <span className="hash-chip">
                   <span className="size-1.5 rounded-full bg-lime" />
-                  contract: {shortAddress(config.contractId)}
+                  contract: {truncateAddress(config.contractId)}
                 </span>
                 <span className="hash-chip">network: {config.network}</span>
-                <span className="hash-chip">admin: {shortAddress(config.adminAddress)}</span>
-                <span className="hash-chip">asset: {shortAddress(config.tokenId)}</span>
+                <span className="hash-chip">admin: {truncateAddress(config.adminAddress)}</span>
+                <span className="hash-chip">asset: {truncateAddress(config.tokenId)}</span>
               </div>
             </Reveal>
 
             <Reveal mode="load" delay={0.52}>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a className="btn btn-lime" href="#app">
-                  Lihat proyek
+                  {l.primaryCta}
                 </a>
-                <Link className="btn btn-ghost" href="/operator">
-                  Finalize match
+                <Link className="btn btn-ghost" href="/results">
+                  {l.secondaryCta}
                 </Link>
               </div>
             </Reveal>
@@ -223,16 +227,14 @@ export default function DiscoveryPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/25 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-5 text-paper">
-                  <span className="rounded-full bg-lime px-3 py-1 text-xs font-black text-ink">
-                    LIVE PROJECT
+                  <span className="rounded-full bg-lime px-3 py-1 text-xs font-black uppercase text-ink">
+                    {l.liveProjectBadge}
                   </span>
                   <h2 className="mt-3 text-3xl font-black leading-none">
-                    {heroProject?.title ?? "Menunggu data proyek"}
+                    {heroProject?.title ?? l.waitingProjectTitle}
                   </h2>
                   <p className="mt-2 text-sm font-semibold text-white/75">
-                    {heroProject
-                      ? `${topRow.donors ?? 0} donor menarik match terbesar.`
-                      : "Hubungkan deployment untuk melihat data live."}
+                    {heroProject ? l.heroTopLine(topRow.donors ?? 0) : l.heroTopLineEmpty}
                   </p>
                 </div>
               </div>
@@ -242,15 +244,15 @@ export default function DiscoveryPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <span className="text-xs font-black uppercase tracking-[.16em] text-lime/75">
-                        Match engine
+                        {l.matchEngineLabel}
                       </span>
-                      <h2 className="mt-2 text-2xl font-black">Finalisasi Soroban</h2>
+                      <h2 className="mt-2 text-2xl font-black">{l.matchEngineTitle}</h2>
                       <p className="mono mt-2 text-xs font-bold text-white/60">
                         fn finalize(round_id: {roundId ?? "—"}) -&gt; allocation[]
                       </p>
                     </div>
                     <span className="rounded-full border border-lime/30 px-3 py-1 text-xs font-black text-lime">
-                      {openRound.data ? "READY" : "IDLE"}
+                      {openRound.data ? brand.machine.ready : brand.machine.idle}
                     </span>
                   </div>
 
@@ -258,13 +260,13 @@ export default function DiscoveryPage() {
                     <div className="grid size-full place-items-center rounded-full bg-ink text-center">
                       <div>
                         <span className="text-xs font-black uppercase tracking-[.18em] text-white/55">
-                          Crowd share
+                          {l.crowdShareLabel}
                         </span>
                         <strong className="mt-2 block text-5xl font-black text-lime">
                           {crowdShare}%
                         </strong>
                         <span className="mt-2 block text-xs font-bold text-white/50">
-                          of matching pool
+                          {l.ofPoolSuffix}
                         </span>
                       </div>
                     </div>
@@ -296,16 +298,20 @@ export default function DiscoveryPage() {
                   </div>
 
                   <div className="mt-5 grid grid-cols-3 gap-2">
-                    {["escrow", "registry", "payout"].map((label) => (
-                      <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
-                        <span className="mono text-[10px] font-black uppercase text-white/55">
-                          {label}
-                        </span>
-                        <strong className="mt-1 block text-sm font-black text-lime">
-                          {label === "payout" ? "queued" : "live"}
-                        </strong>
-                      </div>
-                    ))}
+                    {[brand.machine.escrow, brand.machine.registry, brand.machine.payout].map(
+                      (label) => (
+                        <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+                          <span className="mono text-[10px] font-black uppercase text-white/55">
+                            {label}
+                          </span>
+                          <strong className="mt-1 block text-sm font-black text-lime">
+                            {label === brand.machine.payout
+                              ? brand.machine.queued
+                              : brand.machine.live}
+                          </strong>
+                        </div>
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
@@ -316,17 +322,9 @@ export default function DiscoveryPage() {
       </section>
 
       <section className="overflow-hidden border-y border-white/10 bg-lime py-4 text-ink">
+        {/* Brand-register strip: deliberate EN/ID pairs, constant across locales (src/brand.ts). */}
         <div className="marquee gap-8 text-2xl font-black uppercase sm:text-4xl">
-          {[
-            "Rp50rb x 200 perantau > Rp10jt x 1 donor",
-            "Dana padanan mengikuti jumlah orang",
-            "Soroban records every contribution",
-            "Contract computes (sum sqrt c)^2",
-            "Verified-address registry blocks sybil donors",
-            "Public payout, no backroom allocation",
-            "Rp50rb x 200 perantau > Rp10jt x 1 donor",
-            "Dana padanan mengikuti jumlah orang",
-          ].map((item, index) => (
+          {brand.marquee.map((item, index) => (
             <span key={`${item}-${index}`}>{item}</span>
           ))}
         </div>
@@ -336,13 +334,13 @@ export default function DiscoveryPage() {
         <div className="mx-auto grid max-w-[1500px] items-start gap-10 lg:grid-cols-[.72fr_1.28fr]">
           <Reveal>
             <div className="lg:sticky lg:top-32">
-              <span className="tag">Soroban proof layer</span>
+              <span className="tag">{l.proofTag}</span>
+              {/* "Trust compiled." is a display slogan — brand register, constant across locales. */}
               <h2 className="display mt-4 text-[clamp(2.3rem,4.2vw,4.6rem)] leading-[.9]">
                 Trust compiled.
               </h2>
               <p className="mt-4 max-w-xl text-base font-semibold leading-7 text-white/65">
-                Bumbu blockchain-nya bukan tempelan: contract menyaksikan kontribusi,
-                registry membatasi sybil, dan payout keluar dari math yang bisa diaudit.
+                {l.proofBody}
               </p>
             </div>
           </Reveal>
@@ -350,13 +348,13 @@ export default function DiscoveryPage() {
           <div className="chain-panel rounded-[2rem] p-5 sm:p-8">
             <div className="relative z-10">
               <p className="mono text-[11px] font-bold text-white/60">
-                // patungan.wasm — jalur satu musim pencocokan
+                {`// patungan.wasm — ${l.proofComment}`}
               </p>
               <ol className="mt-4">
                 {[
-                  ["fund_pool", "(sponsor, amount)", "Pool escrow", "Sponsor deposit ke contract, bukan ke rekening panitia."],
-                  ["verify", "(addr, tier)", "One ID, one address", "Verified registry membatasi sybil: satu identitas, satu suara."],
-                  ["contribute", "(donor, project, amt)", "Tagged donations", "Setiap chip-in tercatat dengan donor, project_id, amount, dan ledger."],
+                  ["fund_pool", "(sponsor, amount)", l.proofSteps[0].title, l.proofSteps[0].copy],
+                  ["verify", "(addr, tier)", l.proofSteps[1].title, l.proofSteps[1].copy],
+                  ["contribute", "(donor, project, amt)", l.proofSteps[2].title, l.proofSteps[2].copy],
                 ].map(([fn, sig, title, copy], i) => (
                   <Reveal key={fn} delay={i * 0.08}>
                     <li className="grid gap-2 border-b border-white/10 py-5 sm:grid-cols-[minmax(15rem,.9fr)_1.1fr] sm:items-baseline sm:gap-6">
@@ -379,10 +377,9 @@ export default function DiscoveryPage() {
                       finalize<span className="text-ink/55">(round_id)</span>
                     </span>
                     <span>
-                      <h3 className="text-lg font-black">QF allocation</h3>
+                      <h3 className="text-lg font-black">{l.proofSteps[3].title}</h3>
                       <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">
-                        Contract menghitung (Σ√c)² per kampanye dan membagi matching pool —
-                        yang menang jumlah orang, bukan satu whale.
+                        {l.proofSteps[3].copy}
                       </p>
                     </span>
                   </li>
@@ -404,7 +401,7 @@ export default function DiscoveryPage() {
             <div className="flex flex-wrap items-end justify-between gap-5">
               <div>
                 <span className="mono text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
-                  // direktori publik — semua kampanye terverifikasi kurator
+                  {`// ${l.directoryComment}`}
                 </span>
                 <h1 className="display mt-3 text-4xl leading-none text-ink sm:text-6xl">
                   {d.heading}
@@ -483,7 +480,7 @@ export default function DiscoveryPage() {
                 <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
               ) : null}
               <p className="mono mb-5 text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
-                {d.resultCount(visible.length)} · musim #{roundId ?? "—"}
+                {d.resultCount(visible.length)} · {l.seasonRef(roundId ?? "—")}
               </p>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {visible.map((c) => (

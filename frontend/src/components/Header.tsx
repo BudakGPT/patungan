@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useStrings } from "@/lib/locale";
+import { brand } from "@/brand";
 import { config } from "@/lib/config";
 import { WalletButton } from "./WalletButton";
 import { NetworkBanner } from "./NetworkBanner";
@@ -52,7 +53,7 @@ export function Header() {
                 {strings.appName}
               </span>
               <span className="mt-2 block truncate text-[.68rem] font-black uppercase tracking-[.18em] text-lime/85">
-                gotong royong on-chain
+                {brand.tagline}
               </span>
             </span>
           </Link>
@@ -78,7 +79,7 @@ export function Header() {
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
-              aria-label={open ? "Tutup menu" : "Buka menu"}
+              aria-label={open ? strings.nav.closeMenu : strings.nav.openMenu}
               className="icon-btn lg:hidden"
             >
               <MenuIcon open={open} />
@@ -107,14 +108,14 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Tutup menu"
+                aria-label={strings.nav.closeMenu}
                 className="icon-btn"
               >
                 <MenuIcon open />
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col justify-center gap-1 px-6 sm:px-9" aria-label="Menu utama">
+            <nav className="flex flex-1 flex-col justify-center gap-1 px-6 sm:px-9" aria-label={strings.nav.mainMenu}>
               {NAV_ITEMS.map((item, i) => (
                 <motion.div
                   key={item.href}

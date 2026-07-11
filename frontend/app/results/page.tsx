@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { RoundState } from "@/contract/src";
@@ -8,6 +8,7 @@ import { useStrings } from "@/lib/locale";
 import { formatIDR } from "@/lib/format";
 import { CategoryChip } from "@/components/CategoryChip";
 import { useRounds, useCampaigns, usePreviewRound, useRoundProjects } from "@/lib/hooks";
+import { isDemoArtifact } from "@/lib/demo";
 import { CountUp, Reveal } from "@/components/motion";
 
 const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
@@ -89,16 +90,11 @@ function ResultsInner() {
 function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState[] }) {
   const strings = useStrings();
   const r = strings.results;
-  const preview = usePreviewRound(round.id);
+  const finalized = round.status.tag === "Finalized";
+  // A finalized round's split is stored on-chain and immutable — fetch it once and never
+  // repoll, so final figures can't drift on screen. Open rounds keep the live projection poll.
+  const preview = usePreviewRound(round.id, { frozen: finalized });
   const campaigns = useCampaigns();
-
-  // Campaigns that got a QF split for this round, ranked by matched desc (crowd winner on top).
-  const ranked = useMemo(
-    () => [...(preview.data ?? [])].sort((a, b) => descBig(a[1], b[1])),
-    [preview.data],
-  );
-  const pids = useMemo(() => ranked.map(([pid]) => Number(pid)), [ranked]);
-  const tallies = useRoundProjects(round.id, pids);
 
   const campaignOf = useMemo(() => {
     const m = new Map<number, { title: string; category: string }>();
@@ -106,7 +102,20 @@ function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState
     return m;
   }, [campaigns.data]);
 
-  const finalized = round.status.tag === "Finalized";
+  // Campaigns that got a QF split for this round, ranked by matched desc (crowd winner on top).
+  // E2E smoke campaigns are excluded from the public ranking.
+  const ranked = useMemo(
+    () =>
+      [...(preview.data ?? [])]
+        .filter(([pid]) => {
+          const c = campaignOf.get(Number(pid));
+          return c === undefined || !isDemoArtifact(c.title);
+        })
+        .sort((a, b) => descBig(a[1], b[1])),
+    [preview.data, campaignOf],
+  );
+  const pids = useMemo(() => ranked.map(([pid]) => Number(pid)), [ranked]);
+  const tallies = useRoundProjects(round.id, pids, { frozen: finalized });
 
   // Rows: direct/donors from round_project, matched from the (live or stored) preview split.
   const talliesReady = pids.length === 0 || tallies.every((q) => q.data !== undefined);
@@ -138,23 +147,38 @@ function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState
   );
 
   const loading = preview.data === undefined || campaigns.data === undefined || !talliesReady;
+  // Surface each query's failure instead of ANDing them into one silent skeleton: any query that
+  // errored with nothing cached fails the page (with a retry that targets only the failed reads);
+  // errors after a successful read degrade to the stale-data note.
+  const failed =
+    (preview.isError && preview.data === undefined) ||
+    (campaigns.isError && campaigns.data === undefined) ||
+    tallies.some((q) => q.isError && q.data === undefined);
+  const stale =
+    !failed && (preview.isError || campaigns.isError || tallies.some((q) => q.isError));
+  const retryFailed = () => {
+    if (preview.isError) void preview.refetch();
+    if (campaigns.isError) void campaigns.refetch();
+    for (const q of tallies) if (q.isError) void q.refetch();
+  };
 
   return (
     <>
       <Header round={round} rounds={rounds} finalized={finalized} />
 
       <div className="mt-8">
-        {loading ? (
-          preview.isError && preview.data === undefined ? (
-            <ErrorPanel onRetry={() => preview.refetch()} />
-          ) : (
+        {failed ? (
+          <ErrorPanel onRetry={retryFailed} />
+        ) : loading ? (
+          <>
             <RowsSkeleton />
-          )
+            <SlowLoadHint onRetry={retryFailed} />
+          </>
         ) : ranked.length === 0 ? (
           <EmptyPanel />
         ) : (
           <>
-            {preview.isError ? (
+            {stale ? (
               <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
             ) : null}
             <ul className="space-y-3" aria-label={r.barLabel}>
@@ -242,7 +266,9 @@ function ResultRow({
               <h3 className="mt-1.5 truncate text-base font-semibold text-ink">
                 {campaign?.title ?? `#${fallbackId}`}
               </h3>
-              <p className="tabular mt-1 text-xl font-black text-match-ink">
+              {/* Donor count is the row's loudest figure — crowd beats whale is a type-scale
+                  decision, so the people number outranks every rupiah figure beside it. */}
+              <p className="tabular mt-1 text-2xl font-black leading-none text-match-ink sm:text-3xl">
                 {donors}{" "}
                 <span className="text-xs font-bold uppercase tracking-[.08em]">
                   {r.donorSuffix}
@@ -317,17 +343,30 @@ function Header({
 
       <label className="flex items-center gap-2 text-sm text-muted">
         <span className="whitespace-nowrap">{r.roundPickerLabel}</span>
-        <select
-          value={round.id}
-          onChange={(e) => router.replace(`/results?round=${e.target.value}`)}
-          className="rounded-xl border border-line bg-surface py-2.5 pl-3 pr-8 text-sm font-medium text-ink transition-colors focus:border-accent focus:outline-none"
-        >
-          {ordered.map((x) => (
-            <option key={x.id} value={x.id}>
-              {r.seasonLabel(x.id)} · {strings.seasons.status[x.status.tag] ?? x.status.tag}
-            </option>
-          ))}
-        </select>
+        <span className="relative">
+          <select
+            value={round.id}
+            onChange={(e) => router.replace(`/results?round=${e.target.value}`)}
+            className="appearance-none rounded-full border border-line bg-surface py-2.5 pl-4 pr-9 text-sm font-semibold text-ink transition-colors hover:border-accent/40 focus:border-accent focus:outline-none"
+          >
+            {ordered.map((x) => (
+              <option key={x.id} value={x.id}>
+                {r.seasonLabel(x.id)} · {strings.seasons.status[x.status.tag] ?? x.status.tag}
+              </option>
+            ))}
+          </select>
+          <svg
+            className="pointer-events-none absolute right-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden
+          >
+            <path d="m5 8 5 5 5-5" />
+          </svg>
+        </span>
       </label>
     </header>
   );
@@ -348,6 +387,30 @@ function RowsSkeleton() {
         </li>
       ))}
     </ul>
+  );
+}
+
+/** After 8s of skeleton with no error, admit the chain read is slow and offer a manual retry —
+ * a stalled RPC call must never leave the page silently blank. */
+function SlowLoadHint({ onRetry }: { onRetry: () => void }) {
+  const strings = useStrings();
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(t);
+  }, []);
+  if (!slow) return null;
+  return (
+    <p className="mt-4 text-center text-sm text-muted">
+      {strings.results.slowLoad}{" "}
+      <button
+        type="button"
+        onClick={onRetry}
+        className="font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+      >
+        {strings.retry}
+      </button>
+    </p>
   );
 }
 

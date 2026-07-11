@@ -9,7 +9,13 @@ import { formatCompactIDR, formatIDR, truncateAddress } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
-import { useCampaign, useOpenRound, usePreviewRound, useRoundProject } from "@/lib/hooks";
+import {
+  useCampaign,
+  useCampaignContributions,
+  useOpenRound,
+  usePreviewRound,
+  useRoundProject,
+} from "@/lib/hooks";
 import { ContributePanel } from "@/components/ContributePanel";
 import { ParallaxImg, Reveal } from "@/components/motion";
 import { config } from "@/lib/config";
@@ -50,7 +56,7 @@ export default function CampaignDetailPage() {
   }, [preview.data, campaign]);
 
   // Donor count is only exposed per-round; fetch it only when this campaign is in scope.
-  const roundProject = useRoundProject(roundId, id, inScope);
+  const roundProject = useRoundProject(roundId, id, { enabled: inScope });
   const donors = roundProject.data?.[1];
 
   if (!valid || campaignQ.isError) return <NotFound />;
@@ -125,8 +131,19 @@ function Content({
 
           <Reveal mode="load" delay={0.22} y={36} className="lg:self-start">
           <aside className="glass-dark rounded-[2rem] p-5">
+            {/* Canonical metric-tile mapping (DESIGN.md §5), identical to the discovery card:
+                lime = pendukung count (the biggest figure), cream = direct, pale = projected,
+                ink = total. */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="metric-card bg-paper text-ink">
+              <div className="metric-card bg-lime text-ink">
+                <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
+                  {strings.discovery.donorLabel}
+                </span>
+                <strong className="num tabular mt-2 text-3xl font-black">
+                  {donors ?? "—"}
+                </strong>
+              </div>
+              <div className="metric-card bg-tile-cream text-ink">
                 <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
                   {strings.discovery.directShort}
                 </span>
@@ -134,29 +151,21 @@ function Content({
                   {formatCompactIDR(campaign.lifetime_direct)}
                 </strong>
               </div>
-              <div className="metric-card bg-lime text-ink">
+              <div className="metric-card bg-tile-match text-ink">
                 <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
-                  {t.projectedMatchLabel}
+                  {strings.discovery.projectedShort}
                 </span>
-                <strong className="num tabular mt-2 text-2xl font-black">
+                <strong className="num tabular mt-2 text-2xl font-black text-deep">
                   {projectedMatch === undefined
                     ? strings.landing.noMatchYet
                     : formatCompactIDR(projectedMatch)}
                 </strong>
               </div>
-              <div className="metric-card bg-white/10 text-paper">
+              <div className="metric-card border border-white/10 bg-ink text-paper">
                 <span className="text-xs font-black uppercase tracking-[.12em] text-white/60">
-                  Donor
+                  {strings.discovery.totalShort}
                 </span>
-                <strong className="num tabular mt-2 text-2xl font-black text-lime">
-                  {donors ?? "—"}
-                </strong>
-              </div>
-              <div className="metric-card bg-white/10 text-paper">
-                <span className="text-xs font-black uppercase tracking-[.12em] text-white/60">
-                  Total
-                </span>
-                <strong className="num tabular mt-2 text-2xl font-black text-lime">
+                <strong className="num tabular mt-2 text-2xl font-black">
                   {formatCompactIDR(total)}
                 </strong>
               </div>
@@ -191,6 +200,8 @@ function Content({
               <p className="mt-6 max-w-[68ch] text-base leading-relaxed text-muted">
                 {visual.story}
               </p>
+
+              <BackerLedger campaignId={campaign.id} />
             </div>
           </Reveal>
 
@@ -216,16 +227,14 @@ function Content({
           <div className="grid gap-0 lg:grid-cols-[1fr_1fr]">
             <div className="p-6 sm:p-9">
               <span className="text-xs font-black uppercase tracking-[.16em] text-lime/85">
-                Jejak on-chain
+                {t.jejak.tag}
               </span>
-              <h2 className="mt-3 text-2xl font-black sm:text-3xl">
-                Ke mana Rp50 ribu-mu pergi
-              </h2>
+              <h2 className="mt-3 text-2xl font-black sm:text-3xl">{t.jejak.heading}</h2>
               <ol className="mt-6 space-y-5">
                 {[
-                  ["contribute()", "Donasimu tercatat di contract dengan alamat, jumlah, dan ledger."],
-                  ["preview_matches()", "Kontribusimu menaikkan bobot (Σ√c)² kampanye ini — sinyal publik, bukan janji."],
-                  ["finalize()", "Di akhir musim, matching pool dibagi mengikuti sinyal itu. Bisa diaudit siapa pun."],
+                  ["contribute()", t.jejak.steps[0]],
+                  ["preview_matches()", t.jejak.steps[1]],
+                  ["finalize()", t.jejak.steps[2]],
                 ].map(([fn, copy], i) => (
                   <Reveal key={fn} delay={i * 0.08}>
                     <li className="flex gap-4">
@@ -246,7 +255,7 @@ function Content({
 
             <div className="border-t border-white/10 p-6 sm:p-9 lg:border-l lg:border-t-0">
               <span className="text-xs font-black uppercase tracking-[.16em] text-white/55">
-                Artefak kampanye #{campaign.id}
+                {t.jejak.artifactsLabel(campaign.id)}
               </span>
               <dl className="mt-6 space-y-4 text-sm">
                 {[
@@ -260,7 +269,9 @@ function Content({
                   </div>
                 ))}
                 <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-white/10 pb-3">
-                  <dt className="font-black uppercase tracking-[.12em] text-white/55">kategori</dt>
+                  <dt className="font-black uppercase tracking-[.12em] text-white/55">
+                    {t.jejak.categoryLabel}
+                  </dt>
                   <dd className="font-bold text-white/85">{categoryLabel}</dd>
                 </div>
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -273,6 +284,54 @@ function Content({
         </div>
       </section>
     </main>
+  );
+}
+
+/**
+ * The public backer ledger: recent `contrib` events for this campaign as mono receipt rows
+ * (address · amount · ledger №), each linking to the tx on the explorer — the "receipt" thesis
+ * rendered with the page's own money. Capped to the newest 8; RPC retention keeps it honest.
+ */
+function BackerLedger({ campaignId }: { campaignId: number }) {
+  const strings = useStrings();
+  const t = strings.campaign.ledger;
+  const contributions = useCampaignContributions(campaignId);
+  const rows = (contributions.data ?? []).slice(0, 8);
+
+  return (
+    <section className="mt-12">
+      <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">{t.heading}</h2>
+      <p className="mt-2 max-w-[68ch] text-sm leading-relaxed text-muted">{t.body}</p>
+
+      {contributions.data === undefined ? (
+        <div className="mt-5 space-y-2" aria-hidden>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-9 animate-pulse rounded-lg bg-line/50" />
+          ))}
+        </div>
+      ) : rows.length === 0 ? (
+        <p className="mt-5 text-sm text-muted">{t.empty}</p>
+      ) : (
+        <ul className="mono mt-5 divide-y divide-line border-y border-line text-sm">
+          {rows.map((row) => (
+            <li key={row.txHash}>
+              <a
+                href={`${config.explorerBase}/tx/${row.txHash}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-2.5 transition-colors hover:bg-line/30"
+              >
+                <span className="text-ink/85">{truncateAddress(row.donor)}</span>
+                <span className="tabular font-bold text-match-ink">{formatIDR(row.amount)}</span>
+                <span className="tabular ml-auto text-xs text-faint">ledger {row.ledger}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="mt-3 text-xs text-faint">{t.retention}</p>
+    </section>
   );
 }
 
