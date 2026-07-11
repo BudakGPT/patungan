@@ -28,6 +28,11 @@ const config: Config = {
         gold: "#f6be3e",
         clay: "#cf6746",
 
+        // Metric-tile fills (signature component): the warm-cream "direct" tile and the pale
+        // "projected match" tile. Named so the ledger grid never carries raw hex.
+        "tile-cream": "#eee5d3",
+        "tile-match": "#e3f8df",
+
         surface: "oklch(0.997 0.003 85 / <alpha-value>)",
         muted: "oklch(0.52 0.015 265 / <alpha-value>)",
         faint: "oklch(0.63 0.012 265 / <alpha-value>)",
