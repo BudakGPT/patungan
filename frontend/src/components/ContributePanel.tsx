@@ -206,7 +206,6 @@ export function ContributePanel({
           <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 focus-within:border-lime">
             <span className="text-sm font-black text-white/60">Rp</span>
             <input
-              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
               inputMode="numeric"
               value={customRaw}

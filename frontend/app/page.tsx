@@ -10,7 +10,7 @@ import { isDemoArtifact } from "@/lib/demo";
 import { RoundBanner } from "@/components/RoundBanner";
 import { HowItWorks } from "@/components/HowItWorks";
 import { CampaignCard } from "@/components/CampaignCard";
-import { formatCompactIDR, formatIDR, truncateAddress } from "@/lib/format";
+import { formatCompactIDR, truncateAddress } from "@/lib/format";
 import { brand } from "@/brand";
 import { config } from "@/lib/config";
 import { getProjectVisual, heroVisual as heroBackdrop } from "@/lib/projectVisuals";

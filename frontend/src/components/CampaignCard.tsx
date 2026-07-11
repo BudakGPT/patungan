@@ -51,7 +51,6 @@ export function CampaignCard({
       className="group flex flex-col overflow-hidden rounded-[2rem] border border-ink/10 bg-paper text-ink shadow-soft transition duration-200 hover:-translate-y-1 hover:border-lime/70"
     >
       <div className="relative aspect-[16/10] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
           src={thumb || visual.image}

@@ -1,0 +1,20 @@
+{
+  "extends": "next/core-web-vitals",
+  "reportUnusedDisableDirectives": true,
+  "ignorePatterns": ["src/contract/**"],
+  "rules": {
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "eqeqeq": ["error", "smart"],
+    "@next/next/no-img-element": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-explicit-any": "error"
+      }
+    }
+  ]
+}

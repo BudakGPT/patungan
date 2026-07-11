@@ -207,7 +207,6 @@ function Content({
 
           <Reveal delay={0.1}>
             <figure className="overflow-hidden rounded-[1.5rem] shadow-soft">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="aspect-[4/3] w-full object-cover"
                 src={thumb || visual.image}
