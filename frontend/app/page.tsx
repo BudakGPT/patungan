@@ -577,11 +577,11 @@ function SkeletonGrid() {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="overflow-hidden rounded-2xl border border-line bg-surface">
-          <div className="aspect-[16/9] animate-pulse bg-line/50" />
+        <div key={i} className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+          <div className="skeleton aspect-[16/9]" />
           <div className="space-y-3 p-4">
-            <div className="h-4 w-3/4 animate-pulse rounded bg-line/50" />
-            <div className="h-4 w-1/2 animate-pulse rounded bg-line/50" />
+            <div className="skeleton h-4 w-3/4 rounded" />
+            <div className="skeleton h-4 w-1/2 rounded" />
           </div>
         </div>
       ))}
@@ -597,13 +597,13 @@ function EmptyPanel({
   action?: { label: string; onClick: () => void };
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-muted">{message}</p>
       {action ? (
         <button
           type="button"
           onClick={action.onClick}
-          className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+          className="action-link mt-4"
         >
           {action.label}
         </button>
@@ -615,12 +615,12 @@ function EmptyPanel({
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
   const strings = useStrings();
   return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-4"
       >
         {strings.retry}
       </button>

@@ -57,6 +57,7 @@ for (const locale of ["id", "en"] as const) {
     test("campaign sort menu opens and commits a selection", async ({ page }) => {
       await page.goto("/");
       const trigger = page.getByRole("button", { name: copy[locale].sortLabel });
+      await trigger.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
       await trigger.click();
       await expect(page.getByRole("listbox", { name: copy[locale].sortLabel })).toBeVisible();
       await page.getByRole("option", { name: copy[locale].newestLabel }).click();
@@ -74,9 +75,9 @@ for (const locale of ["id", "en"] as const) {
     test("results page loads", async ({ page }) => {
       await page.goto("/results");
       await expect(brandHome(page)).toBeVisible();
-      await expect(
-        page.getByRole("heading", { name: copy[locale].resultsTitle }),
-      ).toBeVisible();
+      const heading = page.getByRole("heading", { name: copy[locale].resultsTitle });
+      await expect(heading).toBeVisible();
+      expect(await heading.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
     });
 
     test("campaign detail renders its shell", async ({ page }) => {

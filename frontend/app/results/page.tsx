@@ -33,7 +33,7 @@ export default function ResultsPage() {
             <span className="tag">Live reveal</span>
           </Reveal>
           <Reveal mode="load" delay={0.08} y={40}>
-            <h1 className="display mt-4 text-[clamp(2.8rem,6.4vw,6.4rem)] leading-[.86]">
+            <h1 className="display mt-4 text-[clamp(2.3rem,9.8vw,6.4rem)] leading-[.86]">
               {r.title}
             </h1>
           </Reveal>
@@ -367,10 +367,10 @@ function RowsSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <li key={i} className="rounded-2xl border border-line bg-surface p-5 shadow-card">
           <div className="flex items-start justify-between gap-3">
-            <div className="h-5 w-1/3 animate-pulse rounded bg-line/50" />
-            <div className="h-5 w-24 animate-pulse rounded bg-line/50" />
+            <div className="skeleton h-5 w-1/3 rounded" />
+            <div className="skeleton h-5 w-24 rounded" />
           </div>
-          <div className="mt-4 h-2.5 w-full animate-pulse rounded-full bg-line/40" />
+          <div className="skeleton mt-4 h-2.5 w-full rounded-full" />
         </li>
       ))}
     </ul>
@@ -393,7 +393,7 @@ function SlowLoadHint({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link"
       >
         {strings.retry}
       </button>
@@ -404,8 +404,8 @@ function SlowLoadHint({ onRetry }: { onRetry: () => void }) {
 function PageSkeleton() {
   return (
     <div>
-      <div className="h-10 w-48 animate-pulse rounded bg-line/50" />
-      <div className="mt-3 h-4 w-72 animate-pulse rounded bg-line/50" />
+      <div className="skeleton h-10 w-48 rounded" />
+      <div className="skeleton mt-3 h-4 w-72 rounded" />
       <div className="mt-8">
         <RowsSkeleton />
       </div>
@@ -416,7 +416,7 @@ function PageSkeleton() {
 function EmptyPanel() {
   const { results: r } = useStrings();
   return (
-    <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{r.empty}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{r.emptyHint}</p>
     </div>
@@ -426,12 +426,12 @@ function EmptyPanel() {
 function NotFound({ title, body }: { title: string; body: string }) {
   const { results: r } = useStrings();
   return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{title}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{body}</p>
       <Link
         href="/seasons"
-        className="mt-5 inline-block text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-5"
       >
         {r.backToSeasons}
       </Link>
@@ -442,12 +442,12 @@ function NotFound({ title, body }: { title: string; body: string }) {
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
   const strings = useStrings();
   return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-4"
       >
         {strings.retry}
       </button>

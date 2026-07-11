@@ -64,7 +64,7 @@ function Gate({
           type="button"
           disabled={connecting}
           onClick={() => void onConnect()}
-          className="mt-4 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+          className="btn btn-lime mt-4 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {connecting ? strings.wallet.connecting : strings.wallet.connect}
         </button>
@@ -135,9 +135,9 @@ function AccountBody({ owner }: { owner: string }) {
     }
     return (
       <div className="space-y-4">
-        <div className="h-16 animate-pulse rounded-xl bg-line/50" />
-        <div className="h-40 animate-pulse rounded-2xl bg-line/50" />
-        <div className="h-40 animate-pulse rounded-2xl bg-line/50" />
+        <div className="skeleton h-16 rounded-xl" />
+        <div className="skeleton h-40 rounded-2xl" />
+        <div className="skeleton h-40 rounded-2xl" />
       </div>
     );
   }
@@ -211,7 +211,7 @@ function SummaryBand({
             {a.tier[Tier[tier]] ?? Tier[tier]}
           </span>
         ) : (
-          <span className="inline-block h-5 w-24 animate-pulse rounded-full bg-line/50" />
+          <span className="skeleton inline-block h-5 w-24 rounded-full" />
         )}
         {campaigns > 0 ? (
           <p className="tabular mt-2 text-xs text-muted">
@@ -291,5 +291,5 @@ function formatDate(iso: string): string {
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">{children}</div>;
+  return <div className="state-panel p-6">{children}</div>;
 }

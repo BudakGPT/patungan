@@ -39,7 +39,7 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/campaign/new"
-          className="shrink-0 rounded-xl border border-line-strong px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-ink"
+          className="btn shrink-0 border border-ink/15 bg-paper text-ink shadow-card hover:border-green/40 hover:bg-lime"
         >
           {d.createCta}
         </Link>
@@ -80,7 +80,7 @@ function Gate({
           type="button"
           disabled={connecting}
           onClick={() => void onConnect()}
-          className="mt-4 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+          className="btn btn-lime mt-4 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {connecting ? strings.wallet.connecting : strings.wallet.connect}
         </button>
@@ -127,8 +127,8 @@ function OwnedCampaigns({ owner }: { owner: string }) {
     }
     return (
       <div className="space-y-4">
-        <div className="h-40 animate-pulse rounded-2xl bg-line/50" />
-        <div className="h-40 animate-pulse rounded-2xl bg-line/50" />
+        <div className="skeleton h-40 rounded-2xl" />
+        <div className="skeleton h-40 rounded-2xl" />
       </div>
     );
   }
@@ -252,7 +252,7 @@ function RoundClaimLine({
   }
 
   if (rp.data === undefined) {
-    return <div className="h-12 animate-pulse rounded-xl bg-line/40" />;
+    return <div className="skeleton h-12 rounded-xl" />;
   }
 
   // (direct, donors, matched, claimed) — the campaign participated only if it drew direct or match.
@@ -455,5 +455,5 @@ function useAction() {
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">{children}</div>;
+  return <div className="state-panel p-6">{children}</div>;
 }

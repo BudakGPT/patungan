@@ -56,7 +56,7 @@ export default function VerifyPage() {
               type="button"
               disabled={connecting}
               onClick={() => void connect()}
-              className="mt-4 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+              className="btn btn-lime mt-4 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {connecting ? strings.wallet.connecting : strings.wallet.connect}
             </button>
@@ -91,7 +91,7 @@ function VerifyFlow({ address }: { address: string }) {
             <p className="text-sm text-cat-disaster">{v.tierError}</p>
           </Panel>
         ) : (
-          <div className="h-28 animate-pulse rounded-2xl bg-line/50" />
+          <div className="skeleton h-28 rounded-2xl" />
         )
       ) : (
         <div className="space-y-5">
@@ -573,5 +573,5 @@ function Note({
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">{children}</div>;
+  return <div className="state-panel p-6">{children}</div>;
 }

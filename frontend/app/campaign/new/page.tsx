@@ -92,7 +92,7 @@ function Gate({
           type="button"
           disabled={connecting}
           onClick={() => void onConnect()}
-          className="mt-4 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+          className="btn btn-lime mt-4 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {connecting ? strings.wallet.connecting : strings.wallet.connect}
         </button>
@@ -337,7 +337,7 @@ function CreateForm({ owner }: { owner: string }) {
               type="button"
               disabled={pending}
               onClick={() => setPayout(owner)}
-              className="shrink-0 text-xs font-medium text-accent-ink underline underline-offset-2 hover:text-accent disabled:opacity-60"
+              className="shrink-0 text-xs font-bold text-green transition-colors hover:text-deep disabled:opacity-60"
             >
               {t.payoutReset}
             </button>
@@ -412,6 +412,10 @@ function Panel({
   children: React.ReactNode;
   tone?: "neutral" | "match";
 }) {
-  const border = tone === "match" ? "border-match/30 bg-match-soft" : "border-line bg-surface";
-  return <div className={`rounded-2xl border ${border} p-6 shadow-card`}>{children}</div>;
+  if (tone === "neutral") return <div className="state-panel p-6">{children}</div>;
+  return (
+    <div className="rounded-2xl border border-match/30 bg-match-soft p-6 shadow-card">
+      {children}
+    </div>
+  );
 }

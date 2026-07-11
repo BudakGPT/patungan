@@ -130,7 +130,7 @@ export function ImageUpload({
                 type="button"
                 disabled={disabled || uploading}
                 onClick={openPicker}
-                className="text-xs font-medium text-accent-ink underline underline-offset-2 hover:text-accent disabled:opacity-60"
+                className="text-xs font-bold text-green transition-colors hover:text-deep disabled:opacity-60"
               >
                 {im.replace}
               </button>

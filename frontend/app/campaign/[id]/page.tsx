@@ -305,7 +305,7 @@ function BackerLedger({ campaignId }: { campaignId: number }) {
       {contributions.data === undefined ? (
         <div className="mt-5 space-y-2" aria-hidden>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-9 animate-pulse rounded-lg bg-line/50" />
+            <div key={i} className="skeleton h-9 rounded-lg" />
           ))}
         </div>
       ) : rows.length === 0 ? (
@@ -337,19 +337,19 @@ function BackerLedger({ campaignId }: { campaignId: number }) {
 function DetailSkeleton() {
   return (
     <main className="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10" aria-hidden>
-      <div className="h-4 w-32 animate-pulse rounded bg-line/50" />
-      <div className="mt-5 aspect-[16/9] animate-pulse rounded-2xl bg-line/50 sm:aspect-[21/9]" />
+      <div className="skeleton h-4 w-32 rounded" />
+      <div className="skeleton mt-5 aspect-[16/9] rounded-2xl sm:aspect-[21/9]" />
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_20rem] lg:gap-12">
         <div className="space-y-4">
-          <div className="h-9 w-3/4 animate-pulse rounded bg-line/50" />
-          <div className="h-4 w-40 animate-pulse rounded bg-line/50" />
+          <div className="skeleton h-9 w-3/4 rounded" />
+          <div className="skeleton h-4 w-40 rounded" />
           <div className="mt-6 space-y-2">
-            <div className="h-4 w-full animate-pulse rounded bg-line/50" />
-            <div className="h-4 w-11/12 animate-pulse rounded bg-line/50" />
-            <div className="h-4 w-4/5 animate-pulse rounded bg-line/50" />
+            <div className="skeleton h-4 w-full rounded" />
+            <div className="skeleton h-4 w-11/12 rounded" />
+            <div className="skeleton h-4 w-4/5 rounded" />
           </div>
         </div>
-        <div className="h-56 animate-pulse rounded-2xl bg-line/50" />
+        <div className="skeleton h-56 rounded-2xl" />
       </div>
     </main>
   );
@@ -359,12 +359,12 @@ function NotFound() {
   const { campaign: t } = useStrings();
   return (
     <main className="mx-auto max-w-page px-4 py-24 sm:px-6">
-      <div className="mx-auto max-w-md rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+      <div className="state-panel mx-auto max-w-md px-6 py-16 text-center">
         <p className="text-lg font-semibold text-ink">{t.notFoundTitle}</p>
         <p className="mt-2 text-sm text-muted">{t.notFoundBody}</p>
         <Link
           href="/"
-          className="mt-5 inline-block rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink"
+          className="action-link mt-5"
         >
           {t.backHome}
         </Link>
