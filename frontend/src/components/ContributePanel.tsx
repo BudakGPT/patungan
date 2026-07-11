@@ -46,9 +46,17 @@ export function ContributePanel({
 
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState<number>(PRESETS[1]);
+  const [custom, setCustom] = useState(false);
+  const [customRaw, setCustomRaw] = useState("");
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
 
   const pending = tx.phase === "awaiting-signature" || tx.phase === "submitting";
+
+  // The contract accepts any positive integer amount (`InvalidAmount` guards `amount <= 0`);
+  // the input is digits-only, so the only invalid states are empty and zero.
+  const customAmount = customRaw === "" ? NaN : Number(customRaw);
+  const chosenAmount = custom ? customAmount : amount;
+  const amountValid = Number.isInteger(chosenAmount) && chosenAmount > 0;
 
   if (disabled) return null;
 
@@ -115,11 +123,11 @@ export function ContributePanel({
   }
 
   async function submit() {
-    if (pending || !address) return;
+    if (pending || !address || !amountValid) return;
     setTx({ phase: "awaiting-signature" });
     try {
       const assembled = await contractClient.contribute(
-        { donor: address, project_id: campaign.id, amount: BigInt(amount) },
+        { donor: address, project_id: campaign.id, amount: BigInt(chosenAmount) },
         { publicKey: address },
       );
       const sent = await assembled.signAndSend({
@@ -137,7 +145,7 @@ export function ContributePanel({
 
       // Patch lifetime_direct only; the round match/donor-count come from separate on-chain keys
       // and must repoll (invalidate), never be guessed locally.
-      const delta = BigInt(amount);
+      const delta = BigInt(chosenAmount);
       const patch = (p: ProjectState): ProjectState =>
         p.id === campaign.id ? { ...p, lifetime_direct: p.lifetime_direct + delta } : p;
       queryClient.setQueryData<ProjectState>(["campaign", campaign.id], (old) =>
@@ -148,6 +156,7 @@ export function ContributePanel({
       void queryClient.invalidateQueries({ queryKey: ["campaigns"] });
       void queryClient.invalidateQueries({ queryKey: ["previewRound"] });
       void queryClient.invalidateQueries({ queryKey: ["roundProject"] });
+      void queryClient.invalidateQueries({ queryKey: ["campaignContributions", campaign.id] });
 
       setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
     } catch (err) {
@@ -164,11 +173,14 @@ export function ContributePanel({
             key={preset}
             type="button"
             disabled={pending}
-            onClick={() => setAmount(preset)}
+            onClick={() => {
+              setCustom(false);
+              setAmount(preset);
+            }}
             className={`tabular rounded-xl border px-2 py-2.5 text-sm font-black transition-colors disabled:opacity-60 ${
-              amount === preset
+              !custom && amount === preset
                 ? "border-lime bg-lime text-ink"
-                : "border-white/15 bg-white/8 text-paper hover:border-lime/50"
+                : "border-white/15 bg-white/10 text-paper hover:border-lime/50"
             }`}
           >
             {formatIDR(preset)}
@@ -176,11 +188,52 @@ export function ContributePanel({
         ))}
       </div>
 
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => setCustom(true)}
+        className={`w-full rounded-xl border px-2 py-2.5 text-sm font-black transition-colors disabled:opacity-60 ${
+          custom
+            ? "border-lime bg-lime text-ink"
+            : "border-white/15 bg-white/10 text-paper hover:border-lime/50"
+        }`}
+      >
+        {c.customChip}
+      </button>
+
+      {custom ? (
+        <>
+          <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 focus-within:border-lime">
+            <span className="text-sm font-black text-white/60">Rp</span>
+            <input
+              autoFocus
+              inputMode="numeric"
+              value={customRaw}
+              disabled={pending}
+              onChange={(e) => setCustomRaw(e.target.value.replace(/\D/g, "").slice(0, 12))}
+              placeholder={c.customPlaceholder}
+              aria-label={c.customChip}
+              className="tabular w-full bg-transparent text-sm font-black text-paper placeholder:text-white/40 focus:outline-none disabled:opacity-60"
+            />
+          </label>
+          {amountValid ? (
+            <p className="tabular text-xs font-bold text-white/55">= {formatIDR(chosenAmount)}</p>
+          ) : customRaw !== "" ? (
+            <p className="text-xs font-semibold text-cat-disaster">{c.customInvalid}</p>
+          ) : null}
+        </>
+      ) : null}
+
       {tx.phase === "error" ? (
         <p className="text-sm font-semibold text-cat-disaster">{tx.message}</p>
       ) : null}
 
-      <button type="button" disabled={pending} onClick={() => void submit()} className="btn btn-lime w-full disabled:opacity-60">
+      <button
+        type="button"
+        disabled={pending || !amountValid}
+        onClick={() => void submit()}
+        className="btn btn-lime w-full disabled:opacity-60"
+      >
         {tx.phase === "awaiting-signature"
           ? c.awaiting
           : tx.phase === "submitting"

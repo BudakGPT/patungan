@@ -128,7 +128,6 @@ export function ParallaxImg({
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <motion.img
         src={src}
         alt={alt}

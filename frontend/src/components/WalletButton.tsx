@@ -70,7 +70,7 @@ export function WalletButton() {
   return (
     <div className="flex items-center gap-2">
       {/* Verification tier + network, merged into one quiet capsule matching the header's other chips. */}
-      <span className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/8 px-3 py-1.5 text-sm lg:inline-flex">
+      <span className="hidden items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm lg:inline-flex">
         {address ? (
           <span className="hidden items-center gap-2 xl:flex">
             <TierBadge tier={tier} variant="inline" />
@@ -88,7 +88,7 @@ export function WalletButton() {
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           title={address ?? undefined}
-          className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/8 px-3 py-1.5 text-sm font-black text-paper hover:bg-white/15"
+          className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-black text-paper hover:bg-white/15"
         >
           {address ? truncate(address) : null}
           <ChevronIcon open={menuOpen} />
@@ -103,7 +103,7 @@ export function WalletButton() {
                 setMenuOpen(false);
                 disconnect();
               }}
-              className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-bold text-paper/80 hover:bg-white/8 hover:text-paper"
+              className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-bold text-paper/80 hover:bg-white/10 hover:text-paper"
             >
               {strings.wallet.disconnect}
             </button>

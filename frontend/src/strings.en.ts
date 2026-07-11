@@ -10,8 +10,52 @@ export const en: Strings = {
     dashboard: "Dashboard",
     account: "Account",
     operator: "Operator",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    mainMenu: "Main menu",
   },
   landing: {
+    heroTags: ["Payment & Consumer App", "PMI/TKI diaspora", "Quadratic matching"],
+    heroLede:
+      "Rp50k from many perantau isn't just a donation. On Patungan, every contribution becomes a public signal that pulls the sponsor pool toward the most-backed village projects.",
+    heroPoolLabel: "Matching pool",
+    heroDonorLabel: "Backers",
+    heroStatusLabel: "Status",
+    waitingPool: "Waiting",
+    primaryCta: "Browse projects",
+    secondaryCta: "See results",
+    liveProjectBadge: "Live project",
+    waitingProjectTitle: "Waiting for project data",
+    heroTopLine: (n: number) => `${n} backers pulling the largest match.`,
+    heroTopLineEmpty: "Connect a deployment to see live data.",
+    matchEngineLabel: "Match engine",
+    matchEngineTitle: "Soroban finalization",
+    crowdShareLabel: "Top share",
+    ofPoolSuffix: "of matching pool",
+    proofTag: "Soroban proof layer",
+    proofBody:
+      "The blockchain isn't a sticker: the contract witnesses contributions, the registry limits sybils, and payouts come from auditable math.",
+    proofComment: "one matching season, end to end",
+    proofSteps: [
+      {
+        title: "Pool escrow",
+        copy: "Sponsors deposit into the contract, not a committee's bank account.",
+      },
+      {
+        title: "One ID, one voice",
+        copy: "The verified registry limits sybils: one identity, one voice.",
+      },
+      {
+        title: "Tagged donations",
+        copy: "Every chip-in is recorded with donor, project_id, amount, and ledger.",
+      },
+      {
+        title: "Quadratic allocation",
+        copy: "The contract computes (Σ√c)² per campaign and splits the matching pool — headcount wins, not one whale.",
+      },
+    ],
+    directoryComment: "public directory — every campaign curator-verified",
+    seasonRef: (id: string | number) => `season #${id}`,
     title: "Patungan",
     subtitle: "Chip in together, matched fairly.",
     poolLabel: "Matching pool",
@@ -60,7 +104,10 @@ export const en: Strings = {
     countdown: { day: "d", hour: "h", min: "m", ended: "Ended" },
     // Card
     donorSuffix: "backers",
+    donorLabel: "Backers",
     directShort: "Direct",
+    projectedShort: "Projected",
+    totalShort: "Total",
     matchSuffix: "match",
     noThumbAlt: "No image",
     // Onboarding "how it works" strip — QF explainer for cold visitors
@@ -163,9 +210,29 @@ export const en: Strings = {
       viewCampaign: "View campaign",
       createAnother: "Submit another campaign",
     },
+    jejak: {
+      tag: "On-chain trail",
+      heading: "Where your Rp50k goes",
+      steps: [
+        "Your donation is recorded in the contract with address, amount, and ledger.",
+        "Your contribution raises this campaign's (Σ√c)² weight — a public signal, not a promise.",
+        "At season's end, the matching pool is split along that signal. Anyone can audit it.",
+      ],
+      artifactsLabel: (id: number) => `Campaign artifacts #${id}`,
+      categoryLabel: "category",
+    },
+    ledger: {
+      heading: "Backer ledger",
+      body: "Every chip-in to this campaign, straight from the contract's event log.",
+      empty: "No donations inside the RPC retention window yet.",
+      retention: "Only donations within the Testnet RPC retention window are shown.",
+    },
     contribute: {
       cta: "Chip in",
       amountLabel: "Choose amount",
+      customChip: "Custom amount",
+      customPlaceholder: "e.g. 25000",
+      customInvalid: "Enter a positive whole number.",
       confirm: "Send & sign",
       awaiting: "Open Freighter to sign…",
       submitting: "Sending transaction…",
@@ -255,6 +322,7 @@ export const en: Strings = {
     backToSeasons: "View season archive",
     noRounds: "No matching seasons yet.",
     barLabel: "Comparison of direct donations and matching funds",
+    slowLoad: "On-chain data is taking longer than usual.",
   },
   operator: {
     title: "Operator Console",
@@ -544,6 +612,11 @@ export const en: Strings = {
   },
   footer: {
     transparency: "Every action is recorded on-chain on Stellar Testnet.",
+  },
+  notFound: {
+    title: "Page not found",
+    body: "This route isn't in the ledger. Check the link, or head back home.",
+    cta: "Back to home",
   },
   loading: "Loading…",
   empty: "No projects yet",

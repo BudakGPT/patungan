@@ -60,7 +60,7 @@ export function ImageUpload({
         });
       }
     },
-    [disabled, onChange],
+    [disabled, onChange, im.errorFallback],
   );
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +104,6 @@ export function ImageUpload({
       {hasImage ? (
         <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
           <div className="relative aspect-[16/9] bg-line/40">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview!} alt={im.previewAlt} className="h-full w-full object-cover" />
             {uploading ? (
               <div className="absolute inset-0 flex items-center justify-center bg-ink/40">

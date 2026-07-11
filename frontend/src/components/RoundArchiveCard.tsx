@@ -7,6 +7,7 @@ import { useStrings } from "@/lib/locale";
 import { formatIDR, truncateAddress, formatCountdown } from "@/lib/format";
 import { CategoryChip } from "./CategoryChip";
 import { usePreviewRound } from "@/lib/hooks";
+import { isDemoArtifact } from "@/lib/demo";
 
 /**
  * One round in the `/seasons` archive. A full-width ledger row, not a grid card:
@@ -88,7 +89,8 @@ export function RoundArchiveCard({
 function Leaderboard({ roundId, titleOf }: { roundId: number; titleOf: Map<number, string> }) {
   const strings = useStrings();
   const s = strings.seasons;
-  const preview = usePreviewRound(roundId);
+  // Leaderboards only render for Finalized rounds — the stored split is immutable, read it once.
+  const preview = usePreviewRound(roundId, { frozen: true });
 
   if (preview.data === undefined) {
     return (
@@ -100,7 +102,10 @@ function Leaderboard({ roundId, titleOf }: { roundId: number; titleOf: Map<numbe
   }
 
   const top = [...preview.data]
-    .filter(([, matched]) => matched > 0n)
+    .filter(
+      ([pid, matched]) =>
+        matched > 0n && !isDemoArtifact(titleOf.get(Number(pid)) ?? ""),
+    )
     .sort((a, b) => (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0))
     .slice(0, 3);
 

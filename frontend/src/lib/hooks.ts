@@ -4,7 +4,12 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import type { Config, ProjectState, RoundState } from "@/contract/src";
 import { Tier } from "@/contract/src";
 import { contractClient } from "./contract";
-import { fetchContributions, type Contribution } from "./events";
+import {
+  fetchCampaignContributions,
+  fetchContributions,
+  type CampaignContribution,
+  type Contribution,
+} from "./events";
 
 /**
  * The global role/token config (`admin`/`curator`/`attester`/`token`) in one call — the operator
@@ -69,16 +74,28 @@ export function useCampaign(id: number, enabled = true) {
   });
 }
 
+/** Fetch behavior for round-scoped reads. `frozen` = fetch once, never repoll — the contract
+ * stores a Finalized round's split (`RoundMatched`) immutably, so final figures must not be
+ * able to drift on screen ("numbers never jitter"). */
+interface RoundReadOpts {
+  enabled?: boolean;
+  frozen?: boolean;
+}
+
 /**
- * Live projected QF split for a given round: `[project_id, matched]` pairs on current state.
- * Pass a `null` round id (or `enabled: false` once the round is Finalized — its stored
- * `RoundMatched` is then authoritative and identical) to skip the app's most expensive read.
+ * Projected QF split for a given round: `[project_id, matched]` pairs. Live (4s poll) for the
+ * open round; pass `frozen: true` for Finalized rounds so the stored, authoritative split is
+ * read exactly once. Pass a `null` round id to skip the app's most expensive read.
  */
-export function usePreviewRound(roundId: number | null | undefined, enabled = true) {
+export function usePreviewRound(
+  roundId: number | null | undefined,
+  { enabled = true, frozen = false }: RoundReadOpts = {},
+) {
   return useQuery<Array<readonly [number, bigint]>>({
     queryKey: ["previewRound", roundId],
     queryFn: async () => (await contractClient.preview_round({ round_id: roundId! })).result,
-    refetchInterval: 4000,
+    refetchInterval: frozen ? false : 4000,
+    staleTime: frozen ? Infinity : 0,
     enabled: enabled && roundId !== null && roundId !== undefined,
   });
 }
@@ -91,13 +108,14 @@ export function usePreviewRound(roundId: number | null | undefined, enabled = tr
 export function useRoundProject(
   roundId: number | null | undefined,
   projectId: number,
-  enabled = true,
+  { enabled = true, frozen = false }: RoundReadOpts = {},
 ) {
   return useQuery<readonly [bigint, number, bigint, boolean]>({
     queryKey: ["roundProject", roundId, projectId],
     queryFn: async () =>
       (await contractClient.round_project({ round_id: roundId!, project_id: projectId })).result,
-    refetchInterval: 4000,
+    refetchInterval: frozen ? false : 4000,
+    staleTime: frozen ? Infinity : 0,
     enabled: enabled && roundId !== null && roundId !== undefined,
   });
 }
@@ -108,14 +126,19 @@ export function useRoundProject(
  * the exact `["roundProject", round, project]` cache keys with `useRoundProject`, so a card and the
  * results page never double-fetch the same tally. Returns react-query results in `projectIds` order.
  */
-export function useRoundProjects(roundId: number | null | undefined, projectIds: number[]) {
+export function useRoundProjects(
+  roundId: number | null | undefined,
+  projectIds: number[],
+  { frozen = false }: RoundReadOpts = {},
+) {
   return useQueries({
     queries: projectIds.map((projectId) => ({
       queryKey: ["roundProject", roundId, projectId],
       queryFn: async () =>
         (await contractClient.round_project({ round_id: roundId!, project_id: projectId })).result,
       enabled: roundId !== null && roundId !== undefined,
-      refetchInterval: 4000,
+      refetchInterval: frozen ? false : 4000,
+      staleTime: frozen ? Infinity : 0,
     })),
   });
 }
@@ -143,6 +166,20 @@ export function useContributions(who: string | null) {
     queryKey: ["contributions", who],
     queryFn: async () => fetchContributions(who!),
     enabled: !!who,
+    refetchInterval: 8000,
+  });
+}
+
+/**
+ * The recent donations one campaign received (`contrib` events by project-id topic) — the public
+ * backer ledger under the campaign story. Same event-scan weight as `useContributions`, so the
+ * same slower 8s poll.
+ */
+export function useCampaignContributions(projectId: number, enabled = true) {
+  return useQuery<CampaignContribution[]>({
+    queryKey: ["campaignContributions", projectId],
+    queryFn: async () => fetchCampaignContributions(projectId),
+    enabled,
     refetchInterval: 8000,
   });
 }

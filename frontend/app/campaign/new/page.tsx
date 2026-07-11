@@ -162,7 +162,7 @@ function CreateForm({ owner }: { owner: string }) {
     if (!STELLAR_ADDR.test(payout.trim())) e.payout = t.invalid.payoutInvalid;
     if (!imageCid) e.image = t.invalid.imageRequired;
     return e;
-  }, [title, story, payout, imageCid]);
+  }, [title, story, payout, imageCid, t.invalid]);
 
   const categoryValid = category !== null;
   const valid = Object.keys(errors).length === 0 && categoryValid;

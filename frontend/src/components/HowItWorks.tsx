@@ -14,7 +14,7 @@ export function HowItWorks() {
   return (
     <section aria-label={h.overline} className="mt-14 border-t-2 border-ink pt-8">
       <p className="mono text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
-        // {h.overline}
+        {`// ${h.overline}`}
       </p>
       <ol className="mt-6 grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8">
         {h.steps.map((s, i) => (

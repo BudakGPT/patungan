@@ -1,9 +1,20 @@
-# Every push must keep the contract tests green and the frontend building from a clean
-# checkout (no local node_modules, no dist/).
+# Every push must keep the contract tests green and the frontend safety net (typecheck, lint,
+# alpha-step guard, unit + E2E tests) passing before the frontend is built from a clean checkout.
 name: ci
 on:
   push:
   pull_request:
+
+# Public testnet identifiers, not secrets — the build needs them present; runtime always uses
+# frontend/.env.local written by scripts/deploy.sh. Duplicated per job (Actions ignores YAML anchors).
+env:
+  NEXT_PUBLIC_NETWORK: TESTNET
+  NEXT_PUBLIC_SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
+  NEXT_PUBLIC_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
+  NEXT_PUBLIC_CONTRACT_ID: CB3XHHEHIXV6HHXEB2CSOWMIG3MLPMTT5REZ5GBWYGUH7MX4B3Z6RYUH
+  NEXT_PUBLIC_TOKEN_ID: CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+  NEXT_PUBLIC_EXPLORER_BASE: https://stellar.expert/explorer/testnet
+  NEXT_PUBLIC_ADMIN_ADDRESS: GBO6MF56C7EWFCXX2FNL4OTECCHD2K6CLKXN7ROQVYDWKJWVXUUHJVP6
 
 jobs:
   contract:
@@ -19,16 +30,9 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
-    env:
-      # Build-time placeholders (public testnet identifiers, not secrets). Runtime always
-      # uses frontend/.env.local written by scripts/deploy.sh.
-      NEXT_PUBLIC_NETWORK: TESTNET
-      NEXT_PUBLIC_SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
-      NEXT_PUBLIC_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
-      NEXT_PUBLIC_CONTRACT_ID: CB3XHHEHIXV6HHXEB2CSOWMIG3MLPMTT5REZ5GBWYGUH7MX4B3Z6RYUH
-      NEXT_PUBLIC_TOKEN_ID: CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
-      NEXT_PUBLIC_EXPLORER_BASE: https://stellar.expert/explorer/testnet
-      NEXT_PUBLIC_ADMIN_ADDRESS: GBO6MF56C7EWFCXX2FNL4OTECCHD2K6CLKXN7ROQVYDWKJWVXUUHJVP6
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,7 +42,40 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: npm ci
         run: npm ci
-        working-directory: frontend
+      # Fast gates first — fail before paying for a build.
+      - name: typecheck
+        run: npm run typecheck
+      - name: lint
+        run: npm run lint
+      - name: alpha-step guard
+        run: npm run check:alpha
+      - name: unit tests
+        run: npm test
       - name: next build
         run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: npm ci
+        run: npm ci
+      - name: install Playwright browser
+        run: npx playwright install --with-deps chromium
+      # The Playwright webServer builds then serves; specs run against next build + start.
+      - name: playwright e2e
+        run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7

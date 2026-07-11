@@ -43,7 +43,7 @@ export function LocaleToggle({ openUp = false }: { openUp?: boolean }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Ganti bahasa"
-        className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/8 px-3 py-1.5 text-sm font-black uppercase text-paper hover:bg-white/15"
+        className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-black uppercase text-paper hover:bg-white/15"
       >
         {locale}
         <ChevronIcon open={open} />
@@ -67,7 +67,7 @@ export function LocaleToggle({ openUp = false }: { openUp?: boolean }) {
                 setOpen(false);
               }}
               className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-bold transition-colors ${
-                locale === l ? "text-lime" : "text-paper/80 hover:bg-white/8 hover:text-paper"
+                locale === l ? "text-lime" : "text-paper/80 hover:bg-white/10 hover:text-paper"
               }`}
             >
               {LOCALE_NAMES[l]}
