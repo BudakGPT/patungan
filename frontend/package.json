@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:alpha": "node scripts/check-alpha-steps.mjs"
   },
   "dependencies": {
     "@stellar/freighter-api": "^6.0.1",
