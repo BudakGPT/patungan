@@ -24,7 +24,7 @@ export default function ResultsPage() {
   const strings = useStrings();
   const r = strings.results;
   return (
-    <>
+    <main className="bg-cream text-ink">
       <section className="relative overflow-hidden bg-ink px-4 py-14 text-paper sm:px-7 lg:px-10">
         <div className="chain-grid absolute inset-0 opacity-50" />
         <div className="relative mx-auto max-w-[1500px]">
@@ -44,12 +44,12 @@ export default function ResultsPage() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-page bg-cream px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10">
         <Suspense fallback={<PageSkeleton />}>
           <ResultsInner />
         </Suspense>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
 
