@@ -15,18 +15,24 @@ const copy: Record<Locale, {
   seasonsTitle: string;
   resultsTitle: string;
   notFoundTitle: string;
+  sortLabel: string;
+  newestLabel: string;
 }> = {
   id: {
     directoryHeading: "Jelajahi kampanye",
     seasonsTitle: "Arsip musim",
     resultsTitle: "Hasil pencocokan",
     notFoundTitle: "Halaman tidak ditemukan",
+    sortLabel: "Urutkan",
+    newestLabel: "Terbaru",
   },
   en: {
     directoryHeading: "Explore campaigns",
     seasonsTitle: "Season archive",
     resultsTitle: "Matching results",
     notFoundTitle: "Page not found",
+    sortLabel: "Sort",
+    newestLabel: "Newest",
   },
 };
 
@@ -46,6 +52,15 @@ for (const locale of ["id", "en"] as const) {
       // "Crowd beats whale." is a brand-register slogan, constant across locales.
       await expect(page.getByRole("heading", { name: /beats/i })).toBeVisible();
       await expect(page.getByText(copy[locale].directoryHeading)).toBeVisible();
+    });
+
+    test("campaign sort menu opens and commits a selection", async ({ page }) => {
+      await page.goto("/");
+      const trigger = page.getByRole("button", { name: copy[locale].sortLabel });
+      await trigger.click();
+      await expect(page.getByRole("listbox", { name: copy[locale].sortLabel })).toBeVisible();
+      await page.getByRole("option", { name: copy[locale].newestLabel }).click();
+      await expect(trigger).toContainText(copy[locale].newestLabel);
     });
 
     test("seasons archive loads", async ({ page }) => {

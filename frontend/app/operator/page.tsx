@@ -293,7 +293,7 @@ function OpenRoundSection({
               value={endLocal}
               disabled={action.pending}
               onChange={(e) => setEndLocal(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none"
+              className="field-control mt-2"
             />
             <p className="mt-1.5 text-xs text-faint">{o.open.endHelper}</p>
             {touched && !dateValid ? (
@@ -403,7 +403,7 @@ function FundPoolSection({
               value={amount}
               disabled={action.pending}
               onChange={(e) => setAmount(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition-colors focus:border-accent focus:outline-none tabular"
+              className="field-control tabular mt-2"
             />
             {amountValid ? (
               <p className="tabular mt-1.5 text-sm text-muted">
@@ -668,7 +668,7 @@ function VerifySection() {
             disabled={action.pending}
             onChange={(e) => setAddr(e.target.value)}
             placeholder="G…"
-            className="mt-2 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition-colors focus:border-accent focus:outline-none tabular"
+            className="field-control tabular mt-2"
           />
           {touched && !addrValid ? (
             <p className="mt-1 text-sm text-cat-disaster">{o.verify.invalidAddress}</p>

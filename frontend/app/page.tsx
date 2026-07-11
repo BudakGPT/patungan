@@ -15,6 +15,7 @@ import { brand } from "@/brand";
 import { config } from "@/lib/config";
 import { getProjectVisual, heroVisual as heroBackdrop } from "@/lib/projectVisuals";
 import { CountUp, ParallaxImg, Reveal } from "@/components/motion";
+import { SelectMenu } from "@/components/SelectMenu";
 
 type SortKey = "mostBacked" | "newest" | "closingSoon";
 
@@ -432,30 +433,43 @@ export default function DiscoveryPage() {
             ))}
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <label className="relative flex-1 sm:max-w-sm">
+          <div className="flex flex-col gap-3 rounded-2xl border border-ink/10 bg-paper/65 p-2.5 shadow-[0_10px_30px_rgba(7,18,15,.05)] sm:flex-row sm:items-center sm:justify-between">
+            <label className="group relative flex-1 sm:max-w-md">
               <SearchIcon />
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={d.searchPlaceholder}
-                className="w-full rounded-full border border-ink/15 bg-paper py-2.5 pl-10 pr-4 text-sm font-semibold text-ink placeholder:text-ink/40 transition-colors focus:border-ink focus:outline-none"
+                className={`w-full rounded-full border border-ink/15 bg-paper py-2.5 pl-10 text-sm font-semibold text-ink shadow-[0_1px_0_rgba(7,18,15,.04)] placeholder:text-ink/40 transition-all hover:border-green/50 focus:border-green focus:bg-white focus:outline-none focus:shadow-[0_0_0_3px_rgba(13,141,99,.13)] ${search ? "pr-10" : "pr-4"}`}
               />
+              {search ? (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  aria-label={d.resetFilters}
+                  title={d.resetFilters}
+                  className="absolute right-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-full text-ink/45 transition-colors hover:bg-ink/5 hover:text-ink"
+                >
+                  <CloseIcon />
+                </button>
+              ) : null}
             </label>
 
-            <label className="flex items-center gap-2 text-sm font-semibold text-ink/60">
+            <div className="flex items-center justify-between gap-3 pl-2 text-sm font-semibold text-ink/60 sm:justify-end">
               <span className="whitespace-nowrap">{d.sortLabel}</span>
-              <select
+              <SelectMenu
                 value={sort}
-                onChange={(e) => setSort(e.target.value as SortKey)}
-                className="rounded-full border border-ink/15 bg-paper py-2.5 pl-4 pr-8 text-sm font-bold text-ink transition-colors focus:border-ink focus:outline-none"
-              >
-                <option value="mostBacked">{d.sort.mostBacked}</option>
-                <option value="newest">{d.sort.newest}</option>
-                <option value="closingSoon">{d.sort.closingSoon}</option>
-              </select>
-            </label>
+                onChange={setSort}
+                ariaLabel={d.sortLabel}
+                options={[
+                  { value: "mostBacked", label: d.sort.mostBacked },
+                  { value: "newest", label: d.sort.newest },
+                  { value: "closingSoon", label: d.sort.closingSoon },
+                ]}
+                className="w-48"
+              />
+            </div>
           </div>
         </div>
 
@@ -539,6 +553,22 @@ function SearchIcon() {
     >
       <circle cx="9" cy="9" r="6" />
       <path d="m14 14 3.5 3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden
+      className="size-3.5"
+    >
+      <path d="m5 5 10 10M15 5 5 15" />
     </svg>
   );
 }

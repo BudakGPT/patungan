@@ -230,6 +230,54 @@
     color: #fffaf0;
   }
 
+  .field-control {
+    width: 100%;
+    min-height: 2.75rem;
+    border: 1px solid oklch(0.91 0.006 265);
+    border-radius: .75rem;
+    background: oklch(0.997 0.003 85);
+    padding: .625rem .875rem;
+    color: #07120f;
+    font-size: .875rem;
+    transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+  }
+
+  .field-control::placeholder {
+    color: oklch(0.63 0.012 265);
+  }
+
+  .field-control:hover:not(:disabled) {
+    border-color: rgba(13, 141, 99, .45);
+  }
+
+  .field-control:focus {
+    border-color: #0d8d63;
+    background: #fff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 141, 99, .13);
+  }
+
+  .field-control:disabled {
+    cursor: not-allowed;
+    background: rgba(7, 18, 15, .045);
+    color: rgba(7, 18, 15, .45);
+  }
+
+  .field-control[aria-invalid="true"] {
+    border-color: #cf6746;
+    box-shadow: 0 0 0 3px rgba(207, 103, 70, .1);
+  }
+
+  .field-control::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: .55;
+    transition: opacity .18s ease;
+  }
+
+  .field-control::-webkit-calendar-picker-indicator:hover {
+    opacity: .9;
+  }
+
   .marquee {
     display: flex;
     width: max-content;

@@ -10,6 +10,7 @@ import { CategoryChip } from "@/components/CategoryChip";
 import { useRounds, useCampaigns, usePreviewRound, useRoundProjects } from "@/lib/hooks";
 import { isDemoArtifact } from "@/lib/demo";
 import { CountUp, Reveal } from "@/components/motion";
+import { SelectMenu } from "@/components/SelectMenu";
 
 const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
 
@@ -341,33 +342,19 @@ function Header({
         </p>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-muted">
+      <div className="flex items-center gap-2 text-sm text-muted">
         <span className="whitespace-nowrap">{r.roundPickerLabel}</span>
-        <span className="relative">
-          <select
-            value={round.id}
-            onChange={(e) => router.replace(`/results?round=${e.target.value}`)}
-            className="appearance-none rounded-full border border-line bg-surface py-2.5 pl-4 pr-9 text-sm font-semibold text-ink transition-colors hover:border-accent/40 focus:border-accent focus:outline-none"
-          >
-            {ordered.map((x) => (
-              <option key={x.id} value={x.id}>
-                {r.seasonLabel(x.id)} · {strings.seasons.status[x.status.tag] ?? x.status.tag}
-              </option>
-            ))}
-          </select>
-          <svg
-            className="pointer-events-none absolute right-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden
-          >
-            <path d="m5 8 5 5 5-5" />
-          </svg>
-        </span>
-      </label>
+        <SelectMenu
+          value={round.id}
+          onChange={(id) => router.replace(`/results?round=${id}`)}
+          ariaLabel={r.roundPickerLabel}
+          options={ordered.map((x) => ({
+            value: x.id,
+            label: `${r.seasonLabel(x.id)} · ${strings.seasons.status[x.status.tag] ?? x.status.tag}`,
+          }))}
+          className="min-w-52"
+        />
+      </div>
     </header>
   );
 }

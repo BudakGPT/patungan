@@ -318,20 +318,20 @@ function KycStep({
             value={fields.first_name}
             onChange={(e) => setFields({ ...fields, first_name: e.target.value })}
             placeholder={v.kyc.firstName}
-            className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-faint"
+            className="field-control"
           />
           <input
             value={fields.last_name}
             onChange={(e) => setFields({ ...fields, last_name: e.target.value })}
             placeholder={v.kyc.lastName}
-            className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-faint"
+            className="field-control"
           />
           <input
             type="email"
             value={fields.email_address}
             onChange={(e) => setFields({ ...fields, email_address: e.target.value })}
             placeholder={v.kyc.email}
-            className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm text-ink placeholder:text-faint"
+            className="field-control"
           />
           <button
             type="button"

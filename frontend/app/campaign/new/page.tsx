@@ -365,11 +365,7 @@ function CreateForm({ owner }: { owner: string }) {
 }
 
 function inputClass(hasError: boolean): string {
-  return `w-full rounded-xl border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition-colors focus:outline-none ${
-    hasError
-      ? "border-cat-disaster focus:border-cat-disaster"
-      : "border-line focus:border-accent"
-  }`;
+  return `field-control ${hasError ? "border-cat-disaster focus:border-cat-disaster" : ""}`;
 }
 
 function Field({
