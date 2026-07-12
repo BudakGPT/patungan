@@ -33,6 +33,9 @@ export const vi: Strings = {
     matchEngineLabel: "Cỗ máy đối ứng",
     matchEngineTitle: "Chốt sổ trên Soroban",
     crowdShareLabel: "Phần dẫn đầu",
+    selectedShareLabel: "Phần của chiến dịch",
+    switchCampaignLabel: "Chọn chiến dịch để hiển thị",
+    rankedByDirect: "Xếp theo quyên góp trong mùa này",
     ofPoolSuffix: "của quỹ đối ứng",
     proofTag: "Lớp bằng chứng Soroban",
     proofBody:
@@ -114,6 +117,8 @@ export const vi: Strings = {
     totalShort: "Tổng",
     matchSuffix: "đối ứng",
     cardDirectOpen: "Quyên góp trực tiếp vẫn mở",
+    targetProgress: "hướng tới mục tiêu",
+    targetReached: "Đã đạt mục tiêu",
     noThumbAlt: "Không có ảnh",
     // Onboarding "how it works" strip — QF explainer for cold visitors
     howItWorks: {
@@ -335,6 +340,10 @@ export const vi: Strings = {
     roundPickerLabel: "Mùa",
     directLabel: "Trực tiếp",
     matchedLabel: "Đối ứng",
+    directDefinition: "Trực tiếp: khoản quyên góp thực tế từ người ủng hộ trong mùa này.",
+    matchedDefinition: "Đối ứng: phần bổ sung từ quỹ tài trợ, được chia theo công thức bậc hai.",
+    barHint: "Độ dài thanh là tổng tiền; màu sắc cho biết nguồn tiền.",
+    openCampaign: "Mở chiến dịch",
     donorSuffix: "người ủng hộ",
     poolLabel: "Quỹ đối ứng",
     totalMatchedLabel: "Tổng quỹ đối ứng đã phân phối",

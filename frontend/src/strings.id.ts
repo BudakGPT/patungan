@@ -31,6 +31,9 @@ export const id = {
     matchEngineLabel: "Mesin pencocokan",
     matchEngineTitle: "Finalisasi Soroban",
     crowdShareLabel: "Porsi teratas",
+    selectedShareLabel: "Porsi kampanye",
+    switchCampaignLabel: "Pilih kampanye untuk ditampilkan",
+    rankedByDirect: "Diurutkan dari donasi musim ini",
     ofPoolSuffix: "dari dana pendamping",
     proofTag: "Lapisan bukti Soroban",
     proofBody:
@@ -114,6 +117,8 @@ export const id = {
     totalShort: "Total",
     matchSuffix: "pendamping",
     cardDirectOpen: "Donasi langsung tetap dibuka",
+    targetProgress: "menuju target",
+    targetReached: "Target tercapai",
     noThumbAlt: "Tanpa gambar",
     // Onboarding "how it works" strip — QF explainer for cold visitors
     howItWorks: {
@@ -350,6 +355,10 @@ export const id = {
     roundPickerLabel: "Musim",
     directLabel: "Langsung",
     matchedLabel: "Pendamping",
+    directDefinition: "Langsung: total donasi yang benar-benar diberikan pendukung pada musim ini.",
+    matchedDefinition: "Pendamping: tambahan dari dana sponsor yang dibagi dengan rumus kuadratik.",
+    barHint: "Panjang bar menunjukkan total dana; warna menunjukkan sumber dananya.",
+    openCampaign: "Buka kampanye",
     donorSuffix: "pendukung",
     poolLabel: "Dana pendamping",
     totalMatchedLabel: "Total dana pendamping dibagikan",

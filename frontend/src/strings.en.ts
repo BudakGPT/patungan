@@ -33,6 +33,9 @@ export const en: Strings = {
     matchEngineLabel: "Match engine",
     matchEngineTitle: "Soroban finalization",
     crowdShareLabel: "Top share",
+    selectedShareLabel: "Campaign share",
+    switchCampaignLabel: "Choose a campaign to display",
+    rankedByDirect: "Ranked by donations this season",
     ofPoolSuffix: "of matching pool",
     proofTag: "Soroban proof layer",
     proofBody:
@@ -114,6 +117,8 @@ export const en: Strings = {
     totalShort: "Total",
     matchSuffix: "match",
     cardDirectOpen: "Direct donations remain open",
+    targetProgress: "toward target",
+    targetReached: "Target reached",
     noThumbAlt: "No image",
     // Onboarding "how it works" strip — QF explainer for cold visitors
     howItWorks: {
@@ -332,6 +337,10 @@ export const en: Strings = {
     roundPickerLabel: "Season",
     directLabel: "Direct",
     matchedLabel: "Matched",
+    directDefinition: "Direct: donations actually given by backers during this season.",
+    matchedDefinition: "Matched: extra sponsor funds allocated by the quadratic formula.",
+    barHint: "Bar length shows total funding; colors show where it came from.",
+    openCampaign: "Open campaign",
     donorSuffix: "backers",
     poolLabel: "Matching pool",
     totalMatchedLabel: "Total matching funds distributed",

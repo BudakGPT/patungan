@@ -33,6 +33,9 @@ export const fil: Strings = {
     matchEngineLabel: "Makina ng pagtutumbas",
     matchEngineTitle: "Pag-finalize sa Soroban",
     crowdShareLabel: "Nangungunang bahagi",
+    selectedShareLabel: "Bahagi ng kampanya",
+    switchCampaignLabel: "Pumili ng kampanyang ipapakita",
+    rankedByDirect: "Nakaayos ayon sa donasyon ngayong season",
     ofPoolSuffix: "ng pondo sa pagtutumbas",
     proofTag: "Proof layer ng Soroban",
     proofBody:
@@ -114,6 +117,8 @@ export const fil: Strings = {
     totalShort: "Kabuuan",
     matchSuffix: "tumbasan",
     cardDirectOpen: "Bukas pa rin ang direktang donasyon",
+    targetProgress: "papunta sa target",
+    targetReached: "Naabot ang target",
     noThumbAlt: "Walang larawan",
     // Onboarding "how it works" strip — QF explainer for cold visitors
     howItWorks: {
@@ -336,6 +341,10 @@ export const fil: Strings = {
     roundPickerLabel: "Season",
     directLabel: "Direkta",
     matchedLabel: "Tinumbasan",
+    directDefinition: "Direkta: mga donasyong ibinigay mismo ng mga tagasuporta ngayong season.",
+    matchedDefinition: "Tinumbasan: dagdag na pondo ng sponsor na hinati gamit ang quadratic formula.",
+    barHint: "Ang haba ng bar ay kabuuang pondo; ipinapakita ng kulay ang pinagmulan.",
+    openCampaign: "Buksan ang kampanya",
     donorSuffix: "tagasuporta",
     poolLabel: "Pondo sa pagtutumbas",
     totalMatchedLabel: "Kabuuang naipamahaging pondo sa pagtutumbas",

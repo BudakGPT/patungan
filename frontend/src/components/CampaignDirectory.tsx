@@ -174,14 +174,14 @@ export function CampaignDirectory() {
               {d.resultCount(visible.length)} · {l.seasonRef(roundId ?? "—")}
             </p>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {visible.map((campaign) => (
+              {visible.map((campaign, index) => (
                 <CampaignCard
                   key={campaign.id}
                   campaign={campaign}
+                  rank={index + 1}
                   roundId={roundId}
                   inScope={inScope(campaign)}
                   projectedMatch={matchOf.get(campaign.id)}
-                  pool={openRound.data?.pool ?? 0n}
                   roundEnd={openRound.data?.round_end}
                 />
               ))}

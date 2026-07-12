@@ -182,6 +182,17 @@ function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState
             {stale ? (
               <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
             ) : null}
+            <div className="mb-5 grid gap-3 border-y border-line py-4 text-sm sm:grid-cols-2">
+              <div className="flex gap-3">
+                <span className="mt-1 size-3 shrink-0 rounded-sm bg-ink/25" aria-hidden />
+                <p className="leading-6 text-muted">{r.directDefinition}</p>
+              </div>
+              <div className="flex gap-3">
+                <span className="mt-1 size-3 shrink-0 rounded-sm bg-match" aria-hidden />
+                <p className="leading-6 text-muted">{r.matchedDefinition}</p>
+              </div>
+              <p className="text-xs font-semibold text-faint sm:col-span-2">{r.barHint}</p>
+            </div>
             <ul className="space-y-3" aria-label={r.barLabel}>
               {rows.map((row, i) => (
                 <ResultRow
@@ -238,8 +249,10 @@ function ResultRow({
 }) {
   const strings = useStrings();
   const r = strings.results;
-  const directPct = scale > 0 ? (Number(direct) / scale) * 100 : 0;
-  const matchedPct = scale > 0 ? (Number(matched) / scale) * 100 : 0;
+  const total = Number(direct + matched);
+  const totalPct = scale > 0 ? (total / scale) * 100 : 0;
+  const directShare = total > 0 ? (Number(direct) / total) * 100 : 0;
+  const matchedShare = total > 0 ? 100 - directShare : 0;
   const winner = index === 0;
 
   return (
@@ -247,10 +260,15 @@ function ResultRow({
       <Reveal
         delay={index * 0.07}
         y={20}
-        className={`flex gap-4 rounded-2xl border p-5 shadow-card sm:gap-6 ${
+        className={`rounded-2xl border shadow-card transition-colors ${
           winner ? "border-match/30 bg-match-soft/60" : "border-line bg-surface"
         }`}
       >
+        <Link
+          href={`/campaign/${fallbackId}`}
+          aria-label={`${r.openCampaign}: ${campaign?.title ?? `#${fallbackId}`}`}
+          className="group flex gap-4 rounded-2xl p-5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-match sm:gap-6"
+        >
         <span
           className={`display select-none text-4xl leading-none sm:text-5xl ${
             winner ? "text-match-ink" : "text-line-strong"
@@ -292,14 +310,18 @@ function ResultRow({
 
           <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-line/40">
             <div
-              className="flex h-full origin-left motion-safe:animate-bar-in"
-              style={{ animationDelay: `${index * 45}ms` }}
+              className="flex h-full origin-left overflow-hidden rounded-full motion-safe:animate-bar-in"
+              style={{ width: `${Math.max(totalPct, total > 0 ? 2 : 0)}%`, animationDelay: `${index * 45}ms` }}
             >
-              <div className="h-full bg-ink/25" style={{ width: `${directPct}%` }} />
-              <div className="h-full bg-match" style={{ width: `${matchedPct}%` }} />
+              <div className="h-full bg-ink/25" style={{ width: `${directShare}%` }} />
+              <div className="h-full bg-match" style={{ width: `${matchedShare}%` }} />
             </div>
           </div>
+          <span className="mt-3 inline-flex text-xs font-black text-match-ink opacity-0 transition-opacity group-hover:opacity-100 group-focus:opacity-100">
+            {r.openCampaign} →
+          </span>
         </div>
+        </Link>
       </Reveal>
     </li>
   );

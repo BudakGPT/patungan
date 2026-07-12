@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
 import { useStrings } from "@/lib/locale";
@@ -29,6 +29,7 @@ export default function DiscoveryPage() {
   const openRound = useOpenRound();
   const roundId = openRound.data?.id ?? null;
   const preview = usePreviewRound(roundId);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
 
   // Which categories the open round matches (empty scope = all in scope).
   const scope = openRound.data?.categories ?? [];
@@ -64,13 +65,19 @@ export default function DiscoveryPage() {
   const pool = openRound.data?.pool ?? 0n;
   const heroRows = inScopeApproved.map((project, i) => ({
     project,
+    direct: roundProjects[i]?.data?.[0] ?? 0n,
     match: matchOf.get(project.id) ?? 0n,
     donors: roundProjects[i]?.data?.[1],
   }));
-  const topRow = [...heroRows].sort((a, b) => Number(b.match - a.match))[0];
-  const maxMatch = heroRows.reduce((max, row) => (row.match > max ? row.match : max), 0n);
-  const crowdShare = topRow && pool > 0n ? Math.round(Number((topRow.match * 100n) / pool)) : 0;
-  const heroProject = topRow?.project;
+  const rankedRows = [...heroRows].sort((a, b) =>
+    a.direct === b.direct ? (b.donors ?? 0) - (a.donors ?? 0) : a.direct > b.direct ? -1 : 1,
+  );
+  const selectedRow =
+    rankedRows.find((row) => row.project.id === selectedCampaignId) ?? rankedRows[0];
+  const maxDirect = rankedRows.reduce((max, row) => (row.direct > max ? row.direct : max), 0n);
+  const crowdShare =
+    selectedRow && pool > 0n ? Math.round(Number((selectedRow.match * 100n) / pool)) : 0;
+  const heroProject = selectedRow?.project;
   const heroVisual = getProjectVisual(heroProject?.id ?? 0);
   const statusLabel = openRound.data ? strings.landing.statusOpen : d.noRound;
 
@@ -173,9 +180,13 @@ export default function DiscoveryPage() {
           <Reveal mode="load" delay={0.3} y={40}>
           <aside className="glass-dark scanline rounded-[2rem] p-4 sm:p-5 lg:p-6">
             <div className="grid gap-4 xl:grid-cols-[.95fr_1.05fr]">
-              <div className="relative min-h-[330px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-paper text-ink">
+              <Link
+                href={heroProject ? `/campaign/${heroProject.id}` : "/campaigns"}
+                aria-label={heroProject ? `${l.primaryCta}: ${heroProject.title}` : l.primaryCta}
+                className="group relative min-h-[330px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-lime"
+              >
                 <img
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   src={heroVisual.image}
                   alt={heroProject?.title ?? "Proyek Patungan"}
                 />
@@ -188,10 +199,15 @@ export default function DiscoveryPage() {
                     {heroProject?.title ?? l.waitingProjectTitle}
                   </h2>
                   <p className="mt-2 text-sm font-semibold text-white/75">
-                    {heroProject ? l.heroTopLine(topRow.donors ?? 0) : l.heroTopLineEmpty}
+                    {heroProject ? l.heroTopLine(selectedRow.donors ?? 0) : l.heroTopLineEmpty}
                   </p>
+                  {heroProject ? (
+                    <span className="mt-4 inline-flex text-xs font-black uppercase tracking-[.12em] text-lime underline decoration-lime/50 underline-offset-4">
+                      {l.primaryCta} →
+                    </span>
+                  ) : null}
                 </div>
-              </div>
+              </Link>
 
               <div className="chain-panel rounded-[1.5rem] p-5">
                 <div className="relative z-10">
@@ -216,7 +232,7 @@ export default function DiscoveryPage() {
                     <div className="grid size-full place-items-center rounded-full bg-ink text-center">
                       <div>
                         <span className="text-xs font-black uppercase tracking-[.18em] text-white/55">
-                          {l.crowdShareLabel}
+                          {l.selectedShareLabel}
                         </span>
                         <strong className="mt-2 block text-5xl font-black text-lime">
                           {crowdShare}%
@@ -228,29 +244,47 @@ export default function DiscoveryPage() {
                     </div>
                   </div>
 
-                  <div className="mt-7 space-y-3">
-                    {heroRows.length === 0 ? (
+                  <div className="mt-7">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[10px] font-black uppercase tracking-[.13em] text-white/50">
+                        {l.rankedByDirect}
+                      </p>
+                      <span className="text-[10px] font-bold text-white/40">{l.switchCampaignLabel}</span>
+                    </div>
+                    <div className="space-y-2" role="listbox" aria-label={l.switchCampaignLabel}>
+                    {rankedRows.length === 0 ? (
                       <p className="text-sm font-semibold text-white/50">{strings.loading}</p>
                     ) : (
-                      heroRows.map(({ project, match }) => {
+                      rankedRows.map(({ project, direct }) => {
                         const width =
-                          maxMatch > 0n ? Math.max(Number((match * 100n) / maxMatch), 4) : 4;
+                          maxDirect > 0n ? Math.max(Number((direct * 100n) / maxDirect), 4) : 4;
+                        const active = project.id === heroProject?.id;
                         return (
-                          <div key={project.id}>
-                            <div className="mb-1 flex justify-between gap-3 text-xs font-black uppercase tracking-[.12em] text-white/55">
+                          <button
+                            key={project.id}
+                            type="button"
+                            role="option"
+                            aria-selected={active}
+                            onClick={() => setSelectedCampaignId(project.id)}
+                            className={`block w-full rounded-xl px-3 py-2.5 text-left transition-colors ${
+                              active ? "bg-lime/10 ring-1 ring-lime/40" : "hover:bg-white/[.06]"
+                            }`}
+                          >
+                            <div className={`mb-1.5 flex justify-between gap-3 text-xs font-black uppercase tracking-[.1em] ${active ? "text-paper" : "text-white/55"}`}>
                               <span>{project.title}</span>
-                              <span>{pool > 0n ? Number((match * 100n) / pool) : 0}%</span>
+                              <span className="tabular shrink-0">{formatCompactIDR(direct)}</span>
                             </div>
                             <div className="h-2 overflow-hidden rounded-full bg-white/10">
                               <div
-                                className="h-full rounded-full bg-lime"
+                                className={`h-full rounded-full ${active ? "bg-lime" : "bg-white/35"}`}
                                 style={{ width: `${width}%` }}
                               />
                             </div>
-                          </div>
+                          </button>
                         );
                       })
                     )}
+                    </div>
                   </div>
 
                   <div className="mt-5 grid grid-cols-3 gap-2">

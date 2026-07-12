@@ -91,6 +91,10 @@ function Content({
   const approved = campaign.status.tag === "Approved";
   const statusNotice = approved ? null : t.status[campaign.status.tag];
   const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
+  const targetPct = Math.min(
+    Number((total * 10_000n) / visual.fundingTarget) / 100,
+    100,
+  );
 
   useEffect(() => {
     const previous = document.title;
@@ -176,6 +180,23 @@ function Content({
                 <strong className="num tabular mt-2 text-2xl font-black">
                   {formatCompactIDR(total)}
                 </strong>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[.06] p-3.5">
+              <div className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[.08em] text-white/65">
+                <span>
+                  {targetPct >= 100
+                    ? strings.discovery.targetReached
+                    : `${targetPct.toLocaleString("id-ID", { maximumFractionDigits: 1 })}% ${strings.discovery.targetProgress}`}
+                </span>
+                <span className="tabular text-paper">{formatCompactIDR(visual.fundingTarget)}</span>
+              </div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-green to-lime"
+                  style={{ width: `${targetPct}%` }}
+                />
               </div>
             </div>
 
