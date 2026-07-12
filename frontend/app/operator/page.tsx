@@ -146,14 +146,14 @@ function Console({
           <RegionLabel>{o.lifecycleHeading}</RegionLabel>
           <OpenRoundSection round={round} sponsor={address} />
           <FundPoolSection round={round} funder={address} />
-          <FinalizeSection round={round} />
+          <FinalizeSection round={round} admin={address} />
         </section>
 
         {/* Governance — always available (right, secondary) */}
         <section className="space-y-5 lg:col-span-2">
           <RegionLabel>{o.governanceHeading}</RegionLabel>
-          <CurationSection />
-          <VerifySection />
+          <CurationSection curator={address} />
+          <VerifySection attester={address} />
         </section>
       </div>
     </div>
@@ -466,7 +466,13 @@ function FundPoolSection({
 
 /* ── 3 · Finalize ───────────────────────────────────────────────────────────────────────── */
 
-function FinalizeSection({ round }: { round: import("@/contract/src").RoundState | null }) {
+function FinalizeSection({
+  round,
+  admin,
+}: {
+  round: import("@/contract/src").RoundState | null;
+  admin: string;
+}) {
   const { operator: o } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
@@ -475,7 +481,7 @@ function FinalizeSection({ round }: { round: import("@/contract/src").RoundState
   async function submit() {
     if (!round || action.pending) return;
     const ok = await action.submit(
-      () => contractClient.finalize_round({ round_id: round.id }, { publicKey: undefined }),
+      () => contractClient.finalize_round({ round_id: round.id }, { publicKey: admin }),
       o.errors,
     );
     if (ok !== undefined) {
@@ -559,7 +565,7 @@ function FinalizeSection({ round }: { round: import("@/contract/src").RoundState
 
 /* ── 4 · Curation queue ─────────────────────────────────────────────────────────────────── */
 
-function CurationSection() {
+function CurationSection({ curator }: { curator: string }) {
   const strings = useStrings();
   const o = strings.operator;
   const campaigns = useCampaigns();
@@ -586,7 +592,7 @@ function CurationSection() {
       ) : (
         <ul className="space-y-3">
           {pending.map((c) => (
-            <CurationRow key={c.id} campaign={c} />
+            <CurationRow key={c.id} campaign={c} curator={curator} />
           ))}
         </ul>
       )}
@@ -594,7 +600,7 @@ function CurationSection() {
   );
 }
 
-function CurationRow({ campaign }: { campaign: ProjectState }) {
+function CurationRow({ campaign, curator }: { campaign: ProjectState; curator: string }) {
   const strings = useStrings();
   const o = strings.operator;
   const queryClient = useQueryClient();
@@ -606,8 +612,8 @@ function CurationRow({ campaign }: { campaign: ProjectState }) {
     const ok = await action.submit(
       () =>
         kind === "approve"
-          ? contractClient.approve_project({ id: campaign.id }, { publicKey: undefined })
-          : contractClient.reject_project({ id: campaign.id }, { publicKey: undefined }),
+          ? contractClient.approve_project({ id: campaign.id }, { publicKey: curator })
+          : contractClient.reject_project({ id: campaign.id }, { publicKey: curator }),
       o.errors,
     );
     if (ok !== undefined) {
@@ -665,7 +671,7 @@ function CurationRow({ campaign }: { campaign: ProjectState }) {
 
 /* ── 5 · Verify fallback ────────────────────────────────────────────────────────────────── */
 
-function VerifySection() {
+function VerifySection({ attester }: { attester: string }) {
   const { operator: o } = useStrings();
   const queryClient = useQueryClient();
   const action = useAction();
@@ -680,7 +686,7 @@ function VerifySection() {
     if (!addrValid || action.pending) return;
     const who = addr.trim();
     const ok = await action.submit(
-      () => contractClient.set_verification({ who, tier }, { publicKey: undefined }),
+      () => contractClient.set_verification({ who, tier }, { publicKey: attester }),
       o.errors,
     );
     if (ok !== undefined) {
