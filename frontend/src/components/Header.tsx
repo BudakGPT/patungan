@@ -21,6 +21,7 @@ export function Header() {
     () =>
       [
         { href: "/", label: strings.nav.landing },
+        { href: "/campaigns", label: strings.nav.campaigns },
         { href: "/seasons", label: strings.nav.seasons },
         { href: "/results", label: strings.nav.results },
         { href: "/dashboard", label: strings.nav.dashboard },
@@ -29,6 +30,12 @@ export function Header() {
       ] as const,
     [strings],
   );
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/campaigns") return pathname.startsWith("/campaign");
+    return pathname === href;
+  };
 
   // Close the drawer on navigation and lock body scroll while it's open.
   useEffect(() => setOpen(false), [pathname]);
@@ -63,7 +70,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`nav-link ${pathname === item.href ? "nav-link-active" : ""}`}
+                className={`nav-link ${isActive(item.href) ? "nav-link-active" : ""}`}
               >
                 {item.label}
               </Link>
@@ -126,7 +133,7 @@ export function Header() {
                   <Link
                     href={item.href}
                     className={`group flex items-baseline gap-4 border-b border-white/10 py-4 ${
-                      pathname === item.href ? "text-lime" : "text-paper"
+                      isActive(item.href) ? "text-lime" : "text-paper"
                     }`}
                   >
                     <span className="display text-4xl leading-none sm:text-5xl">{item.label}</span>

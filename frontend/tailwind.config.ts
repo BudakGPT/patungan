@@ -39,10 +39,12 @@ const config: Config = {
         line: "oklch(0.91 0.006 265 / <alpha-value>)",
         "line-strong": "oklch(0.85 0.008 265 / <alpha-value>)",
 
-        accent: "oklch(0.52 0.16 275 / <alpha-value>)",
-        "accent-ink": "oklch(0.42 0.17 275 / <alpha-value>)",
-        "accent-soft": "oklch(0.955 0.025 275 / <alpha-value>)",
-        "on-accent": "oklch(0.98 0.01 275 / <alpha-value>)",
+        // Legacy semantic names retained for compatibility, now mapped into the Patungan
+        // green/lime brand so transactional surfaces no longer fall back to purple.
+        accent: "rgb(13 141 99 / <alpha-value>)",
+        "accent-ink": "rgb(8 61 48 / <alpha-value>)",
+        "accent-soft": "rgb(239 255 197 / <alpha-value>)",
+        "on-accent": "rgb(255 250 240 / <alpha-value>)",
 
         match: "oklch(0.56 0.13 160 / <alpha-value>)",
         "match-ink": "oklch(0.46 0.12 160 / <alpha-value>)",

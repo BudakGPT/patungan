@@ -28,7 +28,7 @@ export function QueryState<T>({
           <p className="text-xs text-amber-700">{strings.staleData}</p>
         ) : null}
         {isEmpty?.(query.data) ? (
-          <p className="text-neutral-500">{strings.empty}</p>
+          <div className="state-panel px-5 py-8 text-center text-sm text-muted">{strings.empty}</div>
         ) : (
           children(query.data)
         )}
@@ -38,12 +38,12 @@ export function QueryState<T>({
 
   if (query.isError) {
     return (
-      <div className="flex items-center gap-3 text-red-600">
+      <div className="state-panel flex flex-col items-center gap-3 px-5 py-8 text-center text-cat-disaster sm:flex-row sm:justify-center">
         <p>{strings.errorGeneric}</p>
         <button
           type="button"
           onClick={() => query.refetch()}
-          className="underline underline-offset-2"
+          className="action-link"
         >
           {strings.retry}
         </button>
@@ -51,5 +51,10 @@ export function QueryState<T>({
     );
   }
 
-  return <p className="text-neutral-500">{strings.loading}</p>;
+  return (
+    <p className="flex items-center gap-2 text-sm font-semibold text-muted">
+      <span className="size-2 animate-pulse rounded-full bg-lime ring-4 ring-lime/20" />
+      {strings.loading}
+    </p>
+  );
 }

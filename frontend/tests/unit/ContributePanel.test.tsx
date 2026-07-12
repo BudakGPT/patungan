@@ -156,6 +156,19 @@ describe("ContributePanel tx state machine", () => {
     mocks.tier = { data: Tier.Basic };
   });
 
+  it("reviews the campaign, amount, recipient, and network before requesting a signature", async () => {
+    renderPanel();
+    await userEvent.click(screen.getByRole("button", { name: c.cta }));
+    await userEvent.click(screen.getByRole("button", { name: c.confirm }));
+
+    expect(screen.getByText(c.reviewTitle)).toBeInTheDocument();
+    expect(screen.getByText("Test Campaign")).toBeInTheDocument();
+    expect(screen.getByText("Rp50.000")).toBeInTheDocument();
+    expect(screen.getByText("GPAYOUT")).toBeInTheDocument();
+    expect(screen.getByText("Stellar Testnet")).toBeInTheDocument();
+    expect(mocks.contribute).not.toHaveBeenCalled();
+  });
+
   it("on success shows the receipt, an explorer link, and patches lifetime_direct only", async () => {
     mocks.contribute.mockResolvedValue({
       signAndSend: async ({ watcher }: { watcher: { onSubmitted: () => void } }) => {
@@ -170,6 +183,7 @@ describe("ContributePanel tx state machine", () => {
     await userEvent.click(screen.getByRole("button", { name: c.cta }));
     // Default preset is 50_000 (PRESETS[1]).
     await userEvent.click(screen.getByRole("button", { name: c.confirm }));
+    await userEvent.click(screen.getByRole("button", { name: c.reviewSubmit }));
 
     await waitFor(() => expect(screen.getByText(c.successTitle)).toBeInTheDocument());
     expect(screen.getByRole("link", { name: strings.explorer.viewTx })).toHaveAttribute(
@@ -189,6 +203,7 @@ describe("ContributePanel tx state machine", () => {
     renderPanel();
     await userEvent.click(screen.getByRole("button", { name: c.cta }));
     await userEvent.click(screen.getByRole("button", { name: c.confirm }));
+    await userEvent.click(screen.getByRole("button", { name: c.reviewSubmit }));
     await waitFor(() =>
       expect(screen.getByText(strings.errors.NotVerified)).toBeInTheDocument(),
     );
@@ -200,6 +215,7 @@ describe("ContributePanel tx state machine", () => {
     renderPanel();
     await userEvent.click(screen.getByRole("button", { name: c.cta }));
     await userEvent.click(screen.getByRole("button", { name: c.confirm }));
+    await userEvent.click(screen.getByRole("button", { name: c.reviewSubmit }));
     await waitFor(() => expect(screen.getByText(strings.errors.generic)).toBeInTheDocument());
   });
 });

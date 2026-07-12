@@ -11,22 +11,31 @@ type Locale = "id" | "en";
 
 // The stable, localized anchors each surface renders regardless of chain state.
 const copy: Record<Locale, {
+  heroTitle: string;
   directoryHeading: string;
   seasonsTitle: string;
   resultsTitle: string;
   notFoundTitle: string;
+  sortLabel: string;
+  newestLabel: string;
 }> = {
   id: {
+    heroTitle: "Donasi kecil. Dampak lebih besar.",
     directoryHeading: "Jelajahi kampanye",
     seasonsTitle: "Arsip musim",
     resultsTitle: "Hasil pencocokan",
     notFoundTitle: "Halaman tidak ditemukan",
+    sortLabel: "Urutkan",
+    newestLabel: "Terbaru",
   },
   en: {
+    heroTitle: "Small donations. Bigger impact.",
     directoryHeading: "Explore campaigns",
     seasonsTitle: "Season archive",
     resultsTitle: "Matching results",
     notFoundTitle: "Page not found",
+    sortLabel: "Sort",
+    newestLabel: "Newest",
   },
 };
 
@@ -43,9 +52,18 @@ for (const locale of ["id", "en"] as const) {
     test("landing renders the hero and localized directory", async ({ page }) => {
       await page.goto("/");
       await expect(brandHome(page)).toBeVisible();
-      // "Crowd beats whale." is a brand-register slogan, constant across locales.
-      await expect(page.getByRole("heading", { name: /beats/i })).toBeVisible();
+      await expect(page.getByRole("heading", { name: copy[locale].heroTitle })).toBeVisible();
       await expect(page.getByText(copy[locale].directoryHeading)).toBeVisible();
+    });
+
+    test("campaign sort menu opens and commits a selection", async ({ page }) => {
+      await page.goto("/campaigns");
+      const trigger = page.getByRole("button", { name: copy[locale].sortLabel });
+      await trigger.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+      await trigger.click();
+      await expect(page.getByRole("listbox", { name: copy[locale].sortLabel })).toBeVisible();
+      await page.getByRole("option", { name: copy[locale].newestLabel }).click();
+      await expect(trigger).toContainText(copy[locale].newestLabel);
     });
 
     test("seasons archive loads", async ({ page }) => {
@@ -59,9 +77,9 @@ for (const locale of ["id", "en"] as const) {
     test("results page loads", async ({ page }) => {
       await page.goto("/results");
       await expect(brandHome(page)).toBeVisible();
-      await expect(
-        page.getByRole("heading", { name: copy[locale].resultsTitle }),
-      ).toBeVisible();
+      const heading = page.getByRole("heading", { name: copy[locale].resultsTitle });
+      await expect(heading).toBeVisible();
+      expect(await heading.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
     });
 
     test("campaign detail renders its shell", async ({ page }) => {

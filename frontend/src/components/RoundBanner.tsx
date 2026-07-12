@@ -19,7 +19,7 @@ export function RoundBanner({ query }: { query: UseQueryResult<RoundState | null
   if (query.data === undefined) {
     if (query.isError) return <EmptyBand hint={strings.errorGeneric} />;
     return (
-      <div className="h-32 w-full animate-pulse rounded-2xl bg-accent-soft" aria-hidden />
+      <div className="skeleton h-32 w-full rounded-2xl" aria-hidden />
     );
   }
   const round = query.data;

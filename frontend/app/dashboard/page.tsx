@@ -8,8 +8,8 @@ import type { AssembledTransaction, Result } from "@stellar/stellar-sdk/contract
 import type { ProjectState, RoundState } from "@/contract/src";
 import { contractClient } from "@/lib/contract";
 import { useWallet } from "@/lib/wallet";
-import { useCampaigns, useRounds, useRoundProject } from "@/lib/hooks";
-import { formatIDR } from "@/lib/format";
+import { useCampaignContributions, useCampaigns, useRounds, useRoundProject } from "@/lib/hooks";
+import { formatIDR, truncateAddress } from "@/lib/format";
 import { categoryMeta } from "@/lib/category";
 import { mapContractError } from "@/lib/errors";
 import { useStrings } from "@/lib/locale";
@@ -39,7 +39,7 @@ export default function DashboardPage() {
         </div>
         <Link
           href="/campaign/new"
-          className="shrink-0 rounded-xl border border-line-strong px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-accent hover:text-accent-ink"
+          className="btn shrink-0 border border-ink/15 bg-paper text-ink shadow-card hover:border-green/40 hover:bg-lime"
         >
           {d.createCta}
         </Link>
@@ -80,7 +80,7 @@ function Gate({
           type="button"
           disabled={connecting}
           onClick={() => void onConnect()}
-          className="mt-4 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+          className="btn btn-lime mt-4 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {connecting ? strings.wallet.connecting : strings.wallet.connect}
         </button>
@@ -102,6 +102,7 @@ function OwnedCampaigns({ owner }: { owner: string }) {
   const d = strings.dashboard;
   const campaigns = useCampaigns();
   const rounds = useRounds();
+  const [filter, setFilter] = useState<"all" | "active" | "pending" | "action">("all");
 
   const mine = useMemo(
     () => (campaigns.data ?? []).filter((c) => c.owner === owner),
@@ -116,6 +117,27 @@ function OwnedCampaigns({ owner }: { owner: string }) {
     [rounds.data],
   );
 
+  const visible = useMemo(
+    () =>
+      mine.filter((campaign) => {
+        if (filter === "active") return campaign.status.tag === "Approved";
+        if (filter === "pending") return campaign.status.tag === "Pending";
+        if (filter === "action") return campaign.unrounded_direct > 0n;
+        return true;
+      }),
+    [filter, mine],
+  );
+
+  const summary = useMemo(
+    () => ({
+      active: mine.filter((campaign) => campaign.status.tag === "Approved").length,
+      raised: mine.reduce((total, campaign) => total + campaign.lifetime_direct, 0n),
+      claimable: mine.reduce((total, campaign) => total + campaign.unrounded_direct, 0n),
+      actionCount: mine.filter((campaign) => campaign.unrounded_direct > 0n).length,
+    }),
+    [mine],
+  );
+
   // Loading — skeleton ledger rows (campaigns is the gating read; rounds fill in per card).
   if (campaigns.data === undefined) {
     if (campaigns.isError) {
@@ -127,8 +149,8 @@ function OwnedCampaigns({ owner }: { owner: string }) {
     }
     return (
       <div className="space-y-4">
-        <div className="h-40 animate-pulse rounded-2xl bg-line/50" />
-        <div className="h-40 animate-pulse rounded-2xl bg-line/50" />
+        <div className="skeleton h-40 rounded-2xl" />
+        <div className="skeleton h-40 rounded-2xl" />
       </div>
     );
   }
@@ -148,11 +170,79 @@ function OwnedCampaigns({ owner }: { owner: string }) {
     );
   }
 
+  const filters = [
+    ["all", d.filters.all],
+    ["active", d.filters.active],
+    ["pending", d.filters.pending],
+    ["action", d.filters.action],
+  ] as const;
+
   return (
-    <div className="space-y-4">
-      {mine.map((c) => (
-        <CampaignLedger key={c.id} campaign={c} finalized={finalized} />
-      ))}
+    <div>
+      <section aria-label={d.summary.campaigns} className="grid grid-cols-2 border-y-2 border-ink lg:grid-cols-4">
+        {[
+          [d.summary.campaigns, String(mine.length)],
+          [d.summary.active, String(summary.active)],
+          [d.summary.raised, formatIDR(summary.raised)],
+          [d.summary.claimable, formatIDR(summary.claimable)],
+        ].map(([label, value], index) => (
+          <div
+            key={label}
+            className={`min-w-0 px-4 py-5 ${index % 2 ? "border-l border-ink/15" : ""} ${index >= 2 ? "border-t border-ink/15 lg:border-t-0" : ""} lg:border-l lg:first:border-l-0`}
+          >
+            <p className="text-xs font-black uppercase tracking-[.12em] text-muted">{label}</p>
+            <p className="tabular mt-2 truncate text-xl font-black text-ink sm:text-2xl">{value}</p>
+          </div>
+        ))}
+      </section>
+
+      {summary.actionCount > 0 ? (
+        <section className="mt-6 flex flex-col gap-4 border-l-4 border-lime bg-ink px-5 py-5 text-paper sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-black">{d.actionCenter.title}</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-white/65">
+              {d.actionCenter.body(summary.actionCount)}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFilter("action")}
+            className="btn btn-lime shrink-0 self-start sm:self-auto"
+          >
+            {d.actionCenter.cta}
+          </button>
+        </section>
+      ) : null}
+
+      <div className="mt-7 flex flex-wrap items-center gap-2" aria-label={d.filters.label}>
+        {filters.map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={filter === value}
+            onClick={() => setFilter(value)}
+            className={`rounded-full border px-4 py-2 text-sm font-bold transition-colors ${
+              filter === value
+                ? "border-ink bg-ink text-paper"
+                : "border-ink/15 bg-paper text-ink/65 hover:border-green/50 hover:text-ink"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-5 space-y-4">
+        {visible.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-line-strong px-6 py-10 text-center text-sm font-semibold text-muted">
+            {d.filters.empty}
+          </div>
+        ) : (
+          visible.map((campaign) => (
+            <CampaignLedger key={campaign.id} campaign={campaign} finalized={finalized} />
+          ))
+        )}
+      </div>
     </div>
   );
 }
@@ -169,6 +259,7 @@ function CampaignLedger({
   const strings = useStrings();
   const d = strings.dashboard;
   const { label, chip } = categoryMeta(campaign.category.tag, strings.categories);
+  const [insightsOpen, setInsightsOpen] = useState(false);
 
   return (
     <article className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">
@@ -206,7 +297,87 @@ function CampaignLedger({
       {campaign.unrounded_direct > 0n ? (
         <DirectClaim projectId={campaign.id} owner={campaign.owner} amount={campaign.unrounded_direct} />
       ) : null}
+
+      <div className="mt-4 border-t border-line pt-4">
+        <button
+          type="button"
+          aria-expanded={insightsOpen}
+          onClick={() => setInsightsOpen((open) => !open)}
+          className="flex w-full items-center justify-between gap-3 text-sm font-black text-ink transition-colors hover:text-match-ink"
+        >
+          {insightsOpen ? d.insights.hide : d.insights.show}
+          <span
+            aria-hidden
+            className={`text-lg transition-transform ${insightsOpen ? "rotate-45" : ""}`}
+          >
+            +
+          </span>
+        </button>
+        {insightsOpen ? <CampaignInsights campaignId={campaign.id} /> : null}
+      </div>
     </article>
+  );
+}
+
+function CampaignInsights({ campaignId }: { campaignId: number }) {
+  const { dashboard: d } = useStrings();
+  const contributions = useCampaignContributions(campaignId);
+
+  if (contributions.data === undefined) {
+    return contributions.isError ? (
+      <p className="mt-4 text-sm text-cat-disaster">{d.insights.empty}</p>
+    ) : (
+      <div className="skeleton mt-4 h-28 rounded-xl" aria-hidden />
+    );
+  }
+
+  if (contributions.data.length === 0) {
+    return <p className="mt-4 text-sm text-muted">{d.insights.empty}</p>;
+  }
+
+  const recent = contributions.data.slice(0, 8).reverse();
+  const max = recent.reduce((highest, item) => (item.amount > highest ? item.amount : highest), 1n);
+
+  return (
+    <div className="mt-5 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+      <section>
+        <h3 className="text-xs font-black uppercase tracking-[.13em] text-faint">{d.insights.trend}</h3>
+        <div className="mt-3 flex h-28 items-end gap-2 border-b border-line px-1 pb-2" aria-label={d.insights.trend}>
+          {recent.map((item) => {
+            const height = Math.max(Number((item.amount * 100n) / max), 8);
+            return (
+              <div key={item.txHash} className="group relative flex h-full flex-1 items-end">
+                <div
+                  className="w-full rounded-t bg-gradient-to-t from-green to-lime transition-opacity hover:opacity-75"
+                  style={{ height: `${height}%` }}
+                  title={`${formatIDR(item.amount)} · ${formatDate(item.at)}`}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-xs font-black uppercase tracking-[.13em] text-faint">{d.insights.activity}</h3>
+        <ul className="mt-2 divide-y divide-line">
+          {contributions.data.slice(0, 3).map((item) => (
+            <li key={item.txHash} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+              <span>
+                <span className="font-black text-ink">{formatIDR(item.amount)}</span>
+                <span className="ml-2 text-xs text-muted">
+                  {d.insights.donor} {truncateAddress(item.donor)}
+                </span>
+              </span>
+              <span className="flex items-center gap-3 text-xs text-muted">
+                <time dateTime={item.at}>{formatDate(item.at)}</time>
+                <ExplorerLink hash={item.txHash} label={d.insights.viewTx} />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 }
 
@@ -252,7 +423,7 @@ function RoundClaimLine({
   }
 
   if (rp.data === undefined) {
-    return <div className="h-12 animate-pulse rounded-xl bg-line/40" />;
+    return <div className="skeleton h-12 rounded-xl" />;
   }
 
   // (direct, donors, matched, claimed) — the campaign participated only if it drew direct or match.
@@ -455,5 +626,11 @@ function useAction() {
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">{children}</div>;
+  return <div className="state-panel p-6">{children}</div>;
+}
+
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
 }

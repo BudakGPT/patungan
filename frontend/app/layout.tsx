@@ -24,8 +24,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Patungan",
-  description: "Patungan — remitansi kolektif dengan Quadratic Funding di Stellar Testnet",
+  title: {
+    default: "Patungan",
+    template: "%s | Patungan",
+  },
+  description:
+    "Patungan membantu banyak donasi kecil menarik dana pendamping secara transparan di Stellar Testnet.",
 };
 
 export default function RootLayout({
