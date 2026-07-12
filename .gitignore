@@ -52,3 +52,6 @@ Thumbs.db
 
 # Env backups (e.g. .env.local.stage-backup from demo staging) must never be committed
 frontend/.env.local.*
+
+# ---- Local engineering scratchpad (never shipped) ----
+todo.md
