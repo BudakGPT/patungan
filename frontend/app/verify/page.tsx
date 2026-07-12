@@ -400,7 +400,7 @@ function SelfAttest({ address }: { address: string }) {
   async function submit() {
     if (action.pending) return;
     const ok = await action.submit(() =>
-      contractClient.set_verification({ who: address, tier }, { publicKey: undefined }),
+      contractClient.set_verification({ who: address, tier }, { publicKey: address }),
     );
     if (ok !== undefined) void queryClient.invalidateQueries({ queryKey: ["tier", address] });
   }
