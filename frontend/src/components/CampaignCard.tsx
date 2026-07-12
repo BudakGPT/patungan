@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
 import { useStrings } from "@/lib/locale";
-import { formatCompactIDR, formatIDR } from "@/lib/format";
+import { formatCompactIDR, formatCountdown, formatIDR } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
@@ -22,24 +23,35 @@ export function CampaignCard({
   inScope,
   projectedMatch,
   pool,
+  roundEnd,
 }: {
   campaign: ProjectState;
   roundId: number | null;
   inScope: boolean;
   projectedMatch?: bigint;
   pool: bigint;
+  roundEnd?: bigint;
 }) {
   const strings = useStrings();
   const d = strings.discovery;
   const thumb = cidToUrl(campaign.image_cid);
   const visual = getProjectVisual(campaign.id);
   const { label: categoryLabel } = categoryMeta(campaign.category.tag, strings.categories);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!inScope || roundEnd === undefined) return;
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, [inScope, roundEnd]);
 
   // Donor count is only exposed per-round; fetch it just for in-scope cards.
   const rp = useRoundProject(roundId, campaign.id, { enabled: inScope });
   const donors = rp.data?.[1];
 
   const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
+  const countdown =
+    inScope && roundEnd !== undefined ? formatCountdown(roundEnd, d.countdown, now) : null;
   const pct =
     projectedMatch !== undefined && pool > 0n
       ? Math.max(Math.min(Number((projectedMatch * 10_000n) / pool) / 100, 100), 5)
@@ -79,6 +91,22 @@ export function CampaignCard({
         <p className="line-clamp-3 text-base font-semibold leading-7 text-ink/70">
           {campaign.story}
         </p>
+
+        <div
+          className={`flex min-h-10 items-center justify-between gap-3 rounded-xl border px-3.5 py-2 text-xs font-black ${
+            inScope
+              ? "border-green/20 bg-match-soft text-match-ink"
+              : "border-ink/10 bg-ink/[.035] text-ink/60"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <span className={`size-2 rounded-full ${inScope ? "animate-pulse bg-green" : "bg-ink/25"}`} />
+            {inScope ? d.endsInLabel : d.cardDirectOpen}
+          </span>
+          {inScope ? (
+            <span className="tabular shrink-0">{countdown ?? d.countdown.ended}</span>
+          ) : null}
+        </div>
 
         {/* Canonical metric-tile mapping (DESIGN.md §5): lime = pendukung count (the crowd,
             attested — and the grid's biggest figure), cream = direct, pale = projected,

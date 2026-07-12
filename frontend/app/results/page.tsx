@@ -326,9 +326,9 @@ function Header({
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-muted">{r.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2.5">
-          <h1 className="text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-[2.25rem]">
+          <h2 className="text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-[2.25rem]">
             {r.seasonLabel(round.id)}
-          </h1>
+          </h2>
           <span
             className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
               finalized ? "bg-match-soft text-match-ink" : "bg-accent-soft text-accent-ink"

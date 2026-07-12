@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ProjectState } from "@/contract/src";
@@ -92,6 +92,14 @@ function Content({
   const statusNotice = approved ? null : t.status[campaign.status.tag];
   const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
 
+  useEffect(() => {
+    const previous = document.title;
+    document.title = `${campaign.title} | Patungan`;
+    return () => {
+      document.title = previous;
+    };
+  }, [campaign.title]);
+
   return (
     <main className="bg-cream text-ink">
       {/* Hero banner */}
@@ -151,7 +159,7 @@ function Content({
                   {formatCompactIDR(campaign.lifetime_direct)}
                 </strong>
               </div>
-              <div className="metric-card bg-tile-match text-ink">
+              <div className="metric-card bg-tile-match text-ink" title={strings.discovery.projectedHint}>
                 <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
                   {strings.discovery.projectedShort}
                 </span>
@@ -170,6 +178,12 @@ function Content({
                 </strong>
               </div>
             </div>
+
+            {inScope ? (
+              <p className="mt-3 text-xs font-semibold leading-5 text-white/55">
+                {strings.discovery.projectedHint}
+              </p>
+            ) : null}
 
             {!inScope ? (
               <p className="mt-4 text-center text-xs font-semibold text-white/60">{t.notInRound}</p>
@@ -200,6 +214,28 @@ function Content({
               <p className="mt-6 max-w-[68ch] text-base leading-relaxed text-muted">
                 {visual.story}
               </p>
+
+              <section className="mt-9 max-w-[68ch] border-y border-line py-6">
+                <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">
+                  {t.transparencyHeading}
+                </h2>
+                <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                  <div>
+                    <dt className="font-bold text-muted">{t.verifiedLabel}</dt>
+                    <dd className="mt-1 font-black text-match-ink">{t.verifiedValue}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-bold text-muted">{t.payoutRecipientLabel}</dt>
+                    <dd className="mono mt-1 break-all font-bold text-ink">
+                      {campaign.payout}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="font-bold text-muted">{t.payoutScheduleLabel}</dt>
+                    <dd className="mt-1 leading-6 text-ink/80">{t.payoutScheduleValue}</dd>
+                  </div>
+                </dl>
+              </section>
 
               <BackerLedger campaignId={campaign.id} />
             </div>

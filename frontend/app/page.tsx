@@ -99,12 +99,7 @@ export default function DiscoveryPage() {
 
             <h1 className="display mt-8 max-w-4xl text-[clamp(3.2rem,8.4vw,8.6rem)] leading-[.86] text-paper">
               <Reveal mode="load" delay={0.06} y={44} className="overflow-hidden">
-                <span className="block">Crowd</span>
-              </Reveal>
-              <Reveal mode="load" delay={0.14} y={44} className="overflow-hidden">
-                <span className="block">
-                  beats <span className="text-lime">whale.</span>
-                </span>
+                <span className="block max-w-[10ch]">{l.heroTitle}</span>
               </Reveal>
             </h1>
 
@@ -200,17 +195,19 @@ export default function DiscoveryPage() {
 
               <div className="chain-panel rounded-[1.5rem] p-5">
                 <div className="relative z-10">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <span className="text-xs font-black uppercase tracking-[.16em] text-lime/75">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <span className="text-xs font-black uppercase tracking-[.16em] text-lime">
                         {l.matchEngineLabel}
                       </span>
-                      <h2 className="mt-2 text-2xl font-black">{l.matchEngineTitle}</h2>
-                      <p className="mono mt-2 text-xs font-bold text-white/60">
-                        fn finalize(round_id: {roundId ?? "—"}) -&gt; allocation[]
+                      <h2 className="mt-2 text-2xl font-black text-paper">{l.matchEngineTitle}</h2>
+                      <p className="mt-2 max-w-[24rem] text-xs font-semibold leading-5 text-white/70">
+                        {openRound.data
+                          ? `${strings.discovery.season} #${roundId} · ${strings.discovery.live}`
+                          : strings.discovery.noRound}
                       </p>
                     </div>
-                    <span className="rounded-full border border-lime/30 px-3 py-1 text-xs font-black text-lime">
+                    <span className="inline-flex min-h-8 shrink-0 items-center whitespace-nowrap rounded-full border border-lime/50 bg-lime/10 px-3 py-1 text-xs font-black leading-none text-lime">
                       {openRound.data ? brand.machine.ready : brand.machine.idle}
                     </span>
                   </div>
@@ -306,8 +303,8 @@ export default function DiscoveryPage() {
 
           <div className="chain-panel rounded-[2rem] p-5 sm:p-8">
             <div className="relative z-10">
-              <p className="mono text-[11px] font-bold text-white/60">
-                {`// patungan.wasm — ${l.proofComment}`}
+              <p className="text-xs font-black uppercase tracking-[.14em] text-lime/80">
+                {l.proofComment}
               </p>
               <ol className="mt-4">
                 {[
@@ -316,30 +313,31 @@ export default function DiscoveryPage() {
                   ["contribute", "(donor, project, amt)", l.proofSteps[2].title, l.proofSteps[2].copy],
                 ].map(([fn, sig, title, copy], i) => (
                   <Reveal key={fn} delay={i * 0.08}>
-                    <li className="grid gap-2 border-b border-white/10 py-5 sm:grid-cols-[minmax(15rem,.9fr)_1.1fr] sm:items-baseline sm:gap-6">
-                      <span className="mono text-sm font-bold text-lime/80">
-                        <span className="text-white/55">{String(i + 1).padStart(2, "0")}&nbsp;&nbsp;</span>
-                        {fn}
-                        <span className="text-white/55">{sig}</span>
+                    <li className="grid gap-3 border-b border-white/10 py-6 sm:grid-cols-[3rem_1fr] sm:gap-5">
+                      <span className="mono text-sm font-black text-lime/75">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
                       <span>
-                        <h3 className="text-lg font-black">{title}</h3>
-                        <p className="mt-1 text-sm font-semibold leading-6 text-white/50">{copy}</p>
+                        <h3 className="text-xl font-black text-paper">{title}</h3>
+                        <p className="mt-2 max-w-[54ch] text-sm font-semibold leading-6 text-white/70">{copy}</p>
+                        <span className="mono mt-3 inline-flex rounded-md border border-white/15 bg-black/20 px-2.5 py-1.5 text-[11px] font-bold text-white/65">
+                          {fn}{sig}
+                        </span>
                       </span>
                     </li>
                   </Reveal>
                 ))}
                 <Reveal delay={0.24}>
-                  <li className="mt-5 grid gap-2 rounded-[1.35rem] bg-lime p-5 text-ink sm:grid-cols-[minmax(15rem,.9fr)_1.1fr] sm:items-baseline sm:gap-6">
-                    <span className="mono text-sm font-bold">
-                      <span className="text-ink/60">04&nbsp;&nbsp;</span>
-                      finalize<span className="text-ink/55">(round_id)</span>
-                    </span>
+                  <li className="mt-5 grid gap-3 rounded-[1.35rem] bg-lime p-5 text-ink sm:grid-cols-[3rem_1fr] sm:gap-5">
+                    <span className="mono text-sm font-black text-ink/60">04</span>
                     <span>
-                      <h3 className="text-lg font-black">{l.proofSteps[3].title}</h3>
-                      <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">
+                      <h3 className="text-xl font-black">{l.proofSteps[3].title}</h3>
+                      <p className="mt-2 max-w-[54ch] text-sm font-semibold leading-6 text-ink/75">
                         {l.proofSteps[3].copy}
                       </p>
+                      <span className="mono mt-3 inline-flex rounded-md border border-ink/15 bg-ink/5 px-2.5 py-1.5 text-[11px] font-bold text-ink/65">
+                        finalize(round_id)
+                      </span>
                     </span>
                   </li>
                 </Reveal>

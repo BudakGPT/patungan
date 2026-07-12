@@ -115,6 +115,7 @@ export function CampaignDirectory() {
             <SearchIcon />
             <input
               type="search"
+              aria-label={d.searchLabel}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder={d.searchPlaceholder}
@@ -181,6 +182,7 @@ export function CampaignDirectory() {
                   inScope={inScope(campaign)}
                   projectedMatch={matchOf.get(campaign.id)}
                   pool={openRound.data?.pool ?? 0n}
+                  roundEnd={openRound.data?.round_end}
                 />
               ))}
             </div>

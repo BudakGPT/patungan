@@ -11,6 +11,7 @@ type Locale = "id" | "en";
 
 // The stable, localized anchors each surface renders regardless of chain state.
 const copy: Record<Locale, {
+  heroTitle: string;
   directoryHeading: string;
   seasonsTitle: string;
   resultsTitle: string;
@@ -19,6 +20,7 @@ const copy: Record<Locale, {
   newestLabel: string;
 }> = {
   id: {
+    heroTitle: "Donasi kecil. Dampak lebih besar.",
     directoryHeading: "Jelajahi kampanye",
     seasonsTitle: "Arsip musim",
     resultsTitle: "Hasil pencocokan",
@@ -27,6 +29,7 @@ const copy: Record<Locale, {
     newestLabel: "Terbaru",
   },
   en: {
+    heroTitle: "Small donations. Bigger impact.",
     directoryHeading: "Explore campaigns",
     seasonsTitle: "Season archive",
     resultsTitle: "Matching results",
@@ -49,8 +52,7 @@ for (const locale of ["id", "en"] as const) {
     test("landing renders the hero and localized directory", async ({ page }) => {
       await page.goto("/");
       await expect(brandHome(page)).toBeVisible();
-      // "Crowd beats whale." is a brand-register slogan, constant across locales.
-      await expect(page.getByRole("heading", { name: /beats/i })).toBeVisible();
+      await expect(page.getByRole("heading", { name: copy[locale].heroTitle })).toBeVisible();
       await expect(page.getByText(copy[locale].directoryHeading)).toBeVisible();
     });
 
