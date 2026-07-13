@@ -157,6 +157,7 @@ export function ContributePanel({
       void queryClient.invalidateQueries({ queryKey: ["campaigns"] });
       void queryClient.invalidateQueries({ queryKey: ["previewRound"] });
       void queryClient.invalidateQueries({ queryKey: ["roundProject"] });
+      void queryClient.invalidateQueries({ queryKey: ["campaignActivity", campaign.id] });
       void queryClient.invalidateQueries({ queryKey: ["campaignContributions", campaign.id] });
 
       setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });

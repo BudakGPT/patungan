@@ -5,8 +5,10 @@ import type { Config, ProjectState, RoundState } from "@/contract/src";
 import { Tier } from "@/contract/src";
 import { contractClient } from "./contract";
 import {
+  fetchCampaignActivity,
   fetchCampaignContributions,
   fetchContributions,
+  type CampaignActivity,
   type CampaignContribution,
   type Contribution,
 } from "./events";
@@ -171,9 +173,23 @@ export function useContributions(who: string | null) {
 }
 
 /**
- * The recent donations one campaign received (`contrib` events by project-id topic) — the public
- * backer ledger under the campaign story. Same event-scan weight as `useContributions`, so the
- * same slower 8s poll.
+ * One campaign's full public money trail — `contrib` (donations in) and `payout` (funds released
+ * to the owner) events by project-id topic. Powers the interactive activity feed under the campaign
+ * story. Same event-scan weight as `useContributions`, so the same slower 8s poll.
+ */
+export function useCampaignActivity(projectId: number, enabled = true) {
+  return useQuery<CampaignActivity[]>({
+    queryKey: ["campaignActivity", projectId],
+    queryFn: async () => fetchCampaignActivity(projectId),
+    enabled,
+    refetchInterval: 8000,
+  });
+}
+
+/**
+ * The donations one campaign received (`contrib` events by project-id topic) — powers the
+ * dashboard's per-campaign insights. Same event-scan weight as `useContributions`, so the same
+ * slower 8s poll.
  */
 export function useCampaignContributions(projectId: number, enabled = true) {
   return useQuery<CampaignContribution[]>({
