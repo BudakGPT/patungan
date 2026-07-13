@@ -4,19 +4,25 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ProjectState } from "@/contract/src";
+import { Tier } from "@/contract/src";
 import { useStrings } from "@/lib/locale";
 import { formatCompactIDR, formatIDR, truncateAddress } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
+import { isDemoArtifact } from "@/lib/demo";
 import {
   useCampaign,
   useCampaignActivity,
+  useCampaigns,
   useOpenRound,
   usePreviewRound,
+  useProvenance,
   useRoundProject,
+  useTier,
 } from "@/lib/hooks";
 import { ContributePanel } from "@/components/ContributePanel";
+import { TierBadge } from "@/components/TierBadge";
 import { ParallaxImg, Reveal } from "@/components/motion";
 import { config } from "@/lib/config";
 
@@ -236,6 +242,8 @@ function Content({
                 {visual.story}
               </p>
 
+              <OrganizerPanel campaign={campaign} />
+
               <section className="mt-9 max-w-[68ch] border-y border-line py-6">
                 <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">
                   {t.transparencyHeading}
@@ -340,6 +348,108 @@ function Content({
         </div>
       </section>
     </main>
+  );
+}
+
+/**
+ * The organizer panel: who runs this campaign, richer than a bare wallet address but strictly from
+ * what the app can honestly verify — the owner's on-chain verification tier and their track record
+ * on Patungan (campaigns run + total raised across them, links to their others). Real-world identity
+ * never reaches the app by design, so "who" is verified-tier + on-chain reputation, not a name.
+ *
+ * Empty states are deliberately NEUTRAL: a legitimate first-time organizer looks identical to a
+ * scammer on day one, so a thin history is rendered as a plain fact ("First campaign on Patungan"),
+ * never as a red flag — zeros are suppressed, absence shows nothing. The `useProvenance` seam renders
+ * a verified `home_domain` when one ever exists (mainnet, later); it returns null today.
+ */
+function OrganizerPanel({ campaign }: { campaign: ProjectState }) {
+  const strings = useStrings();
+  const t = strings.campaign.organizer;
+  const tierQ = useTier(campaign.owner);
+  const campaignsQ = useCampaigns();
+  const provenanceQ = useProvenance(campaign.owner);
+
+  // The organizer's publicly-verifiable campaigns — the same Approved, non-demo set discovery shows,
+  // so the count and total never overstate a track record a donor couldn't click through and audit.
+  const owned = (campaignsQ.data ?? []).filter(
+    (c) => c.owner === campaign.owner && c.status.tag === "Approved" && !isDemoArtifact(c.title),
+  );
+  const others = owned.filter((c) => c.id !== campaign.id);
+  const totalRaised = owned.reduce((sum, c) => sum + c.lifetime_direct, 0n);
+  const provenance = provenanceQ.data ?? null;
+
+  return (
+    <section className="mt-9 max-w-[68ch] rounded-2xl border border-line bg-surface p-5 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">{t.heading}</h2>
+          <TierBadge tier={tierQ.data} />
+        </div>
+        <a
+          href={`${config.explorerBase}/account/${campaign.owner}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mono text-xs font-semibold text-muted underline-offset-2 hover:text-ink hover:underline"
+        >
+          {truncateAddress(campaign.owner)} · {t.viewWallet}
+        </a>
+      </div>
+
+      {campaignsQ.data === undefined ? (
+        <div className="mt-4 h-5 w-52 animate-pulse rounded bg-line/50" aria-hidden />
+      ) : (
+        <>
+          {/* Neutral track record: a thin history is a plain fact, never an accusation. */}
+          <p className="mt-4 text-sm font-semibold text-ink">
+            {owned.length <= 1 ? t.firstCampaign : t.campaignCount(owned.length)}
+            {owned.length > 1 && totalRaised > 0n ? (
+              <span className="font-medium text-muted">
+                {" · "}
+                <span className="tabular font-black text-match-ink">
+                  {formatCompactIDR(totalRaised)}
+                </span>{" "}
+                {t.raisedAcross}
+              </span>
+            ) : null}
+          </p>
+
+          {others.length > 0 ? (
+            <div className="mt-4">
+              <p className="text-xs font-black uppercase tracking-[.12em] text-faint">
+                {t.otherHeading}
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {others.slice(0, 3).map((c) => (
+                  <li key={c.id}>
+                    <Link
+                      href={`/campaign/${c.id}`}
+                      className="text-sm font-semibold text-ink underline-offset-2 hover:text-match-ink hover:underline"
+                    >
+                      {c.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </>
+      )}
+
+      {/* Provenance seam — a verified domain when one exists (mainnet, later); nothing today. */}
+      {provenance ? (
+        <p className="mt-4 text-sm">
+          <span className="text-muted">{t.verifiedDomain}: </span>
+          <span className="font-black text-ink">{provenance.verifiedDomain}</span>
+        </p>
+      ) : null}
+
+      {/* Only a None-tier owner gets the reassurance line — the campaign is curator-vetted regardless. */}
+      {tierQ.data === Tier.None ? (
+        <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-muted">
+          {t.curatorNote}
+        </p>
+      ) : null}
+    </section>
   );
 }
 
