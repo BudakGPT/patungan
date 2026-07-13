@@ -39,14 +39,17 @@ export function Reveal({
   if (reduced) return <div className={className}>{children}</div>;
 
   const visible = { opacity: 1, y: 0 };
-  const hidden = { opacity: 0, y };
+  // Entrance keeps the choreographed 0.75s + delay (component transition below).
+  // Exit carries its own quick, delay-free timing so scrolling up clears content
+  // cleanly instead of unwinding the stagger in reverse.
+  const hidden = { opacity: 0, y, transition: { duration: 0.4, ease: EASE } };
   return (
     <motion.div
       className={className}
       initial={hidden}
       {...(mode === "load"
         ? { animate: visible }
-        : { whileInView: visible, viewport: { once: true, margin: "-80px" } })}
+        : { whileInView: visible, viewport: { once: false, margin: "-80px" } })}
       transition={{ duration: 0.75, delay, ease: EASE }}
     >
       {children}
