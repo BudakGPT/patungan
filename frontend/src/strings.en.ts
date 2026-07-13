@@ -79,7 +79,10 @@ export const en: Strings = {
   categories: {
     DevelopingRegions: "Developing Regions",
     DisasterRelief: "Disaster Relief",
-    EducationHealth: "Education & Health",
+    Education: "Education",
+    Health: "Health",
+    FaithCommunity: "Faith & Community",
+    EnvironmentAnimals: "Environment & Animals",
   } as Record<string, string>,
   discovery: {
     heading: "Explore campaigns",

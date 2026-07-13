@@ -25,7 +25,7 @@ vi.mock("@stellar/freighter-api", () => ({ default: { signTransaction: mocks.sig
 const c = strings.campaign.contribute;
 
 const campaign: ProjectState = {
-  category: { tag: "EducationHealth", values: undefined },
+  category: { tag: "Education", values: undefined },
   created_ledger: 0n,
   id: 7,
   image_cid: "",

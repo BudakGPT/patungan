@@ -25,9 +25,21 @@ const META: Record<CategoryTag, Omit<CategoryMeta, "label">> = {
     chip: "text-cat-disaster bg-cat-disaster-soft",
     placeholder: "from-cat-disaster-soft to-cat-disaster/20",
   },
-  EducationHealth: {
+  Education: {
     chip: "text-cat-education bg-cat-education-soft",
     placeholder: "from-cat-education-soft to-cat-education/20",
+  },
+  Health: {
+    chip: "text-cat-health bg-cat-health-soft",
+    placeholder: "from-cat-health-soft to-cat-health/20",
+  },
+  FaithCommunity: {
+    chip: "text-cat-faith bg-cat-faith-soft",
+    placeholder: "from-cat-faith-soft to-cat-faith/20",
+  },
+  EnvironmentAnimals: {
+    chip: "text-cat-environment bg-cat-environment-soft",
+    placeholder: "from-cat-environment-soft to-cat-environment/20",
   },
 };
 
@@ -39,9 +51,12 @@ export function categoryMeta(tag: string, categories: Record<string, string>): C
   return { label: categories[tag] ?? tag, ...m };
 }
 
-/** The three on-chain categories, in display order — powers the filter chip row. */
+/** The on-chain categories, in display order — powers the filter chip row. */
 export const ALL_CATEGORIES: CategoryTag[] = [
   "DevelopingRegions",
   "DisasterRelief",
-  "EducationHealth",
+  "Education",
+  "Health",
+  "FaithCommunity",
+  "EnvironmentAnimals",
 ];

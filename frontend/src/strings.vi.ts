@@ -79,7 +79,10 @@ export const vi: Strings = {
   categories: {
     DevelopingRegions: "Khu vực đang phát triển",
     DisasterRelief: "Cứu trợ thiên tai",
-    EducationHealth: "Giáo dục & Y tế",
+    Education: "Giáo dục",
+    Health: "Y tế",
+    FaithCommunity: "Tín ngưỡng & Cộng đồng",
+    EnvironmentAnimals: "Môi trường & Động vật",
   } as Record<string, string>,
   discovery: {
     heading: "Khám phá chiến dịch",

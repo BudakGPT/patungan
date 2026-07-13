@@ -155,7 +155,7 @@ async function main() {
         {
           owner: state.owner!.address,
           title,
-          category: { tag: "EducationHealth", values: undefined } as any,
+          category: { tag: "Education", values: undefined } as any,
           story: "E2E smoke-test campaign — proves submit/approve/verify/contribute against live testnet state.",
           image_cid: CID,
           payout: state.payout!.address,

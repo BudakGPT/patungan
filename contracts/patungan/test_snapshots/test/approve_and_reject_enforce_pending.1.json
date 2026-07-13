@@ -65,7 +65,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "EducationHealth"
+                      "symbol": "Education"
                     }
                   ]
                 },
@@ -147,7 +147,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "EducationHealth"
+                      "symbol": "Education"
                     }
                   ]
                 },
@@ -435,7 +435,7 @@
                       "val": {
                         "vec": [
                           {
-                            "symbol": "EducationHealth"
+                            "symbol": "Education"
                           }
                         ]
                       }
@@ -583,7 +583,7 @@
                       "val": {
                         "vec": [
                           {
-                            "symbol": "EducationHealth"
+                            "symbol": "Education"
                           }
                         ]
                       }

@@ -78,7 +78,10 @@ export const id = {
   categories: {
     DevelopingRegions: "Daerah Berkembang",
     DisasterRelief: "Tanggap Bencana",
-    EducationHealth: "Pendidikan & Kesehatan",
+    Education: "Pendidikan",
+    Health: "Kesehatan",
+    FaithCommunity: "Keagamaan & Sosial",
+    EnvironmentAnimals: "Lingkungan & Satwa",
   } as Record<string, string>,
   /** Discovery `/` — the public directory over live chain state. */
   discovery: {

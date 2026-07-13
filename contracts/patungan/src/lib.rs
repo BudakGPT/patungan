@@ -17,8 +17,8 @@
 extern crate alloc;
 
 use soroban_sdk::{
-    contract, contractimpl, contracterror, contracttype, symbol_short, token, Address, Env, String,
-    Vec,
+    contract, contractimpl, contracterror, contracttype, symbol_short, token, Address, BytesN, Env,
+    String, Vec,
 };
 
 // Pure, chain-free quadratic-funding math (isqrt + weights + pool split), re-keyed per round.
@@ -33,13 +33,19 @@ mod test;
 // ---------- Types ----------
 
 /// The curated, extensible set of social-impact categories a campaign belongs to. **Append
-/// variants only, never renumber** — the frontend and generated bindings map them by position.
+/// variants only, never renumber** — the frontend and generated bindings map them by position, and
+/// stored campaigns keep their discriminant. (A one-time exception was the split of the former
+/// `EducationHealth` into `Education` + `Health`, done on a fresh redeploy with no stored state to
+/// migrate; from here, new categories go in via `upgrade` and must be appended.)
 #[contracttype]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Category {
     DevelopingRegions,
     DisasterRelief,
-    EducationHealth,
+    Education,
+    Health,
+    FaithCommunity,
+    EnvironmentAnimals,
 }
 
 /// Curation state of a campaign. Only `Approved` campaigns are contributable and matchable;
@@ -326,6 +332,15 @@ impl Patungan {
         s.set(&DataKey::RoundIds, &Vec::<u32>::new(&env));
         put(&env, &DataKey::ProjectIds, &Vec::<u32>::new(&env));
         bump_instance(&env);
+        Ok(())
+    }
+
+    /// Replace the contract's own wasm with `new_wasm_hash` — **admin only**. The in-place upgrade
+    /// path so future changes (e.g. appending a `Category`) ship without a fresh deploy that would
+    /// reset all state. The new wasm must already be installed on-chain (`stellar contract upload`).
+    pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) -> Result<(), Error> {
+        require_admin(&env)?;
+        env.deployer().update_current_contract_wasm(new_wasm_hash);
         Ok(())
     }
 

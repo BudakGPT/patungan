@@ -79,7 +79,10 @@ export const fil: Strings = {
   categories: {
     DevelopingRegions: "Umuunlad na Rehiyon",
     DisasterRelief: "Tulong sa Sakuna",
-    EducationHealth: "Edukasyon at Kalusugan",
+    Education: "Edukasyon",
+    Health: "Kalusugan",
+    FaithCommunity: "Pananampalataya at Komunidad",
+    EnvironmentAnimals: "Kalikasan at Hayop",
   } as Record<string, string>,
   discovery: {
     heading: "Tuklasin ang mga kampanya",
