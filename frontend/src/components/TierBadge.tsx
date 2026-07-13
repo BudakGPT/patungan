@@ -18,10 +18,9 @@ interface TierStyle {
   /** Large status-block accent classes (border + tint). */ block: string;
   /** Muted text-only tint for the header's merged wallet-status capsule (no pill chrome of its own). */
   tint: string;
-  /** Check glyph — ascends None → ✓ → ✓✓. Used by the pill/block, not the header capsule. */
+  /** Check glyph — a single ✓ for any verified tier (Basic/Institution), empty for None. Rank is
+   *  carried by hue + label, not by doubling the check. Shared by the pill, block, and capsule. */
   mark: string;
-  /** Capped at a single check for the header capsule — no doubling, quieter than `mark`. */
-  inlineMark: string;
   label: string;
   unlocks: string;
 }
@@ -33,8 +32,7 @@ function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
         pill: "bg-match-soft text-match-ink",
         block: "border-match/30 bg-match-soft",
         tint: "text-match/70",
-        mark: "✓✓",
-        inlineMark: "✓",
+        mark: "✓",
         label: tb.tiers.Institution,
         unlocks: tb.unlocks.Institution,
       };
@@ -44,7 +42,6 @@ function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
         block: "border-accent/25 bg-accent-soft",
         tint: "text-accent/70",
         mark: "✓",
-        inlineMark: "✓",
         label: tb.tiers.Basic,
         unlocks: tb.unlocks.Basic,
       };
@@ -54,7 +51,6 @@ function styleFor(tier: Tier, tb: Strings["tierBadge"]): TierStyle {
         block: "border-line bg-paper",
         tint: "text-paper/55",
         mark: "",
-        inlineMark: "",
         label: tb.tiers.None,
         unlocks: tb.unlocks.None,
       };
@@ -74,7 +70,7 @@ export function TierBadge({ tier, variant = "light" }: { tier: Tier | undefined;
   if (variant === "inline") {
     return (
       <span className={`inline-flex items-center gap-1 font-semibold ${s.tint}`}>
-        {s.inlineMark ? <span aria-hidden>{s.inlineMark}</span> : null}
+        {s.mark ? <span aria-hidden>{s.mark}</span> : null}
         {s.label}
       </span>
     );

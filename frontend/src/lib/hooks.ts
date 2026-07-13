@@ -12,6 +12,7 @@ import {
   type CampaignContribution,
   type Contribution,
 } from "./events";
+import { getProvenance, type Provenance } from "./provenance";
 
 /**
  * The global role/token config (`admin`/`curator`/`attester`/`token`) in one call — the operator
@@ -155,6 +156,21 @@ export function useTier(who: string | null) {
     queryFn: async () => (await contractClient.verification_tier({ who: who! })).result,
     enabled: !!who,
     refetchInterval: 4000,
+  });
+}
+
+/**
+ * Off-chain provenance for an organizer wallet — a verified `home_domain` when one exists. Backed by
+ * the `getProvenance` seam (`lib/provenance.ts`), which returns `null` everywhere today, so the
+ * organizer panel renders nothing extra until this is wired up for mainnet. `staleTime: Infinity`
+ * because provenance changes rarely and there's no live source to poll yet.
+ */
+export function useProvenance(who: string | null) {
+  return useQuery<Provenance | null>({
+    queryKey: ["provenance", who],
+    queryFn: async () => getProvenance(who!),
+    enabled: !!who,
+    staleTime: Infinity,
   });
 }
 

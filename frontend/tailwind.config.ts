@@ -57,6 +57,12 @@ const config: Config = {
         "cat-disaster-soft": "oklch(0.955 0.03 30 / <alpha-value>)",
         "cat-education": "oklch(0.48 0.1 220 / <alpha-value>)",
         "cat-education-soft": "oklch(0.955 0.03 220 / <alpha-value>)",
+        "cat-health": "oklch(0.52 0.1 195 / <alpha-value>)",
+        "cat-health-soft": "oklch(0.955 0.03 195 / <alpha-value>)",
+        "cat-faith": "oklch(0.5 0.12 300 / <alpha-value>)",
+        "cat-faith-soft": "oklch(0.955 0.03 300 / <alpha-value>)",
+        "cat-environment": "oklch(0.5 0.11 145 / <alpha-value>)",
+        "cat-environment-soft": "oklch(0.955 0.035 145 / <alpha-value>)",
       },
       fontFamily: {
         sans: [

@@ -70,7 +70,7 @@ fn submit_basic(
     let id = client.submit_project(
         &owner,
         &title(env),
-        &Category::EducationHealth,
+        &Category::Education,
         &story(env),
         &cid(env),
         &payout,
@@ -171,7 +171,7 @@ fn submit_requires_basic_tier() {
         client.try_submit_project(
             &owner,
             &title(&env),
-            &Category::EducationHealth,
+            &Category::Education,
             &story(&env),
             &cid(&env),
             &payout,
@@ -192,14 +192,14 @@ fn submit_rejects_empty_and_oversized_inputs() {
     // Empty title → InvalidTitle.
     assert_eq!(
         client.try_submit_project(
-            &owner, &empty, &Category::EducationHealth, &story(&env), &cid(&env), &payout,
+            &owner, &empty, &Category::Education, &story(&env), &cid(&env), &payout,
         ),
         Err(Ok(Error::InvalidTitle))
     );
     // Empty cid → InvalidCid.
     assert_eq!(
         client.try_submit_project(
-            &owner, &title(&env), &Category::EducationHealth, &story(&env), &empty, &payout,
+            &owner, &title(&env), &Category::Education, &story(&env), &empty, &payout,
         ),
         Err(Ok(Error::InvalidCid))
     );
@@ -207,7 +207,7 @@ fn submit_rejects_empty_and_oversized_inputs() {
     let long = String::from_str(&env, "x".repeat(97).as_str());
     assert_eq!(
         client.try_submit_project(
-            &owner, &long, &Category::EducationHealth, &story(&env), &cid(&env), &payout,
+            &owner, &long, &Category::Education, &story(&env), &cid(&env), &payout,
         ),
         Err(Ok(Error::InvalidTitle))
     );
@@ -377,7 +377,7 @@ fn bump_ttl_extends_without_panic() {
 #[test]
 fn category_scope() {
     // A gift to an out-of-scope category earns no match: it grows `unrounded_direct`,
-    // never the round aggregates. The campaign is `EducationHealth`; the round scopes `DisasterRelief`.
+    // never the round aggregates. The campaign is `Education`; the round scopes `DisasterRelief`.
     let env = Env::default();
     let (admin, _token_id, client, token_admin) = setup(&env);
     let (id, donor) = approved_with_donor(&env, &client, &token_admin, 50_000);
@@ -676,11 +676,11 @@ fn views_expose_config_and_listings() {
     assert_eq!(cfg.attester, admin);
     assert_eq!(cfg.token, token_id);
 
-    let (_o, _p, id) = submit_basic(&env, &client); // EducationHealth, Pending
+    let (_o, _p, id) = submit_basic(&env, &client); // Education, Pending
     // Approved-only listing excludes the Pending campaign.
-    assert_eq!(client.list_projects_by_category(&Category::EducationHealth).len(), 0);
+    assert_eq!(client.list_projects_by_category(&Category::Education).len(), 0);
     client.approve_project(&id);
-    assert_eq!(client.list_projects_by_category(&Category::EducationHealth).len(), 1);
+    assert_eq!(client.list_projects_by_category(&Category::Education).len(), 1);
     assert_eq!(client.list_projects_by_category(&Category::DisasterRelief).len(), 0);
     // list_projects returns ALL (regardless of status); one campaign total.
     assert_eq!(client.list_projects().len(), 1);

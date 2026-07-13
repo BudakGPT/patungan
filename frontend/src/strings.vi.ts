@@ -15,6 +15,18 @@ export const vi: Strings = {
     closeMenu: "Đóng menu",
     mainMenu: "Menu chính",
   },
+  meta: {
+    titles: {
+      campaigns: "Khám phá chiến dịch",
+      seasons: "Mùa đối ứng",
+      results: "Kết quả đối ứng",
+      dashboard: "Bảng điều khiển chiến dịch",
+      account: "Đóng góp của tôi",
+      operator: "Bảng vận hành",
+      verify: "Xác minh ví",
+      newCampaign: "Gửi chiến dịch",
+    },
+  },
   landing: {
     heroTitle: "Đóng góp nhỏ. Tác động lớn hơn.",
     heroTags: ["Ứng dụng thanh toán & tiêu dùng", "Kiều bào PMI/TKI", "Đối ứng bậc hai"],
@@ -79,7 +91,10 @@ export const vi: Strings = {
   categories: {
     DevelopingRegions: "Khu vực đang phát triển",
     DisasterRelief: "Cứu trợ thiên tai",
-    EducationHealth: "Giáo dục & Y tế",
+    Education: "Giáo dục",
+    Health: "Y tế",
+    FaithCommunity: "Tín ngưỡng & Cộng đồng",
+    EnvironmentAnimals: "Môi trường & Động vật",
   } as Record<string, string>,
   discovery: {
     heading: "Khám phá chiến dịch",
@@ -154,6 +169,16 @@ export const vi: Strings = {
     notFoundBody: "Chiến dịch này có thể chưa tồn tại, hoặc liên kết không đúng.",
     backHome: "Về trang chủ",
     byOwner: "Điều hành bởi",
+    organizer: {
+      heading: "Người tổ chức",
+      viewWallet: "Xem ví",
+      firstCampaign: "Chiến dịch đầu tiên trên Patungan",
+      campaignCount: (n: number) => `${n} chiến dịch trên Patungan`,
+      raisedAcross: "quyên góp được trên tất cả",
+      otherHeading: "Chiến dịch khác của người tổ chức này",
+      verifiedDomain: "Tên miền đã xác minh",
+      curatorNote: "Mọi chiến dịch hiển thị đều được người kiểm duyệt phê duyệt trước khi nhận quyên góp.",
+    },
     transparencyHeading: "Minh bạch giải ngân",
     verifiedLabel: "Trạng thái chiến dịch",
     verifiedValue: "Đã được giám tuyển xác minh",

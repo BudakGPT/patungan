@@ -15,6 +15,18 @@ export const en: Strings = {
     closeMenu: "Close menu",
     mainMenu: "Main menu",
   },
+  meta: {
+    titles: {
+      campaigns: "Browse Campaigns",
+      seasons: "Matching Seasons",
+      results: "Matching Results",
+      dashboard: "Campaign Dashboard",
+      account: "My Contributions",
+      operator: "Operator Console",
+      verify: "Verify Wallet",
+      newCampaign: "Submit a Campaign",
+    },
+  },
   landing: {
     heroTitle: "Small donations. Bigger impact.",
     heroTags: ["Payment & Consumer App", "PMI/TKI diaspora", "Quadratic matching"],
@@ -79,7 +91,10 @@ export const en: Strings = {
   categories: {
     DevelopingRegions: "Developing Regions",
     DisasterRelief: "Disaster Relief",
-    EducationHealth: "Education & Health",
+    Education: "Education",
+    Health: "Health",
+    FaithCommunity: "Faith & Community",
+    EnvironmentAnimals: "Environment & Animals",
   } as Record<string, string>,
   discovery: {
     heading: "Explore campaigns",
@@ -154,6 +169,16 @@ export const en: Strings = {
     notFoundBody: "This campaign may not exist yet, or the link is wrong.",
     backHome: "Back to home",
     byOwner: "Run by",
+    organizer: {
+      heading: "Organizer",
+      viewWallet: "View wallet",
+      firstCampaign: "First campaign on Patungan",
+      campaignCount: (n: number) => `${n} campaigns on Patungan`,
+      raisedAcross: "raised across them",
+      otherHeading: "Also by this organizer",
+      verifiedDomain: "Verified domain",
+      curatorNote: "Every campaign shown is curator-approved before it can receive donations.",
+    },
     transparencyHeading: "Payout transparency",
     verifiedLabel: "Campaign status",
     verifiedValue: "Curator verified",

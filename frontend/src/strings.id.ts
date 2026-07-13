@@ -13,6 +13,21 @@ export const id = {
     closeMenu: "Tutup menu",
     mainMenu: "Menu utama",
   },
+  /** Localized browser-tab titles per route. Rendered client-side by <LocalizedTitle>
+   * (src/components/LocalizedTitle.tsx); the server `metadata` in each app/**\/layout.tsx keeps the
+   * Bahasa default for SSR / no-JS. Keep these keys identical across all four locale catalogs. */
+  meta: {
+    titles: {
+      campaigns: "Jelajahi Kampanye",
+      seasons: "Musim Pencocokan",
+      results: "Hasil Pencocokan",
+      dashboard: "Dasbor Kampanye",
+      account: "Kontribusi Saya",
+      operator: "Konsol Operator",
+      verify: "Verifikasi Wallet",
+      newCampaign: "Ajukan Kampanye",
+    },
+  },
   landing: {
     heroTitle: "Donasi kecil. Dampak lebih besar.",
     heroTags: ["Aplikasi pembayaran & konsumen", "Diaspora PMI/TKI", "Pencocokan kuadratik"],
@@ -78,7 +93,10 @@ export const id = {
   categories: {
     DevelopingRegions: "Daerah Berkembang",
     DisasterRelief: "Tanggap Bencana",
-    EducationHealth: "Pendidikan & Kesehatan",
+    Education: "Pendidikan",
+    Health: "Kesehatan",
+    FaithCommunity: "Keagamaan & Sosial",
+    EnvironmentAnimals: "Lingkungan & Satwa",
   } as Record<string, string>,
   /** Discovery `/` — the public directory over live chain state. */
   discovery: {
@@ -155,6 +173,16 @@ export const id = {
     notFoundBody: "Kampanye ini mungkin belum ada, atau tautannya keliru.",
     backHome: "Kembali ke beranda",
     byOwner: "Dikelola oleh",
+    organizer: {
+      heading: "Pengelola",
+      viewWallet: "Lihat wallet",
+      firstCampaign: "Kampanye pertama di Patungan",
+      campaignCount: (n: number) => `${n} kampanye di Patungan`,
+      raisedAcross: "terkumpul dari semuanya",
+      otherHeading: "Kampanye lain oleh pengelola ini",
+      verifiedDomain: "Domain terverifikasi",
+      curatorNote: "Setiap kampanye yang tampil sudah disetujui kurator sebelum bisa menerima donasi.",
+    },
     transparencyHeading: "Transparansi pencairan",
     verifiedLabel: "Status kampanye",
     verifiedValue: "Terverifikasi kurator",

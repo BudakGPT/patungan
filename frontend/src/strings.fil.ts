@@ -15,6 +15,18 @@ export const fil: Strings = {
     closeMenu: "Isara ang menu",
     mainMenu: "Pangunahing menu",
   },
+  meta: {
+    titles: {
+      campaigns: "Tuklasin ang mga Kampanya",
+      seasons: "Mga Season ng Pagtutumbas",
+      results: "Resulta ng Pagtutumbas",
+      dashboard: "Dashboard ng Kampanya",
+      account: "Aking mga Kontribusyon",
+      operator: "Console ng Operator",
+      verify: "I-verify ang Wallet",
+      newCampaign: "Magsumite ng Kampanya",
+    },
+  },
   landing: {
     heroTitle: "Maliit na donasyon. Mas malaking epekto.",
     heroTags: ["Payment at consumer app", "Diaspora ng PMI/TKI", "Kuwadratikong pagtutumbas"],
@@ -79,7 +91,10 @@ export const fil: Strings = {
   categories: {
     DevelopingRegions: "Umuunlad na Rehiyon",
     DisasterRelief: "Tulong sa Sakuna",
-    EducationHealth: "Edukasyon at Kalusugan",
+    Education: "Edukasyon",
+    Health: "Kalusugan",
+    FaithCommunity: "Pananampalataya at Komunidad",
+    EnvironmentAnimals: "Kalikasan at Hayop",
   } as Record<string, string>,
   discovery: {
     heading: "Tuklasin ang mga kampanya",
@@ -154,6 +169,16 @@ export const fil: Strings = {
     notFoundBody: "Maaaring wala pang kampanyang ito, o mali ang link.",
     backHome: "Bumalik sa home",
     byOwner: "Pinapatakbo ni",
+    organizer: {
+      heading: "Organizer",
+      viewWallet: "Tingnan ang wallet",
+      firstCampaign: "Unang kampanya sa Patungan",
+      campaignCount: (n: number) => `${n} kampanya sa Patungan`,
+      raisedAcross: "nalikom sa lahat ng ito",
+      otherHeading: "Iba pang kampanya ng organizer na ito",
+      verifiedDomain: "Beripikadong domain",
+      curatorNote: "Bawat kampanyang ipinapakita ay aprubado ng kurador bago makatanggap ng donasyon.",
+    },
     transparencyHeading: "Transparency ng payout",
     verifiedLabel: "Status ng kampanya",
     verifiedValue: "Beripikado ng kurador",

@@ -39,9 +39,30 @@ const CAMPAIGNS = [
   {
     key: "atap",
     title: "Atap Sekolah SDN 2 Cianjur",
-    category: cat("EducationHealth"),
+    category: cat("Education"),
     story:
       "Ruang kelas SDN 2 Cianjur bocor parah setiap hujan. Dana ini mengganti rangka atap dan genteng agar 180 murid belajar dengan aman dan kering.",
+  },
+  {
+    key: "jantung",
+    title: "Operasi Jantung Bayi Arka",
+    category: cat("Health"),
+    story:
+      "Arka, bayi 8 bulan, lahir dengan kelainan jantung bawaan. Dana ini menutup biaya operasi dan perawatan pascaoperasi yang tak ditanggung penuh.",
+  },
+  {
+    key: "masjid",
+    title: "Renovasi Masjid Al-Ikhlas Kampung Nelayan",
+    category: cat("FaithCommunity"),
+    story:
+      "Masjid Al-Ikhlas jadi pusat kegiatan 200 keluarga nelayan, tapi atap dan tempat wudunya lapuk. Renovasi ini mengembalikan ruang ibadah dan belajar warga.",
+  },
+  {
+    key: "mangrove",
+    title: "Tanam Mangrove Pesisir Demak",
+    category: cat("EnvironmentAnimals"),
+    story:
+      "Abrasi mengikis pesisir Demak tiap tahun. Penanaman 5.000 bibit mangrove menahan abrasi, memulihkan habitat kepiting, dan melindungi tambak warga.",
   },
   {
     key: "sumur",
