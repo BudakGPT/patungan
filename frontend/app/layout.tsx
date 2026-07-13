@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   ),
   applicationName: "Patungan",
   title: {
-    default: "Patungan — gotong royong on-chain",
+    default: "Patungan | gotong royong on-chain",
     template: "%s | Patungan",
   },
   description:
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Patungan",
-    title: "Patungan — gotong royong on-chain",
+    title: "Patungan | gotong royong on-chain",
     description:
       "Banyak donasi kecil menarik dana pendamping secara transparan di Stellar Testnet.",
     locale: "id_ID",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Patungan — gotong royong on-chain",
+    title: "Patungan | gotong royong on-chain",
     description:
       "Banyak donasi kecil menarik dana pendamping secara transparan di Stellar Testnet.",
     images: ["/assets/patungan-logo.png"],
