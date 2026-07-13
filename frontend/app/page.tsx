@@ -121,11 +121,11 @@ export default function DiscoveryPage() {
                 {/* Lime marks only the number the chain attests live — the donor count.
                     Money and status stay paper (One Verdict Rule). */}
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="glass-dark rounded-3xl p-4">
-                    <span className="text-xs font-black uppercase tracking-[.14em] text-white/60">
+                  <div className="glass-dark flex min-w-0 flex-col justify-between gap-2 rounded-3xl px-3 py-4 [container-type:inline-size]">
+                    <span className="text-[.7rem] font-black uppercase leading-tight tracking-[.12em] text-white/60">
                       {l.heroPoolLabel}
                     </span>
-                    <strong className="num mt-2 block text-[1.45rem] font-black text-paper">
+                    <strong className="num block text-[clamp(1rem,15cqi,1.4rem)] font-black leading-none text-paper">
                       {pool > 0n ? (
                         <CountUp value={Number(pool)} format={formatCompactIDR} />
                       ) : (
@@ -133,19 +133,19 @@ export default function DiscoveryPage() {
                       )}
                     </strong>
                   </div>
-                  <div className="glass-dark rounded-3xl p-4">
-                    <span className="text-xs font-black uppercase tracking-[.14em] text-white/60">
+                  <div className="glass-dark flex min-w-0 flex-col justify-between gap-2 rounded-3xl px-3 py-4 [container-type:inline-size]">
+                    <span className="text-[.7rem] font-black uppercase leading-tight tracking-[.12em] text-white/60">
                       {l.heroDonorLabel}
                     </span>
-                    <strong className="num mt-2 block text-[1.45rem] font-black text-lime">
+                    <strong className="num block text-[clamp(1rem,15cqi,1.4rem)] font-black leading-none text-lime">
                       <CountUp value={donorCount} />
                     </strong>
                   </div>
-                  <div className="glass-dark rounded-3xl p-4">
-                    <span className="text-xs font-black uppercase tracking-[.14em] text-white/60">
+                  <div className="glass-dark flex min-w-0 flex-col justify-between gap-2 rounded-3xl px-3 py-4 [container-type:inline-size]">
+                    <span className="text-[.7rem] font-black uppercase leading-tight tracking-[.12em] text-white/60">
                       {l.heroStatusLabel}
                     </span>
-                    <strong className="num mt-2 block text-[1.45rem] font-black text-paper">
+                    <strong className="num block text-[clamp(1rem,15cqi,1.4rem)] font-black leading-none text-paper">
                       {statusLabel}
                     </strong>
                   </div>
@@ -229,15 +229,15 @@ export default function DiscoveryPage() {
                   </div>
 
                   <div className="relative mx-auto mt-6 grid size-44 place-items-center rounded-full bg-[conic-gradient(from_160deg,var(--tw-gradient-from)_0_82%,rgba(255,255,255,.08)_82%_100%)] from-lime p-3">
-                    <div className="grid size-full place-items-center rounded-full bg-ink text-center">
-                      <div>
-                        <span className="text-xs font-black uppercase tracking-[.18em] text-white/55">
+                    <div className="grid size-full place-items-center rounded-full bg-ink px-3 text-center">
+                      <div className="mx-auto max-w-[7.5rem]">
+                        <span className="block text-[.62rem] font-black uppercase leading-tight tracking-[.08em] text-white/55">
                           {l.selectedShareLabel}
                         </span>
-                        <strong className="mt-2 block text-4xl font-black text-lime">
+                        <strong className="mt-1.5 block text-4xl font-black leading-none text-lime">
                           {crowdShare}%
                         </strong>
-                        <span className="mt-2 block text-xs font-bold text-white/50">
+                        <span className="mt-1.5 block text-[.62rem] font-bold leading-tight text-white/50">
                           {l.ofPoolSuffix}
                         </span>
                       </div>
@@ -251,7 +251,7 @@ export default function DiscoveryPage() {
                       </p>
                       <span className="text-[10px] font-bold text-white/40">{l.switchCampaignLabel}</span>
                     </div>
-                    <div className="max-h-[14.5rem] space-y-1.5 overflow-y-auto pr-1 [scrollbar-width:thin]" role="listbox" aria-label={l.switchCampaignLabel}>
+                    <div className="slim-scroll max-h-[14.5rem] space-y-1.5 overflow-y-auto pr-1.5" role="listbox" aria-label={l.switchCampaignLabel}>
                     {rankedRows.length === 0 ? (
                       <p className="text-sm font-semibold text-white/50">{strings.loading}</p>
                     ) : (
