@@ -92,7 +92,7 @@ export default function DiscoveryPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_20%,rgba(215,255,95,.18),transparent_32rem),linear-gradient(90deg,rgba(7,18,15,.94),rgba(7,18,15,.48)_48%,rgba(7,18,15,.68))]" />
         <div className="chain-grid absolute inset-0 opacity-70" />
 
-        <div className="relative mx-auto grid min-h-[calc(100vh-6rem)] max-w-[1500px] items-end gap-8 px-4 pb-8 pt-12 sm:px-7 lg:grid-cols-[1.05fr_.95fr] lg:px-10 lg:pb-10">
+        <div className="relative mx-auto grid min-h-[calc(100vh-6rem)] max-w-[1500px] items-start gap-8 px-4 pb-8 pt-8 sm:px-7 lg:grid-cols-[1.05fr_.95fr] lg:px-10 lg:pb-10 lg:pt-20">
           <div>
             <Reveal mode="load" y={18}>
               <div className="flex flex-wrap gap-2">
@@ -104,9 +104,9 @@ export default function DiscoveryPage() {
               </div>
             </Reveal>
 
-            <h1 className="display mt-8 max-w-4xl text-[clamp(3.2rem,8.4vw,8.6rem)] leading-[.86] text-paper">
+            <h1 className="display mt-6 max-w-4xl text-[clamp(2.2rem,5.2vw,5.4rem)] leading-[.94] text-paper">
               <Reveal mode="load" delay={0.06} y={44} className="overflow-hidden">
-                <span className="block max-w-[10ch]">{l.heroTitle}</span>
+                <span className="block max-w-[13ch]">{l.heroTitle}</span>
               </Reveal>
             </h1>
 
@@ -178,7 +178,7 @@ export default function DiscoveryPage() {
           </div>
 
           <Reveal mode="load" delay={0.3} y={40}>
-          <aside className="glass-dark scanline rounded-[2rem] p-4 sm:p-5 lg:p-6">
+          <aside className="glass-dark scanline rounded-[2rem] p-4 sm:p-5">
             <div className="grid gap-4 xl:grid-cols-[.95fr_1.05fr]">
               <Link
                 href={heroProject ? `/campaign/${heroProject.id}` : "/campaigns"}
@@ -209,7 +209,7 @@ export default function DiscoveryPage() {
                 </div>
               </Link>
 
-              <div className="chain-panel rounded-[1.5rem] p-5">
+              <div className="chain-panel rounded-[1.5rem] p-4">
                 <div className="relative z-10">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -228,13 +228,13 @@ export default function DiscoveryPage() {
                     </span>
                   </div>
 
-                  <div className="relative mx-auto mt-8 grid size-56 place-items-center rounded-full bg-[conic-gradient(from_160deg,var(--tw-gradient-from)_0_82%,rgba(255,255,255,.08)_82%_100%)] from-lime p-3">
+                  <div className="relative mx-auto mt-6 grid size-44 place-items-center rounded-full bg-[conic-gradient(from_160deg,var(--tw-gradient-from)_0_82%,rgba(255,255,255,.08)_82%_100%)] from-lime p-3">
                     <div className="grid size-full place-items-center rounded-full bg-ink text-center">
                       <div>
                         <span className="text-xs font-black uppercase tracking-[.18em] text-white/55">
                           {l.selectedShareLabel}
                         </span>
-                        <strong className="mt-2 block text-5xl font-black text-lime">
+                        <strong className="mt-2 block text-4xl font-black text-lime">
                           {crowdShare}%
                         </strong>
                         <span className="mt-2 block text-xs font-bold text-white/50">
@@ -244,14 +244,14 @@ export default function DiscoveryPage() {
                     </div>
                   </div>
 
-                  <div className="mt-7">
-                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="mt-5">
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                       <p className="text-[10px] font-black uppercase tracking-[.13em] text-white/50">
                         {l.rankedByDirect}
                       </p>
                       <span className="text-[10px] font-bold text-white/40">{l.switchCampaignLabel}</span>
                     </div>
-                    <div className="space-y-2" role="listbox" aria-label={l.switchCampaignLabel}>
+                    <div className="max-h-[14.5rem] space-y-1.5 overflow-y-auto pr-1 [scrollbar-width:thin]" role="listbox" aria-label={l.switchCampaignLabel}>
                     {rankedRows.length === 0 ? (
                       <p className="text-sm font-semibold text-white/50">{strings.loading}</p>
                     ) : (
@@ -266,7 +266,7 @@ export default function DiscoveryPage() {
                             role="option"
                             aria-selected={active}
                             onClick={() => setSelectedCampaignId(project.id)}
-                            className={`block w-full rounded-xl px-3 py-2.5 text-left transition-colors ${
+                            className={`block w-full rounded-xl px-3 py-2 text-left transition-colors ${
                               active ? "bg-lime/10 ring-1 ring-lime/40" : "hover:bg-white/[.06]"
                             }`}
                           >
@@ -287,10 +287,10 @@ export default function DiscoveryPage() {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-3 gap-2">
+                  <div className="mt-4 grid grid-cols-3 gap-2">
                     {[brand.machine.escrow, brand.machine.registry, brand.machine.payout].map(
                       (label) => (
-                        <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3">
+                        <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-2.5">
                           <span className="mono text-[10px] font-black uppercase text-white/55">
                             {label}
                           </span>
