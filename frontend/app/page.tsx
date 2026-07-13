@@ -5,21 +5,14 @@ import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
 import { useStrings } from "@/lib/locale";
 import { useCampaigns, useOpenRound, usePreviewRound, useRoundProjects } from "@/lib/hooks";
-import { ALL_CATEGORIES, categoryMeta, type CategoryTag } from "@/lib/category";
 import { isDemoArtifact } from "@/lib/demo";
 import { RoundBanner } from "@/components/RoundBanner";
 import { HowItWorks } from "@/components/HowItWorks";
-import { CampaignCard } from "@/components/CampaignCard";
 import { formatCompactIDR, truncateAddress } from "@/lib/format";
 import { brand } from "@/brand";
 import { config } from "@/lib/config";
 import { getProjectVisual, heroVisual as heroBackdrop } from "@/lib/projectVisuals";
 import { CountUp, ParallaxImg, Reveal } from "@/components/motion";
-
-type SortKey = "mostBacked" | "newest" | "closingSoon";
-
-/** bigint-safe descending comparator. */
-const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
 
 /**
  * Discovery `/` — a marketing hero over live chain state, followed by the public directory:
@@ -36,10 +29,7 @@ export default function DiscoveryPage() {
   const openRound = useOpenRound();
   const roundId = openRound.data?.id ?? null;
   const preview = usePreviewRound(roundId);
-
-  const [category, setCategory] = useState<CategoryTag | null>(null);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<SortKey>("mostBacked");
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
 
   // Which categories the open round matches (empty scope = all in scope).
   const scope = openRound.data?.categories ?? [];
@@ -75,45 +65,21 @@ export default function DiscoveryPage() {
   const pool = openRound.data?.pool ?? 0n;
   const heroRows = inScopeApproved.map((project, i) => ({
     project,
+    direct: roundProjects[i]?.data?.[0] ?? 0n,
     match: matchOf.get(project.id) ?? 0n,
     donors: roundProjects[i]?.data?.[1],
   }));
-  const topRow = [...heroRows].sort((a, b) => Number(b.match - a.match))[0];
-  const maxMatch = heroRows.reduce((max, row) => (row.match > max ? row.match : max), 0n);
-  const crowdShare = topRow && pool > 0n ? Math.round(Number((topRow.match * 100n) / pool)) : 0;
-  const heroProject = topRow?.project;
+  const rankedRows = [...heroRows].sort((a, b) =>
+    a.direct === b.direct ? (b.donors ?? 0) - (a.donors ?? 0) : a.direct > b.direct ? -1 : 1,
+  );
+  const selectedRow =
+    rankedRows.find((row) => row.project.id === selectedCampaignId) ?? rankedRows[0];
+  const maxDirect = rankedRows.reduce((max, row) => (row.direct > max ? row.direct : max), 0n);
+  const crowdShare =
+    selectedRow && pool > 0n ? Math.round(Number((selectedRow.match * 100n) / pool)) : 0;
+  const heroProject = selectedRow?.project;
   const heroVisual = getProjectVisual(heroProject?.id ?? 0);
   const statusLabel = openRound.data ? strings.landing.statusOpen : d.noRound;
-
-  const visible = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const filtered = approved.filter((c) => {
-      if (category && c.category.tag !== category) return false;
-      if (q && !`${c.title} ${c.story}`.toLowerCase().includes(q)) return false;
-      return true;
-    });
-    const sorted = [...filtered];
-    if (sort === "mostBacked") {
-      sorted.sort((a, b) => descBig(a.lifetime_direct, b.lifetime_direct));
-    } else if (sort === "newest") {
-      sorted.sort((a, b) => descBig(a.created_ledger, b.created_ledger));
-    } else {
-      // closing-soon: campaigns in the round that's closing come first, then most-backed.
-      sorted.sort((a, b) => {
-        const s = Number(inScope(b)) - Number(inScope(a));
-        return s !== 0 ? s : descBig(a.lifetime_direct, b.lifetime_direct);
-      });
-    }
-    return sorted;
-    // inScope depends on openRound.data/roundId, captured via approved/scope changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [approved, category, search, sort, roundId, openRound.data]);
-
-  const filtersActive = category !== null || search.trim() !== "";
-  const resetFilters = () => {
-    setCategory(null);
-    setSearch("");
-  };
 
   return (
     <>
@@ -140,12 +106,7 @@ export default function DiscoveryPage() {
 
             <h1 className="display mt-8 max-w-4xl text-[clamp(3.2rem,8.4vw,8.6rem)] leading-[.86] text-paper">
               <Reveal mode="load" delay={0.06} y={44} className="overflow-hidden">
-                <span className="block">Crowd</span>
-              </Reveal>
-              <Reveal mode="load" delay={0.14} y={44} className="overflow-hidden">
-                <span className="block">
-                  beats <span className="text-lime">whale.</span>
-                </span>
+                <span className="block max-w-[10ch]">{l.heroTitle}</span>
               </Reveal>
             </h1>
 
@@ -206,9 +167,9 @@ export default function DiscoveryPage() {
 
             <Reveal mode="load" delay={0.52}>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a className="btn btn-lime" href="#app">
+                <Link className="btn btn-lime" href="/campaigns">
                   {l.primaryCta}
-                </a>
+                </Link>
                 <Link className="btn btn-ghost" href="/results">
                   {l.secondaryCta}
                 </Link>
@@ -219,9 +180,13 @@ export default function DiscoveryPage() {
           <Reveal mode="load" delay={0.3} y={40}>
           <aside className="glass-dark scanline rounded-[2rem] p-4 sm:p-5 lg:p-6">
             <div className="grid gap-4 xl:grid-cols-[.95fr_1.05fr]">
-              <div className="relative min-h-[330px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-paper text-ink">
+              <Link
+                href={heroProject ? `/campaign/${heroProject.id}` : "/campaigns"}
+                aria-label={heroProject ? `${l.primaryCta}: ${heroProject.title}` : l.primaryCta}
+                className="group relative min-h-[330px] overflow-hidden rounded-[1.5rem] border border-white/10 bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-lime"
+              >
                 <img
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   src={heroVisual.image}
                   alt={heroProject?.title ?? "Proyek Patungan"}
                 />
@@ -234,24 +199,31 @@ export default function DiscoveryPage() {
                     {heroProject?.title ?? l.waitingProjectTitle}
                   </h2>
                   <p className="mt-2 text-sm font-semibold text-white/75">
-                    {heroProject ? l.heroTopLine(topRow.donors ?? 0) : l.heroTopLineEmpty}
+                    {heroProject ? l.heroTopLine(selectedRow.donors ?? 0) : l.heroTopLineEmpty}
                   </p>
+                  {heroProject ? (
+                    <span className="mt-4 inline-flex text-xs font-black uppercase tracking-[.12em] text-lime underline decoration-lime/50 underline-offset-4">
+                      {l.primaryCta} →
+                    </span>
+                  ) : null}
                 </div>
-              </div>
+              </Link>
 
               <div className="chain-panel rounded-[1.5rem] p-5">
                 <div className="relative z-10">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <span className="text-xs font-black uppercase tracking-[.16em] text-lime/75">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <span className="text-xs font-black uppercase tracking-[.16em] text-lime">
                         {l.matchEngineLabel}
                       </span>
-                      <h2 className="mt-2 text-2xl font-black">{l.matchEngineTitle}</h2>
-                      <p className="mono mt-2 text-xs font-bold text-white/60">
-                        fn finalize(round_id: {roundId ?? "—"}) -&gt; allocation[]
+                      <h2 className="mt-2 text-2xl font-black text-paper">{l.matchEngineTitle}</h2>
+                      <p className="mt-2 max-w-[24rem] text-xs font-semibold leading-5 text-white/70">
+                        {openRound.data
+                          ? `${strings.discovery.season} #${roundId} · ${strings.discovery.live}`
+                          : strings.discovery.noRound}
                       </p>
                     </div>
-                    <span className="rounded-full border border-lime/30 px-3 py-1 text-xs font-black text-lime">
+                    <span className="inline-flex min-h-8 shrink-0 items-center whitespace-nowrap rounded-full border border-lime/50 bg-lime/10 px-3 py-1 text-xs font-black leading-none text-lime">
                       {openRound.data ? brand.machine.ready : brand.machine.idle}
                     </span>
                   </div>
@@ -260,7 +232,7 @@ export default function DiscoveryPage() {
                     <div className="grid size-full place-items-center rounded-full bg-ink text-center">
                       <div>
                         <span className="text-xs font-black uppercase tracking-[.18em] text-white/55">
-                          {l.crowdShareLabel}
+                          {l.selectedShareLabel}
                         </span>
                         <strong className="mt-2 block text-5xl font-black text-lime">
                           {crowdShare}%
@@ -272,29 +244,47 @@ export default function DiscoveryPage() {
                     </div>
                   </div>
 
-                  <div className="mt-7 space-y-3">
-                    {heroRows.length === 0 ? (
+                  <div className="mt-7">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[10px] font-black uppercase tracking-[.13em] text-white/50">
+                        {l.rankedByDirect}
+                      </p>
+                      <span className="text-[10px] font-bold text-white/40">{l.switchCampaignLabel}</span>
+                    </div>
+                    <div className="space-y-2" role="listbox" aria-label={l.switchCampaignLabel}>
+                    {rankedRows.length === 0 ? (
                       <p className="text-sm font-semibold text-white/50">{strings.loading}</p>
                     ) : (
-                      heroRows.map(({ project, match }) => {
+                      rankedRows.map(({ project, direct }) => {
                         const width =
-                          maxMatch > 0n ? Math.max(Number((match * 100n) / maxMatch), 4) : 4;
+                          maxDirect > 0n ? Math.max(Number((direct * 100n) / maxDirect), 4) : 4;
+                        const active = project.id === heroProject?.id;
                         return (
-                          <div key={project.id}>
-                            <div className="mb-1 flex justify-between gap-3 text-xs font-black uppercase tracking-[.12em] text-white/55">
+                          <button
+                            key={project.id}
+                            type="button"
+                            role="option"
+                            aria-selected={active}
+                            onClick={() => setSelectedCampaignId(project.id)}
+                            className={`block w-full rounded-xl px-3 py-2.5 text-left transition-colors ${
+                              active ? "bg-lime/10 ring-1 ring-lime/40" : "hover:bg-white/[.06]"
+                            }`}
+                          >
+                            <div className={`mb-1.5 flex justify-between gap-3 text-xs font-black uppercase tracking-[.1em] ${active ? "text-paper" : "text-white/55"}`}>
                               <span>{project.title}</span>
-                              <span>{pool > 0n ? Number((match * 100n) / pool) : 0}%</span>
+                              <span className="tabular shrink-0">{formatCompactIDR(direct)}</span>
                             </div>
                             <div className="h-2 overflow-hidden rounded-full bg-white/10">
                               <div
-                                className="h-full rounded-full bg-lime"
+                                className={`h-full rounded-full ${active ? "bg-lime" : "bg-white/35"}`}
                                 style={{ width: `${width}%` }}
                               />
                             </div>
-                          </div>
+                          </button>
                         );
                       })
                     )}
+                    </div>
                   </div>
 
                   <div className="mt-5 grid grid-cols-3 gap-2">
@@ -347,8 +337,8 @@ export default function DiscoveryPage() {
 
           <div className="chain-panel rounded-[2rem] p-5 sm:p-8">
             <div className="relative z-10">
-              <p className="mono text-[11px] font-bold text-white/60">
-                {`// patungan.wasm — ${l.proofComment}`}
+              <p className="text-xs font-black uppercase tracking-[.14em] text-lime/80">
+                {l.proofComment}
               </p>
               <ol className="mt-4">
                 {[
@@ -357,30 +347,31 @@ export default function DiscoveryPage() {
                   ["contribute", "(donor, project, amt)", l.proofSteps[2].title, l.proofSteps[2].copy],
                 ].map(([fn, sig, title, copy], i) => (
                   <Reveal key={fn} delay={i * 0.08}>
-                    <li className="grid gap-2 border-b border-white/10 py-5 sm:grid-cols-[minmax(15rem,.9fr)_1.1fr] sm:items-baseline sm:gap-6">
-                      <span className="mono text-sm font-bold text-lime/80">
-                        <span className="text-white/55">{String(i + 1).padStart(2, "0")}&nbsp;&nbsp;</span>
-                        {fn}
-                        <span className="text-white/55">{sig}</span>
+                    <li className="grid gap-3 border-b border-white/10 py-6 sm:grid-cols-[3rem_1fr] sm:gap-5">
+                      <span className="mono text-sm font-black text-lime/75">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
                       <span>
-                        <h3 className="text-lg font-black">{title}</h3>
-                        <p className="mt-1 text-sm font-semibold leading-6 text-white/50">{copy}</p>
+                        <h3 className="text-xl font-black text-paper">{title}</h3>
+                        <p className="mt-2 max-w-[54ch] text-sm font-semibold leading-6 text-white/70">{copy}</p>
+                        <span className="mono mt-3 inline-flex rounded-md border border-white/15 bg-black/20 px-2.5 py-1.5 text-[11px] font-bold text-white/65">
+                          {fn}{sig}
+                        </span>
                       </span>
                     </li>
                   </Reveal>
                 ))}
                 <Reveal delay={0.24}>
-                  <li className="mt-5 grid gap-2 rounded-[1.35rem] bg-lime p-5 text-ink sm:grid-cols-[minmax(15rem,.9fr)_1.1fr] sm:items-baseline sm:gap-6">
-                    <span className="mono text-sm font-bold">
-                      <span className="text-ink/60">04&nbsp;&nbsp;</span>
-                      finalize<span className="text-ink/55">(round_id)</span>
-                    </span>
+                  <li className="mt-5 grid gap-3 rounded-[1.35rem] bg-lime p-5 text-ink sm:grid-cols-[3rem_1fr] sm:gap-5">
+                    <span className="mono text-sm font-black text-ink/60">04</span>
                     <span>
-                      <h3 className="text-lg font-black">{l.proofSteps[3].title}</h3>
-                      <p className="mt-1 text-sm font-semibold leading-6 text-ink/70">
+                      <h3 className="text-xl font-black">{l.proofSteps[3].title}</h3>
+                      <p className="mt-2 max-w-[54ch] text-sm font-semibold leading-6 text-ink/75">
                         {l.proofSteps[3].copy}
                       </p>
+                      <span className="mono mt-3 inline-flex rounded-md border border-ink/15 bg-ink/5 px-2.5 py-1.5 text-[11px] font-bold text-ink/65">
+                        finalize(round_id)
+                      </span>
                     </span>
                   </li>
                 </Reveal>
@@ -390,210 +381,39 @@ export default function DiscoveryPage() {
         </div>
       </section>
 
-      <main id="app" className="bg-cream">
+      <main className="bg-cream">
         <div className="mx-auto max-w-[1500px] px-4 py-12 sm:px-7 lg:px-10 lg:py-16">
-        <RoundBanner query={openRound} />
-
-        <HowItWorks />
-
-        <Reveal>
-          <div className="mt-16 border-t-2 border-ink pt-8">
-            <div className="flex flex-wrap items-end justify-between gap-5">
-              <div>
-                <span className="mono text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
-                  {`// ${l.directoryComment}`}
-                </span>
-                <h1 className="display mt-3 text-4xl leading-none text-ink sm:text-6xl">
-                  {d.heading}
-                </h1>
-                <p className="mt-3 max-w-xl font-semibold text-ink/70">{d.tagline}</p>
-              </div>
-              <Link href="/campaign/new" className="btn shrink-0 bg-ink text-paper">
-                {d.createCta}
-              </Link>
-            </div>
-          </div>
-        </Reveal>
-
-        {/* Controls: category chips + search + sort */}
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex flex-wrap gap-2">
-            <FilterChip active={category === null} onClick={() => setCategory(null)}>
-              {d.allFilter}
-            </FilterChip>
-            {ALL_CATEGORIES.map((tag) => (
-              <FilterChip
-                key={tag}
-                active={category === tag}
-                onClick={() => setCategory(tag)}
-              >
-                {categoryMeta(tag, strings.categories).label}
-              </FilterChip>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <label className="relative flex-1 sm:max-w-sm">
-              <SearchIcon />
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={d.searchPlaceholder}
-                className="w-full rounded-full border border-ink/15 bg-paper py-2.5 pl-10 pr-4 text-sm font-semibold text-ink placeholder:text-ink/40 transition-colors focus:border-ink focus:outline-none"
-              />
-            </label>
-
-            <label className="flex items-center gap-2 text-sm font-semibold text-ink/60">
-              <span className="whitespace-nowrap">{d.sortLabel}</span>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value as SortKey)}
-                className="rounded-full border border-ink/15 bg-paper py-2.5 pl-4 pr-8 text-sm font-bold text-ink transition-colors focus:border-ink focus:outline-none"
-              >
-                <option value="mostBacked">{d.sort.mostBacked}</option>
-                <option value="newest">{d.sort.newest}</option>
-                <option value="closingSoon">{d.sort.closingSoon}</option>
-              </select>
-            </label>
-          </div>
-        </div>
-
-        {/* Grid — four states */}
-        <div className="mt-8">
-          {campaigns.data === undefined ? (
-            campaigns.isError ? (
-              <ErrorPanel onRetry={() => campaigns.refetch()} />
-            ) : (
-              <SkeletonGrid />
-            )
-          ) : approved.length === 0 ? (
-            <EmptyPanel message={d.emptyApproved} />
-          ) : visible.length === 0 ? (
-            <EmptyPanel
-              message={d.emptyFiltered}
-              action={filtersActive ? { label: d.resetFilters, onClick: resetFilters } : undefined}
-            />
-          ) : (
-            <>
-              {campaigns.isError ? (
-                <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
-              ) : null}
-              <p className="mono mb-5 text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
-                {d.resultCount(visible.length)} · {l.seasonRef(roundId ?? "—")}
-              </p>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {visible.map((c) => (
-                  <CampaignCard
-                    key={c.id}
-                    campaign={c}
-                    roundId={roundId}
-                    inScope={inScope(c)}
-                    projectedMatch={matchOf.get(c.id)}
-                    pool={pool}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+          <RoundBanner query={openRound} />
+          <HowItWorks />
         </div>
       </main>
-    </>
-  );
-}
 
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-4 py-1.5 text-sm font-bold transition-colors ${
-        active
-          ? "border-ink bg-ink text-paper"
-          : "border-ink/15 bg-transparent text-ink/70 hover:border-ink/40 hover:text-ink"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-faint"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      aria-hidden
-    >
-      <circle cx="9" cy="9" r="6" />
-      <path d="m14 14 3.5 3.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SkeletonGrid() {
-  return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="overflow-hidden rounded-2xl border border-line bg-surface">
-          <div className="aspect-[16/9] animate-pulse bg-line/50" />
-          <div className="space-y-3 p-4">
-            <div className="h-4 w-3/4 animate-pulse rounded bg-line/50" />
-            <div className="h-4 w-1/2 animate-pulse rounded bg-line/50" />
+      <section className="bg-lime px-4 py-14 text-ink sm:px-7 lg:px-10 lg:py-18">
+        <div className="mx-auto grid max-w-[1500px] gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <span className="mono text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
+              {`// ${l.directoryComment}`}
+            </span>
+            <h2 className="display mt-3 max-w-4xl text-[clamp(2.7rem,6vw,6.4rem)] leading-[.88]">
+              {d.heading}
+            </h2>
+            <p className="mt-4 max-w-2xl text-lg font-semibold leading-8 text-ink/70">
+              {d.tagline}
+            </p>
+            <p className="mono mt-5 text-xs font-bold uppercase tracking-[.12em] text-ink/55">
+              {d.resultCount(approved.length)} · {l.seasonRef(roundId ?? "—")}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/campaigns" className="btn bg-ink text-paper">
+              {l.primaryCta}
+            </Link>
+            <Link href="/campaign/new" className="btn border border-ink/25 bg-transparent text-ink">
+              {d.createCta}
+            </Link>
           </div>
         </div>
-      ))}
-    </div>
-  );
-}
-
-function EmptyPanel({
-  message,
-  action,
-}: {
-  message: string;
-  action?: { label: string; onClick: () => void };
-}) {
-  return (
-    <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
-      <p className="text-muted">{message}</p>
-      {action ? (
-        <button
-          type="button"
-          onClick={action.onClick}
-          className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
-        >
-          {action.label}
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
-function ErrorPanel({ onRetry }: { onRetry: () => void }) {
-  const strings = useStrings();
-  return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
-      <p className="text-ink">{strings.errorGeneric}</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
-      >
-        {strings.retry}
-      </button>
-    </div>
+      </section>
+    </>
   );
 }

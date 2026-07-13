@@ -71,12 +71,12 @@ function SkeletonList() {
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6">
           <div className="flex items-start justify-between gap-3">
-            <div className="h-6 w-32 animate-pulse rounded bg-line/50" />
-            <div className="h-6 w-24 animate-pulse rounded bg-line/50" />
+          <div className="skeleton h-6 w-32 rounded" />
+          <div className="skeleton h-6 w-24 rounded" />
           </div>
-          <div className="mt-4 h-4 w-1/2 animate-pulse rounded bg-line/50" />
+          <div className="skeleton mt-4 h-4 w-1/2 rounded" />
           <div className="mt-5 border-t border-line pt-4">
-            <div className="h-4 w-2/3 animate-pulse rounded bg-line/50" />
+            <div className="skeleton h-4 w-2/3 rounded" />
           </div>
         </div>
       ))}
@@ -87,12 +87,12 @@ function SkeletonList() {
 function EmptyPanel() {
   const strings = useStrings();
   return (
-    <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{strings.seasons.empty}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{strings.seasons.emptyHint}</p>
       <Link
         href="/"
-        className="mt-5 inline-block text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-5"
       >
         {strings.nav.landing}
       </Link>
@@ -103,12 +103,12 @@ function EmptyPanel() {
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
   const strings = useStrings();
   return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-4"
       >
         {strings.retry}
       </button>

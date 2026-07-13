@@ -48,6 +48,7 @@ export function ContributePanel({
   const [amount, setAmount] = useState<number>(PRESETS[1]);
   const [custom, setCustom] = useState(false);
   const [customRaw, setCustomRaw] = useState("");
+  const [reviewing, setReviewing] = useState(false);
   const [tx, setTx] = useState<TxState>({ phase: "idle" });
 
   const pending = tx.phase === "awaiting-signature" || tx.phase === "submitting";
@@ -157,11 +158,60 @@ export function ContributePanel({
       void queryClient.invalidateQueries({ queryKey: ["previewRound"] });
       void queryClient.invalidateQueries({ queryKey: ["roundProject"] });
       void queryClient.invalidateQueries({ queryKey: ["campaignActivity", campaign.id] });
+      void queryClient.invalidateQueries({ queryKey: ["campaignContributions", campaign.id] });
 
       setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
     } catch (err) {
       setTx({ phase: "error", message: mapContractError(err, strings.errors) });
     }
+  }
+
+  if (reviewing) {
+    return (
+      <div className="rounded-xl border border-white/15 bg-white/10 p-4">
+        <p className="font-black text-paper">{c.reviewTitle}</p>
+        <p className="mt-1 text-xs font-semibold leading-5 text-white/55">{c.reviewBody}</p>
+        <dl className="mt-4 divide-y divide-white/10 border-y border-white/10 text-sm">
+          {[
+            [c.reviewCampaign, campaign.title],
+            [c.reviewAmount, formatIDR(chosenAmount)],
+            [c.reviewRecipient, campaign.payout],
+            [c.reviewNetwork, "Stellar Testnet"],
+          ].map(([label, value]) => (
+            <div key={label} className="grid gap-1 py-2.5 sm:grid-cols-[7rem_1fr]">
+              <dt className="font-bold text-white/50">{label}</dt>
+              <dd className="break-all font-black text-paper">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        {tx.phase === "error" ? (
+          <p className="mt-3 text-sm font-semibold text-cat-disaster">{tx.message}</p>
+        ) : null}
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => void submit()}
+          className="btn btn-lime mt-4 w-full disabled:opacity-60"
+        >
+          {tx.phase === "awaiting-signature"
+            ? c.awaiting
+            : tx.phase === "submitting"
+              ? c.submitting
+              : c.reviewSubmit}
+        </button>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => {
+            setTx({ phase: "idle" });
+            setReviewing(false);
+          }}
+          className="mt-3 w-full text-center text-sm font-semibold text-white/60 underline underline-offset-2 hover:text-paper disabled:opacity-60"
+        >
+          {c.reviewBack}
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -231,7 +281,7 @@ export function ContributePanel({
       <button
         type="button"
         disabled={pending || !amountValid}
-        onClick={() => void submit()}
+        onClick={() => setReviewing(true)}
         className="btn btn-lime w-full disabled:opacity-60"
       >
         {tx.phase === "awaiting-signature"
@@ -244,7 +294,10 @@ export function ContributePanel({
       <button
         type="button"
         disabled={pending}
-        onClick={() => setOpen(false)}
+        onClick={() => {
+          setTx({ phase: "idle" });
+          setOpen(false);
+        }}
         className="w-full text-center text-sm font-semibold text-white/50 underline underline-offset-2 hover:text-paper disabled:opacity-60"
       >
         {c.cancel}

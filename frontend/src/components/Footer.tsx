@@ -32,6 +32,7 @@ export function Footer() {
           <nav aria-label="Peta situs" className="grid grid-cols-2 gap-x-8 gap-y-2 self-start text-sm font-bold">
             {[
               ["/", strings.nav.landing],
+              ["/campaigns", strings.nav.campaigns],
               ["/seasons", strings.nav.seasons],
               ["/results", strings.nav.results],
               ["/dashboard", strings.nav.dashboard],

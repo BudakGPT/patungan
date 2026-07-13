@@ -6,8 +6,10 @@ import { Tier } from "@/contract/src";
 import { contractClient } from "./contract";
 import {
   fetchCampaignActivity,
+  fetchCampaignContributions,
   fetchContributions,
   type CampaignActivity,
+  type CampaignContribution,
   type Contribution,
 } from "./events";
 
@@ -179,6 +181,20 @@ export function useCampaignActivity(projectId: number, enabled = true) {
   return useQuery<CampaignActivity[]>({
     queryKey: ["campaignActivity", projectId],
     queryFn: async () => fetchCampaignActivity(projectId),
+    enabled,
+    refetchInterval: 8000,
+  });
+}
+
+/**
+ * The donations one campaign received (`contrib` events by project-id topic) — powers the
+ * dashboard's per-campaign insights. Same event-scan weight as `useContributions`, so the same
+ * slower 8s poll.
+ */
+export function useCampaignContributions(projectId: number, enabled = true) {
+  return useQuery<CampaignContribution[]>({
+    queryKey: ["campaignContributions", projectId],
+    queryFn: async () => fetchCampaignContributions(projectId),
     enabled,
     refetchInterval: 8000,
   });

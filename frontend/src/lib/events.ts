@@ -169,3 +169,40 @@ export async function fetchCampaignActivity(projectId: number): Promise<Campaign
     })
     .sort((a, b) => b.ledger - a.ledger);
 }
+
+/** One reconstructed `contrib` event for a campaign: who gave, how much, and in which ledger. */
+export interface CampaignContribution {
+  donor: string;
+  amount: bigint;
+  ledger: number;
+  at: string;
+  txHash: string;
+}
+
+/**
+ * Reconstruct the donations one campaign received, newest first (contrib-only) — powers the
+ * dashboard's per-campaign insights. Same cursor-correct `scanEvents` walk as the activity feed,
+ * filtered to the project-id topic; payouts are excluded since insights chart donations coming in.
+ */
+export async function fetchCampaignContributions(
+  projectId: number,
+): Promise<CampaignContribution[]> {
+  const projectTopic = nativeToScVal(projectId, { type: "u32" }).toXDR("base64");
+  const events = await scanEvents(makeServer(), [
+    {
+      type: "contract",
+      contractIds: [config.contractId],
+      topics: [[CONTRIB_TOPIC, projectTopic, "*"]],
+    },
+  ]);
+
+  return events
+    .map((e) => ({
+      donor: String(scValToNative(e.topic[2])),
+      amount: BigInt(scValToNative(e.value) as bigint | number),
+      ledger: e.ledger,
+      at: e.ledgerClosedAt,
+      txHash: e.txHash,
+    }))
+    .sort((a, b) => b.ledger - a.ledger);
+}

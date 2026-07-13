@@ -10,6 +10,7 @@ import { CategoryChip } from "@/components/CategoryChip";
 import { useRounds, useCampaigns, usePreviewRound, useRoundProjects } from "@/lib/hooks";
 import { isDemoArtifact } from "@/lib/demo";
 import { CountUp, Reveal } from "@/components/motion";
+import { SelectMenu } from "@/components/SelectMenu";
 
 const descBig = (a: bigint, b: bigint) => (a < b ? 1 : a > b ? -1 : 0);
 
@@ -32,7 +33,7 @@ export default function ResultsPage() {
             <span className="tag">Live reveal</span>
           </Reveal>
           <Reveal mode="load" delay={0.08} y={40}>
-            <h1 className="display mt-4 text-[clamp(2.8rem,6.4vw,6.4rem)] leading-[.86]">
+            <h1 className="display mt-4 text-[clamp(2.3rem,9.8vw,6.4rem)] leading-[.86]">
               {r.title}
             </h1>
           </Reveal>
@@ -181,6 +182,17 @@ function RoundResults({ round, rounds }: { round: RoundState; rounds: RoundState
             {stale ? (
               <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
             ) : null}
+            <div className="mb-5 grid gap-3 border-y border-line py-4 text-sm sm:grid-cols-2">
+              <div className="flex gap-3">
+                <span className="mt-1 size-3 shrink-0 rounded-sm bg-ink/25" aria-hidden />
+                <p className="leading-6 text-muted">{r.directDefinition}</p>
+              </div>
+              <div className="flex gap-3">
+                <span className="mt-1 size-3 shrink-0 rounded-sm bg-match" aria-hidden />
+                <p className="leading-6 text-muted">{r.matchedDefinition}</p>
+              </div>
+              <p className="text-xs font-semibold text-faint sm:col-span-2">{r.barHint}</p>
+            </div>
             <ul className="space-y-3" aria-label={r.barLabel}>
               {rows.map((row, i) => (
                 <ResultRow
@@ -237,8 +249,10 @@ function ResultRow({
 }) {
   const strings = useStrings();
   const r = strings.results;
-  const directPct = scale > 0 ? (Number(direct) / scale) * 100 : 0;
-  const matchedPct = scale > 0 ? (Number(matched) / scale) * 100 : 0;
+  const total = Number(direct + matched);
+  const totalPct = scale > 0 ? (total / scale) * 100 : 0;
+  const directShare = total > 0 ? (Number(direct) / total) * 100 : 0;
+  const matchedShare = total > 0 ? 100 - directShare : 0;
   const winner = index === 0;
 
   return (
@@ -246,10 +260,15 @@ function ResultRow({
       <Reveal
         delay={index * 0.07}
         y={20}
-        className={`flex gap-4 rounded-2xl border p-5 shadow-card sm:gap-6 ${
+        className={`rounded-2xl border shadow-card transition-colors ${
           winner ? "border-match/30 bg-match-soft/60" : "border-line bg-surface"
         }`}
       >
+        <Link
+          href={`/campaign/${fallbackId}`}
+          aria-label={`${r.openCampaign}: ${campaign?.title ?? `#${fallbackId}`}`}
+          className="group flex gap-4 rounded-2xl p-5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-match sm:gap-6"
+        >
         <span
           className={`display select-none text-4xl leading-none sm:text-5xl ${
             winner ? "text-match-ink" : "text-line-strong"
@@ -291,14 +310,18 @@ function ResultRow({
 
           <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-line/40">
             <div
-              className="flex h-full origin-left motion-safe:animate-bar-in"
-              style={{ animationDelay: `${index * 45}ms` }}
+              className="flex h-full origin-left overflow-hidden rounded-full motion-safe:animate-bar-in"
+              style={{ width: `${Math.max(totalPct, total > 0 ? 2 : 0)}%`, animationDelay: `${index * 45}ms` }}
             >
-              <div className="h-full bg-ink/25" style={{ width: `${directPct}%` }} />
-              <div className="h-full bg-match" style={{ width: `${matchedPct}%` }} />
+              <div className="h-full bg-ink/25" style={{ width: `${directShare}%` }} />
+              <div className="h-full bg-match" style={{ width: `${matchedShare}%` }} />
             </div>
           </div>
+          <span className="mt-3 inline-flex text-xs font-black text-match-ink opacity-0 transition-opacity group-hover:opacity-100 group-focus:opacity-100">
+            {r.openCampaign} →
+          </span>
         </div>
+        </Link>
       </Reveal>
     </li>
   );
@@ -325,9 +348,9 @@ function Header({
       <div className="max-w-2xl">
         <p className="text-sm font-medium text-muted">{r.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2.5">
-          <h1 className="text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-[2.25rem]">
+          <h2 className="text-3xl font-bold leading-[1.1] tracking-tight text-ink sm:text-[2.25rem]">
             {r.seasonLabel(round.id)}
-          </h1>
+          </h2>
           <span
             className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
               finalized ? "bg-match-soft text-match-ink" : "bg-accent-soft text-accent-ink"
@@ -341,33 +364,19 @@ function Header({
         </p>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-muted">
+      <div className="flex items-center gap-2 text-sm text-muted">
         <span className="whitespace-nowrap">{r.roundPickerLabel}</span>
-        <span className="relative">
-          <select
-            value={round.id}
-            onChange={(e) => router.replace(`/results?round=${e.target.value}`)}
-            className="appearance-none rounded-full border border-line bg-surface py-2.5 pl-4 pr-9 text-sm font-semibold text-ink transition-colors hover:border-accent/40 focus:border-accent focus:outline-none"
-          >
-            {ordered.map((x) => (
-              <option key={x.id} value={x.id}>
-                {r.seasonLabel(x.id)} · {strings.seasons.status[x.status.tag] ?? x.status.tag}
-              </option>
-            ))}
-          </select>
-          <svg
-            className="pointer-events-none absolute right-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint"
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden
-          >
-            <path d="m5 8 5 5 5-5" />
-          </svg>
-        </span>
-      </label>
+        <SelectMenu
+          value={round.id}
+          onChange={(id) => router.replace(`/results?round=${id}`)}
+          ariaLabel={r.roundPickerLabel}
+          options={ordered.map((x) => ({
+            value: x.id,
+            label: `${r.seasonLabel(x.id)} · ${strings.seasons.status[x.status.tag] ?? x.status.tag}`,
+          }))}
+          className="min-w-52"
+        />
+      </div>
     </header>
   );
 }
@@ -380,10 +389,10 @@ function RowsSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <li key={i} className="rounded-2xl border border-line bg-surface p-5 shadow-card">
           <div className="flex items-start justify-between gap-3">
-            <div className="h-5 w-1/3 animate-pulse rounded bg-line/50" />
-            <div className="h-5 w-24 animate-pulse rounded bg-line/50" />
+            <div className="skeleton h-5 w-1/3 rounded" />
+            <div className="skeleton h-5 w-24 rounded" />
           </div>
-          <div className="mt-4 h-2.5 w-full animate-pulse rounded-full bg-line/40" />
+          <div className="skeleton mt-4 h-2.5 w-full rounded-full" />
         </li>
       ))}
     </ul>
@@ -406,7 +415,7 @@ function SlowLoadHint({ onRetry }: { onRetry: () => void }) {
       <button
         type="button"
         onClick={onRetry}
-        className="font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link"
       >
         {strings.retry}
       </button>
@@ -417,8 +426,8 @@ function SlowLoadHint({ onRetry }: { onRetry: () => void }) {
 function PageSkeleton() {
   return (
     <div>
-      <div className="h-10 w-48 animate-pulse rounded bg-line/50" />
-      <div className="mt-3 h-4 w-72 animate-pulse rounded bg-line/50" />
+      <div className="skeleton h-10 w-48 rounded" />
+      <div className="skeleton mt-3 h-4 w-72 rounded" />
       <div className="mt-8">
         <RowsSkeleton />
       </div>
@@ -429,7 +438,7 @@ function PageSkeleton() {
 function EmptyPanel() {
   const { results: r } = useStrings();
   return (
-    <div className="rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{r.empty}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{r.emptyHint}</p>
     </div>
@@ -439,12 +448,12 @@ function EmptyPanel() {
 function NotFound({ title, body }: { title: string; body: string }) {
   const { results: r } = useStrings();
   return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-base font-semibold text-ink">{title}</p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{body}</p>
       <Link
         href="/seasons"
-        className="mt-5 inline-block text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-5"
       >
         {r.backToSeasons}
       </Link>
@@ -455,12 +464,12 @@ function NotFound({ title, body }: { title: string; body: string }) {
 function ErrorPanel({ onRetry }: { onRetry: () => void }) {
   const strings = useStrings();
   return (
-    <div className="rounded-2xl border border-line bg-surface px-6 py-16 text-center">
+    <div className="state-panel px-6 py-16 text-center">
       <p className="text-ink">{strings.errorGeneric}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 text-sm font-medium text-accent-ink underline underline-offset-4 hover:text-accent"
+        className="action-link mt-4"
       >
         {strings.retry}
       </button>

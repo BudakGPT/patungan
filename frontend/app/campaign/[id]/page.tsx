@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ProjectState } from "@/contract/src";
@@ -91,6 +91,18 @@ function Content({
   const approved = campaign.status.tag === "Approved";
   const statusNotice = approved ? null : t.status[campaign.status.tag];
   const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
+  const targetPct = Math.min(
+    Number((total * 10_000n) / visual.fundingTarget) / 100,
+    100,
+  );
+
+  useEffect(() => {
+    const previous = document.title;
+    document.title = `${campaign.title} | Patungan`;
+    return () => {
+      document.title = previous;
+    };
+  }, [campaign.title]);
 
   return (
     <main className="bg-cream text-ink">
@@ -108,7 +120,7 @@ function Content({
         <div className="relative mx-auto grid max-w-[1500px] gap-8 px-4 py-14 sm:px-7 lg:grid-cols-[1fr_.85fr] lg:px-10">
           <div>
             <Reveal mode="load" y={16}>
-              <Link href="/" className="tag">
+              <Link href="/campaigns" className="tag">
                 {t.back}
               </Link>
               <div className="mt-8 flex flex-wrap gap-2">
@@ -151,7 +163,7 @@ function Content({
                   {formatCompactIDR(campaign.lifetime_direct)}
                 </strong>
               </div>
-              <div className="metric-card bg-tile-match text-ink">
+              <div className="metric-card bg-tile-match text-ink" title={strings.discovery.projectedHint}>
                 <span className="text-xs font-black uppercase tracking-[.12em] text-ink/65">
                   {strings.discovery.projectedShort}
                 </span>
@@ -170,6 +182,29 @@ function Content({
                 </strong>
               </div>
             </div>
+
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[.06] p-3.5">
+              <div className="flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[.08em] text-white/65">
+                <span>
+                  {targetPct >= 100
+                    ? strings.discovery.targetReached
+                    : `${targetPct.toLocaleString("id-ID", { maximumFractionDigits: 1 })}% ${strings.discovery.targetProgress}`}
+                </span>
+                <span className="tabular text-paper">{formatCompactIDR(visual.fundingTarget)}</span>
+              </div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-green to-lime"
+                  style={{ width: `${targetPct}%` }}
+                />
+              </div>
+            </div>
+
+            {inScope ? (
+              <p className="mt-3 text-xs font-semibold leading-5 text-white/55">
+                {strings.discovery.projectedHint}
+              </p>
+            ) : null}
 
             {!inScope ? (
               <p className="mt-4 text-center text-xs font-semibold text-white/60">{t.notInRound}</p>
@@ -200,6 +235,28 @@ function Content({
               <p className="mt-6 max-w-[68ch] text-base leading-relaxed text-muted">
                 {visual.story}
               </p>
+
+              <section className="mt-9 max-w-[68ch] border-y border-line py-6">
+                <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">
+                  {t.transparencyHeading}
+                </h2>
+                <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                  <div>
+                    <dt className="font-bold text-muted">{t.verifiedLabel}</dt>
+                    <dd className="mt-1 font-black text-match-ink">{t.verifiedValue}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-bold text-muted">{t.payoutRecipientLabel}</dt>
+                    <dd className="mono mt-1 break-all font-bold text-ink">
+                      {campaign.payout}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="font-bold text-muted">{t.payoutScheduleLabel}</dt>
+                    <dd className="mt-1 leading-6 text-ink/80">{t.payoutScheduleValue}</dd>
+                  </div>
+                </dl>
+              </section>
 
               <CampaignActivityFeed campaignId={campaign.id} />
             </div>
@@ -342,7 +399,7 @@ function CampaignActivityFeed({ campaignId }: { campaignId: number }) {
       {activity.data === undefined ? (
         <div className="mt-5 space-y-2" aria-hidden>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-9 animate-pulse rounded-lg bg-line/50" />
+            <div key={i} className="skeleton h-9 rounded-lg" />
           ))}
         </div>
       ) : all.length === 0 ? (
@@ -453,19 +510,19 @@ function CampaignActivityFeed({ campaignId }: { campaignId: number }) {
 function DetailSkeleton() {
   return (
     <main className="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10" aria-hidden>
-      <div className="h-4 w-32 animate-pulse rounded bg-line/50" />
-      <div className="mt-5 aspect-[16/9] animate-pulse rounded-2xl bg-line/50 sm:aspect-[21/9]" />
+      <div className="skeleton h-4 w-32 rounded" />
+      <div className="skeleton mt-5 aspect-[16/9] rounded-2xl sm:aspect-[21/9]" />
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_20rem] lg:gap-12">
         <div className="space-y-4">
-          <div className="h-9 w-3/4 animate-pulse rounded bg-line/50" />
-          <div className="h-4 w-40 animate-pulse rounded bg-line/50" />
+          <div className="skeleton h-9 w-3/4 rounded" />
+          <div className="skeleton h-4 w-40 rounded" />
           <div className="mt-6 space-y-2">
-            <div className="h-4 w-full animate-pulse rounded bg-line/50" />
-            <div className="h-4 w-11/12 animate-pulse rounded bg-line/50" />
-            <div className="h-4 w-4/5 animate-pulse rounded bg-line/50" />
+            <div className="skeleton h-4 w-full rounded" />
+            <div className="skeleton h-4 w-11/12 rounded" />
+            <div className="skeleton h-4 w-4/5 rounded" />
           </div>
         </div>
-        <div className="h-56 animate-pulse rounded-2xl bg-line/50" />
+        <div className="skeleton h-56 rounded-2xl" />
       </div>
     </main>
   );
@@ -475,12 +532,12 @@ function NotFound() {
   const { campaign: t } = useStrings();
   return (
     <main className="mx-auto max-w-page px-4 py-24 sm:px-6">
-      <div className="mx-auto max-w-md rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
+      <div className="state-panel mx-auto max-w-md px-6 py-16 text-center">
         <p className="text-lg font-semibold text-ink">{t.notFoundTitle}</p>
         <p className="mt-2 text-sm text-muted">{t.notFoundBody}</p>
         <Link
           href="/"
-          className="mt-5 inline-block rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink"
+          className="action-link mt-5"
         >
           {t.backHome}
         </Link>

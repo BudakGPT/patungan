@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import freighterApi from "@stellar/freighter-api";
@@ -94,7 +94,7 @@ function Gate({
           type="button"
           disabled={connecting}
           onClick={() => void onConnect()}
-          className="mt-4 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:opacity-60"
+          className="btn btn-lime mt-4 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {connecting ? strings.wallet.connecting : strings.wallet.connect}
         </button>
@@ -237,6 +237,7 @@ function OpenRoundSection({
   const o = strings.operator;
   const queryClient = useQueryClient();
   const action = useAction();
+  const endInputRef = useRef<HTMLInputElement>(null);
   const [endLocal, setEndLocal] = useState("");
   const [cats, setCats] = useState<Set<CategoryTag>>(new Set());
   const [touched, setTouched] = useState(false);
@@ -287,14 +288,30 @@ function OpenRoundSection({
         <div className="space-y-4">
           <div>
             <Label htmlFor="round-end">{o.open.endLabel}</Label>
-            <input
-              id="round-end"
-              type="datetime-local"
-              value={endLocal}
-              disabled={action.pending}
-              onChange={(e) => setEndLocal(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none"
-            />
+            <div className="relative mt-2">
+              <input
+                ref={endInputRef}
+                id="round-end"
+                type="datetime-local"
+                value={endLocal}
+                disabled={action.pending}
+                onChange={(e) => setEndLocal(e.target.value)}
+                className="field-control date-control pr-12"
+              />
+              <button
+                type="button"
+                disabled={action.pending}
+                aria-label={o.open.endLabel}
+                title={o.open.endLabel}
+                onClick={() => {
+                  endInputRef.current?.focus();
+                  endInputRef.current?.showPicker?.();
+                }}
+                className="field-icon-btn absolute right-1 top-1/2 -translate-y-1/2 disabled:opacity-40"
+              >
+                <CalendarIcon />
+              </button>
+            </div>
             <p className="mt-1.5 text-xs text-faint">{o.open.endHelper}</p>
             {touched && !dateValid ? (
               <p className="mt-1 text-sm text-cat-disaster">{o.open.invalidDate}</p>
@@ -394,17 +411,35 @@ function FundPoolSection({
         <div className="space-y-4">
           <div>
             <Label htmlFor="fund-amount">{o.fund.amountLabel}</Label>
-            <input
-              id="fund-amount"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              step={1}
-              value={amount}
-              disabled={action.pending}
-              onChange={(e) => setAmount(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition-colors focus:border-accent focus:outline-none tabular"
-            />
+            <div className="field-stepper mt-2">
+              <button
+                type="button"
+                disabled={action.pending || amt <= 1}
+                aria-label={`${o.fund.amountLabel} −`}
+                onClick={() => setAmount(String(Math.max(1, (Number(amount) || 1) - 1)))}
+                className="stepper-button"
+              >
+                −
+              </button>
+              <input
+                id="fund-amount"
+                type="text"
+                inputMode="numeric"
+                value={amount}
+                disabled={action.pending}
+                onChange={(e) => setAmount(e.target.value.replace(/\D/g, "").slice(0, 15))}
+                className="stepper-input tabular"
+              />
+              <button
+                type="button"
+                disabled={action.pending}
+                aria-label={`${o.fund.amountLabel} +`}
+                onClick={() => setAmount(String((Number(amount) || 0) + 1))}
+                className="stepper-button"
+              >
+                +
+              </button>
+            </div>
             {amountValid ? (
               <p className="tabular mt-1.5 text-sm text-muted">
                 {o.fund.echoLabel} <span className="font-semibold text-ink">{formatIDR(amt)}</span>
@@ -546,8 +581,8 @@ function CurationSection({ curator }: { curator: string }) {
           <p className="text-sm text-cat-disaster">{strings.errorGeneric}</p>
         ) : (
           <div className="space-y-2">
-            <div className="h-14 animate-pulse rounded-xl bg-line/50" />
-            <div className="h-14 animate-pulse rounded-xl bg-line/50" />
+            <div className="skeleton h-14 rounded-xl" />
+            <div className="skeleton h-14 rounded-xl" />
           </div>
         )
       ) : pending.length === 0 ? (
@@ -674,7 +709,7 @@ function VerifySection({ attester }: { attester: string }) {
             disabled={action.pending}
             onChange={(e) => setAddr(e.target.value)}
             placeholder="G…"
-            className="mt-2 w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition-colors focus:border-accent focus:outline-none tabular"
+            className="field-control tabular mt-2"
           />
           {touched && !addrValid ? (
             <p className="mt-1 text-sm text-cat-disaster">{o.verify.invalidAddress}</p>
@@ -863,7 +898,7 @@ function ActionPanel({
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-line bg-surface p-6 shadow-card">{children}</div>;
+  return <div className="state-panel p-6">{children}</div>;
 }
 
 function RegionLabel({ children }: { children: React.ReactNode }) {
@@ -885,5 +920,24 @@ function Disabled({ children }: { children: React.ReactNode }) {
     <p className="rounded-xl border border-dashed border-line-strong bg-paper px-4 py-3 text-sm text-muted">
       {children}
     </p>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className="size-4"
+    >
+      <path d="M5.5 2.5v3M14.5 2.5v3M3 7.5h14" />
+      <rect x="3" y="4" width="14" height="13" rx="2.5" />
+      <path d="M6.5 11h2M11.5 11h2M6.5 14h2M11.5 14h2" />
+    </svg>
   );
 }

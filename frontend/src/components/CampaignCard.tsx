@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { ProjectState } from "@/contract/src";
 import { useStrings } from "@/lib/locale";
-import { formatCompactIDR, formatIDR } from "@/lib/format";
+import { formatCompactIDR, formatCountdown, formatIDR } from "@/lib/format";
 import { cidToUrl } from "@/lib/ipfs";
 import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
@@ -18,32 +19,43 @@ import { useRoundProject } from "@/lib/hooks";
  */
 export function CampaignCard({
   campaign,
+  rank,
   roundId,
   inScope,
   projectedMatch,
-  pool,
+  roundEnd,
 }: {
   campaign: ProjectState;
+  rank: number;
   roundId: number | null;
   inScope: boolean;
   projectedMatch?: bigint;
-  pool: bigint;
+  roundEnd?: bigint;
 }) {
   const strings = useStrings();
   const d = strings.discovery;
   const thumb = cidToUrl(campaign.image_cid);
   const visual = getProjectVisual(campaign.id);
   const { label: categoryLabel } = categoryMeta(campaign.category.tag, strings.categories);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!inScope || roundEnd === undefined) return;
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, [inScope, roundEnd]);
 
   // Donor count is only exposed per-round; fetch it just for in-scope cards.
   const rp = useRoundProject(roundId, campaign.id, { enabled: inScope });
   const donors = rp.data?.[1];
 
   const total = campaign.lifetime_direct + (projectedMatch ?? 0n);
-  const pct =
-    projectedMatch !== undefined && pool > 0n
-      ? Math.max(Math.min(Number((projectedMatch * 10_000n) / pool) / 100, 100), 5)
-      : 0;
+  const countdown =
+    inScope && roundEnd !== undefined ? formatCountdown(roundEnd, d.countdown, now) : null;
+  const targetPct = Math.min(
+    Number((total * 10_000n) / visual.fundingTarget) / 100,
+    100,
+  );
 
   return (
     <Link
@@ -59,9 +71,12 @@ export function CampaignCard({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent" />
         <div className="absolute left-4 top-4 flex gap-2">
-          {/* Rank chip stays paper — a campaign number is not a verdict (One Verdict Rule). */}
-          <span className="rounded-full bg-paper/90 px-3 py-1 text-xs font-black text-ink">
-            {String(campaign.id + 1).padStart(2, "0")}
+          {/* Current directory rank: it intentionally follows filtering and sorting. */}
+          <span
+            className="rounded-full bg-paper/90 px-3 py-1 text-xs font-black text-ink"
+            aria-label={`#${rank}`}
+          >
+            #{String(rank).padStart(2, "0")}
           </span>
           <span className="rounded-full bg-paper/90 px-3 py-1 text-xs font-black text-ink">
             {categoryLabel}
@@ -79,6 +94,22 @@ export function CampaignCard({
         <p className="line-clamp-3 text-base font-semibold leading-7 text-ink/70">
           {campaign.story}
         </p>
+
+        <div
+          className={`flex min-h-10 items-center justify-between gap-3 rounded-xl border px-3.5 py-2 text-xs font-black ${
+            inScope
+              ? "border-green/20 bg-match-soft text-match-ink"
+              : "border-ink/10 bg-ink/[.035] text-ink/60"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <span className={`size-2 rounded-full ${inScope ? "animate-pulse bg-green" : "bg-ink/25"}`} />
+            {inScope ? d.endsInLabel : d.cardDirectOpen}
+          </span>
+          {inScope ? (
+            <span className="tabular shrink-0">{countdown ?? d.countdown.ended}</span>
+          ) : null}
+        </div>
 
         {/* Canonical metric-tile mapping (DESIGN.md §5): lime = pendukung count (the crowd,
             attested — and the grid's biggest figure), cream = direct, pale = projected,
@@ -121,11 +152,18 @@ export function CampaignCard({
         </div>
 
         <div>
+          <div className="mb-2 flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[.08em] text-ink/60">
+            <span>
+              {targetPct >= 100
+                ? d.targetReached
+                : `${targetPct.toLocaleString("id-ID", { maximumFractionDigits: 1 })}% ${d.targetProgress}`}
+            </span>
+            <span className="tabular shrink-0">{formatCompactIDR(visual.fundingTarget)}</span>
+          </div>
           <div className="h-4 overflow-hidden rounded-full bg-ink/10">
-            {/* Ends at sea, not lime — a progress bar is not a verdict (One Verdict Rule). */}
             <div
               className="h-full rounded-full bg-gradient-to-r from-green to-sea"
-              style={{ width: `${pct}%` }}
+              style={{ width: `${targetPct}%` }}
             />
           </div>
           <div className="mt-2 flex justify-between gap-3 text-xs font-black uppercase tracking-[.1em] text-ink/65">

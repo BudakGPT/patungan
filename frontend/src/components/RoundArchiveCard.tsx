@@ -95,8 +95,8 @@ function Leaderboard({ roundId, titleOf }: { roundId: number; titleOf: Map<numbe
   if (preview.data === undefined) {
     return (
       <div className="space-y-2">
-        <div className="h-4 w-2/3 animate-pulse rounded bg-line/50" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-line/50" />
+        <div className="skeleton h-4 w-2/3 rounded" />
+        <div className="skeleton h-4 w-1/2 rounded" />
       </div>
     );
   }
