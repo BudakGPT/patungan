@@ -228,10 +228,19 @@ export const id = {
     },
     /** The public backer ledger under the story — recent `contrib` events for this campaign. */
     ledger: {
-      heading: "Catatan pendukung",
-      body: "Setiap urunan untuk kampanye ini, langsung dari event log contract.",
-      empty: "Belum ada donasi dalam jendela retensi RPC.",
-      retention: "Hanya donasi dalam jendela retensi RPC Testnet yang ditampilkan.",
+      heading: "Aktivitas kampanye",
+      body: "Setiap donasi masuk dan setiap pencairan ke pemilik — direkonstruksi langsung dari event log contract, tanpa backend di tengah.",
+      empty: "Belum ada aktivitas on-chain dalam jendela retensi RPC.",
+      retention: "Hanya event dalam jendela retensi RPC Testnet yang ditampilkan.",
+      filterAll: "Semua",
+      filterIn: "Donasi",
+      filterOut: "Pencairan",
+      summaryIn: "donasi masuk",
+      summaryOut: "dicairkan ke pemilik",
+      payoutLabel: "Dicairkan ke pemilik",
+      roundTag: (r: number) => `ronde #${r}`,
+      showMore: "Lihat lebih banyak",
+      showLess: "Lihat lebih sedikit",
     },
     contribute: {
       cta: "Ikut patungan",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ProjectState } from "@/contract/src";
@@ -11,7 +11,7 @@ import { categoryMeta } from "@/lib/category";
 import { getProjectVisual } from "@/lib/projectVisuals";
 import {
   useCampaign,
-  useCampaignContributions,
+  useCampaignActivity,
   useOpenRound,
   usePreviewRound,
   useRoundProject,
@@ -201,7 +201,7 @@ function Content({
                 {visual.story}
               </p>
 
-              <BackerLedger campaignId={campaign.id} />
+              <CampaignActivityFeed campaignId={campaign.id} />
             </div>
           </Reveal>
 
@@ -286,47 +286,163 @@ function Content({
   );
 }
 
+type ActivityFilter = "all" | "in" | "out";
+
 /**
- * The public backer ledger: recent `contrib` events for this campaign as mono receipt rows
- * (address · amount · ledger №), each linking to the tx on the explorer — the "receipt" thesis
- * rendered with the page's own money. Capped to the newest 8; RPC retention keeps it honest.
+ * The interactive campaign activity feed: the campaign's full public money trail reconstructed from
+ * on-chain events — both `contrib` (donations landing in escrow) and `payout` (funds released to
+ * the owner's payout address). Answers the donor's real question — *does my gift actually reach the
+ * owner?* — by showing both halves in one place. A money-in / money-out summary sits above a
+ * filterable receipt list (All · Donations · Payouts), each row linking to the tx on the explorer.
+ * Capped to the newest 6 with a show-more toggle; RPC retention keeps it honest.
  */
-function BackerLedger({ campaignId }: { campaignId: number }) {
+function CampaignActivityFeed({ campaignId }: { campaignId: number }) {
   const strings = useStrings();
   const t = strings.campaign.ledger;
-  const contributions = useCampaignContributions(campaignId);
-  const rows = (contributions.data ?? []).slice(0, 8);
+  const activity = useCampaignActivity(campaignId);
+  const [filter, setFilter] = useState<ActivityFilter>("all");
+  const [expanded, setExpanded] = useState(false);
+
+  const all = useMemo(() => activity.data ?? [], [activity.data]);
+
+  // The two halves of the trail: everything donated in vs. everything released to the owner.
+  const totals = useMemo(() => {
+    let inSum = 0n;
+    let outSum = 0n;
+    for (const row of all) {
+      if (row.kind === "contrib") inSum += row.amount;
+      else outSum += row.amount;
+    }
+    return { inSum, outSum };
+  }, [all]);
+
+  const filtered = useMemo(
+    () =>
+      all.filter((row) =>
+        filter === "all" ? true : filter === "in" ? row.kind === "contrib" : row.kind === "payout",
+      ),
+    [all, filter],
+  );
+
+  const LIMIT = 6;
+  const rows = expanded ? filtered : filtered.slice(0, LIMIT);
+  const canExpand = filtered.length > LIMIT;
+
+  const tabs: Array<{ id: ActivityFilter; label: string }> = [
+    { id: "all", label: t.filterAll },
+    { id: "in", label: t.filterIn },
+    { id: "out", label: t.filterOut },
+  ];
 
   return (
     <section className="mt-12">
       <h2 className="text-xs font-black uppercase tracking-[.16em] text-faint">{t.heading}</h2>
       <p className="mt-2 max-w-[68ch] text-sm leading-relaxed text-muted">{t.body}</p>
 
-      {contributions.data === undefined ? (
+      {activity.data === undefined ? (
         <div className="mt-5 space-y-2" aria-hidden>
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-9 animate-pulse rounded-lg bg-line/50" />
           ))}
         </div>
-      ) : rows.length === 0 ? (
+      ) : all.length === 0 ? (
         <p className="mt-5 text-sm text-muted">{t.empty}</p>
       ) : (
-        <ul className="mono mt-5 divide-y divide-line border-y border-line text-sm">
-          {rows.map((row) => (
-            <li key={row.txHash}>
-              <a
-                href={`${config.explorerBase}/tx/${row.txHash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-2.5 transition-colors hover:bg-line/30"
-              >
-                <span className="text-ink/85">{truncateAddress(row.donor)}</span>
-                <span className="tabular font-bold text-match-ink">{formatIDR(row.amount)}</span>
-                <span className="tabular ml-auto text-xs text-faint">ledger {row.ledger}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
+        <>
+          {/* Money-in / money-out summary — the whole trail at a glance. */}
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-line bg-surface px-4 py-3">
+              <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[.1em] text-faint">
+                <span className="h-2 w-2 rounded-full bg-match" aria-hidden />
+                {t.summaryIn}
+              </span>
+              <strong className="tabular mt-1 block text-lg font-black text-match-ink">
+                {formatCompactIDR(totals.inSum)}
+              </strong>
+            </div>
+            <div className="rounded-xl border border-line bg-surface px-4 py-3">
+              <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[.1em] text-faint">
+                <span className="h-2 w-2 rounded-full bg-ink" aria-hidden />
+                {t.summaryOut}
+              </span>
+              <strong className="tabular mt-1 block text-lg font-black text-ink">
+                {formatCompactIDR(totals.outSum)}
+              </strong>
+            </div>
+          </div>
+
+          {/* Direction filter. */}
+          <div className="mt-4 inline-flex rounded-xl border border-line bg-surface p-1">
+            {tabs.map((tab) => {
+              const active = filter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => {
+                    setFilter(tab.id);
+                    setExpanded(false);
+                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-[.08em] transition-colors ${
+                    active ? "bg-ink text-paper" : "text-muted hover:text-ink"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {rows.length === 0 ? (
+            <p className="mt-4 text-sm text-muted">{t.empty}</p>
+          ) : (
+            <ul className="mono mt-4 divide-y divide-line border-y border-line text-sm">
+              {rows.map((row) => {
+                const isIn = row.kind === "contrib";
+                return (
+                  <li key={`${row.kind}-${row.txHash}`}>
+                    <a
+                      href={`${config.explorerBase}/tx/${row.txHash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-2.5 transition-colors hover:bg-line/30"
+                    >
+                      <span
+                        aria-hidden
+                        className={`mt-1.5 h-2 w-2 shrink-0 self-start rounded-full ${
+                          isIn ? "bg-match" : "bg-ink"
+                        }`}
+                      />
+                      <span className={isIn ? "text-ink/85" : "font-bold text-ink"}>
+                        {isIn ? truncateAddress(row.donor) : t.payoutLabel}
+                      </span>
+                      {!isIn && row.roundId !== null ? (
+                        <span className="rounded bg-ink/5 px-1.5 py-0.5 text-[.68rem] font-bold text-muted">
+                          {t.roundTag(row.roundId)}
+                        </span>
+                      ) : null}
+                      <span className={`tabular font-bold ${isIn ? "text-match-ink" : "text-ink"}`}>
+                        {formatIDR(row.amount)}
+                      </span>
+                      <span className="tabular ml-auto text-xs text-faint">ledger {row.ledger}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          {canExpand ? (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className="mt-3 text-xs font-black uppercase tracking-[.1em] text-ink underline underline-offset-2 hover:text-match-ink"
+            >
+              {expanded ? t.showLess : t.showMore}
+            </button>
+          ) : null}
+        </>
       )}
 
       <p className="mt-3 text-xs text-faint">{t.retention}</p>
