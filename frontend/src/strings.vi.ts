@@ -15,6 +15,18 @@ export const vi: Strings = {
     closeMenu: "Đóng menu",
     mainMenu: "Menu chính",
   },
+  meta: {
+    titles: {
+      campaigns: "Khám phá chiến dịch",
+      seasons: "Mùa đối ứng",
+      results: "Kết quả đối ứng",
+      dashboard: "Bảng điều khiển chiến dịch",
+      account: "Đóng góp của tôi",
+      operator: "Bảng vận hành",
+      verify: "Xác minh ví",
+      newCampaign: "Gửi chiến dịch",
+    },
+  },
   landing: {
     heroTitle: "Đóng góp nhỏ. Tác động lớn hơn.",
     heroTags: ["Ứng dụng thanh toán & tiêu dùng", "Kiều bào PMI/TKI", "Đối ứng bậc hai"],

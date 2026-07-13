@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LocalizedTitle } from "@/components/LocalizedTitle";
 
 export const metadata: Metadata = {
   title: "Hasil Pencocokan",
@@ -6,5 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default function ResultsLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <LocalizedTitle page="results" />
+      {children}
+    </>
+  );
 }

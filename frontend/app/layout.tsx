@@ -24,12 +24,44 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  ),
+  applicationName: "Patungan",
   title: {
-    default: "Patungan",
+    default: "Patungan — gotong royong on-chain",
     template: "%s | Patungan",
   },
   description:
     "Patungan membantu banyak donasi kecil menarik dana pendamping secara transparan di Stellar Testnet.",
+  keywords: [
+    "Patungan",
+    "quadratic funding",
+    "gotong royong",
+    "donasi",
+    "crowdfunding",
+    "matching funds",
+    "Stellar",
+    "Soroban",
+  ],
+  authors: [{ name: "Patungan" }],
+  openGraph: {
+    type: "website",
+    siteName: "Patungan",
+    title: "Patungan — gotong royong on-chain",
+    description:
+      "Banyak donasi kecil menarik dana pendamping secara transparan di Stellar Testnet.",
+    locale: "id_ID",
+    alternateLocale: ["en_US", "fil_PH", "vi_VN"],
+    images: [{ url: "/assets/patungan-logo.png", width: 1024, height: 1024, alt: "Patungan" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Patungan — gotong royong on-chain",
+    description:
+      "Banyak donasi kecil menarik dana pendamping secara transparan di Stellar Testnet.",
+    images: ["/assets/patungan-logo.png"],
+  },
 };
 
 export default function RootLayout({

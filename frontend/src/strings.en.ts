@@ -15,6 +15,18 @@ export const en: Strings = {
     closeMenu: "Close menu",
     mainMenu: "Main menu",
   },
+  meta: {
+    titles: {
+      campaigns: "Browse Campaigns",
+      seasons: "Matching Seasons",
+      results: "Matching Results",
+      dashboard: "Campaign Dashboard",
+      account: "My Contributions",
+      operator: "Operator Console",
+      verify: "Verify Wallet",
+      newCampaign: "Submit a Campaign",
+    },
+  },
   landing: {
     heroTitle: "Small donations. Bigger impact.",
     heroTags: ["Payment & Consumer App", "PMI/TKI diaspora", "Quadratic matching"],

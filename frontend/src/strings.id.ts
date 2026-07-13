@@ -13,6 +13,21 @@ export const id = {
     closeMenu: "Tutup menu",
     mainMenu: "Menu utama",
   },
+  /** Localized browser-tab titles per route. Rendered client-side by <LocalizedTitle>
+   * (src/components/LocalizedTitle.tsx); the server `metadata` in each app/**\/layout.tsx keeps the
+   * Bahasa default for SSR / no-JS. Keep these keys identical across all four locale catalogs. */
+  meta: {
+    titles: {
+      campaigns: "Jelajahi Kampanye",
+      seasons: "Musim Pencocokan",
+      results: "Hasil Pencocokan",
+      dashboard: "Dasbor Kampanye",
+      account: "Kontribusi Saya",
+      operator: "Konsol Operator",
+      verify: "Verifikasi Wallet",
+      newCampaign: "Ajukan Kampanye",
+    },
+  },
   landing: {
     heroTitle: "Donasi kecil. Dampak lebih besar.",
     heroTags: ["Aplikasi pembayaran & konsumen", "Diaspora PMI/TKI", "Pencocokan kuadratik"],

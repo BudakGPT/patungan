@@ -15,6 +15,18 @@ export const fil: Strings = {
     closeMenu: "Isara ang menu",
     mainMenu: "Pangunahing menu",
   },
+  meta: {
+    titles: {
+      campaigns: "Tuklasin ang mga Kampanya",
+      seasons: "Mga Season ng Pagtutumbas",
+      results: "Resulta ng Pagtutumbas",
+      dashboard: "Dashboard ng Kampanya",
+      account: "Aking mga Kontribusyon",
+      operator: "Console ng Operator",
+      verify: "I-verify ang Wallet",
+      newCampaign: "Magsumite ng Kampanya",
+    },
+  },
   landing: {
     heroTitle: "Maliit na donasyon. Mas malaking epekto.",
     heroTags: ["Payment at consumer app", "Diaspora ng PMI/TKI", "Kuwadratikong pagtutumbas"],

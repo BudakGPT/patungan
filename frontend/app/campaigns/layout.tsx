@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LocalizedTitle } from "@/components/LocalizedTitle";
 
 export const metadata: Metadata = {
   title: "Jelajahi Kampanye",
@@ -6,5 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default function CampaignsLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <LocalizedTitle page="campaigns" />
+      {children}
+    </>
+  );
 }
