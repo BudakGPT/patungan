@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useStrings } from "@/lib/locale";
 import { config } from "@/lib/config";
+import { useIsOperator } from "@/lib/hooks";
 import { ContractExplorerLink } from "./ExplorerLink";
 
 const shortId = (v: string) => `${v.slice(0, 4)}…${v.slice(-4)}`;
@@ -13,6 +14,19 @@ const shortId = (v: string) => `${v.slice(0, 4)}…${v.slice(-4)}`;
  */
 export function Footer() {
   const strings = useStrings();
+  const isOperator = useIsOperator();
+
+  // Sitemap mirrors the header nav — the operator console only appears for role-holders.
+  const links: Array<[string, string]> = [
+    ["/", strings.nav.landing],
+    ["/campaigns", strings.nav.campaigns],
+    ["/seasons", strings.nav.seasons],
+    ["/results", strings.nav.results],
+    ["/dashboard", strings.nav.dashboard],
+    ["/account", strings.nav.account],
+  ];
+  if (isOperator) links.push(["/operator", strings.nav.operator]);
+
   return (
     <footer className="mt-auto overflow-hidden border-t border-lime/20 bg-ink text-paper">
       <div className="mx-auto max-w-[1500px] px-4 pt-12 sm:px-7 lg:px-10">
@@ -30,15 +44,7 @@ export function Footer() {
           </div>
 
           <nav aria-label="Peta situs" className="grid grid-cols-2 gap-x-8 gap-y-2 self-start text-sm font-bold">
-            {[
-              ["/", strings.nav.landing],
-              ["/campaigns", strings.nav.campaigns],
-              ["/seasons", strings.nav.seasons],
-              ["/results", strings.nav.results],
-              ["/dashboard", strings.nav.dashboard],
-              ["/account", strings.nav.account],
-              ["/operator", strings.nav.operator],
-            ].map(([href, label]) => (
+            {links.map(([href, label]) => (
               <Link
                 key={href}
                 href={href}

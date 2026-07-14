@@ -3,12 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
-import freighterApi from "@stellar/freighter-api";
-import type { AssembledTransaction, Result } from "@stellar/stellar-sdk/contract";
 import { Tier } from "@/contract/src";
-import { contractClient } from "@/lib/contract";
 import { useWallet } from "@/lib/wallet";
-import { useConfig, useTier } from "@/lib/hooks";
+import { useTier } from "@/lib/hooks";
 import {
   authenticate,
   AnchorError,
@@ -20,7 +17,6 @@ import {
   type KycStatus,
 } from "@/lib/anchor";
 import { anchorConfigured } from "@/lib/config";
-import { mapContractError } from "@/lib/errors";
 import { useStrings } from "@/lib/locale";
 import { TierStatusBlock } from "@/components/TierBadge";
 import { ExplorerLink } from "@/components/ExplorerLink";
@@ -76,11 +72,13 @@ export default function VerifyPage() {
 function VerifyFlow({ address }: { address: string }) {
   const { verify: v } = useStrings();
   const tierQ = useTier(address);
-  const configQ = useConfig();
   const tier = tierQ.data;
-  const isAttester = configQ.data?.attester === address;
   const [jwt, setJwt] = useState<string | null>(null);
   const [kycAccepted, setKycAccepted] = useState(false);
+
+  // Once verified, keep the ownership + KYC steps visible in a completed state (a breadcrumb of what
+  // was done) rather than hiding them — only the actionable controls fall away.
+  const verified = tier !== undefined && tier !== Tier.None;
 
   return (
     <div className="space-y-8">
@@ -100,16 +98,25 @@ function VerifyFlow({ address }: { address: string }) {
         </div>
       )}
 
-      {/* Step 01 — prove wallet ownership to the anchor (real SEP-10). */}
-      <Sep10Step address={address} onAuthenticated={setJwt} />
+      {tier !== undefined ? (
+        <>
+          {/* Step 01 — prove wallet ownership (real SEP-10). Rendered as done once the wallet is verified. */}
+          <Sep10Step address={address} onAuthenticated={setJwt} completed={verified} />
 
-      {/* Step 01b — real SEP-12 KYC fields, only rendered when the anchor publishes a KYC_SERVER. */}
-      {jwt ? (
-        <KycStep address={address} jwt={jwt} onAccepted={() => setKycAccepted(true)} />
+          {/* Step 01b — SEP-12 KYC. Shown while we have a session (jwt) or the wallet is already verified. */}
+          {verified || jwt ? (
+            <KycStep
+              address={address}
+              jwt={jwt}
+              onAccepted={() => setKycAccepted(true)}
+              completed={verified}
+            />
+          ) : null}
+        </>
       ) : null}
 
-      {/* Step 02 — attest a tier: real KYC hand-off when accepted above, else the simulated stand-in. */}
-      <AttestStep address={address} tier={tier} isAttester={isAttester} kycAccepted={kycAccepted} />
+      {/* Step 02 — automated on-chain tier assignment by the backend attester service. */}
+      <AttestStep address={address} tier={tier} jwt={jwt} kycAccepted={kycAccepted} />
     </div>
   );
 }
@@ -166,9 +173,11 @@ type Sep10State =
 function Sep10Step({
   address,
   onAuthenticated,
+  completed,
 }: {
   address: string;
   onAuthenticated: (jwt: string) => void;
+  completed: boolean;
 }) {
   const { verify: v } = useStrings();
   const [state, setState] = useState<Sep10State>({ phase: "idle" });
@@ -189,7 +198,11 @@ function Sep10Step({
 
   return (
     <ActionPanel overline={v.sep10.overline} heading={v.sep10.heading} description={v.sep10.description}>
-      {!anchorConfigured ? (
+      {completed ? (
+        <Note tone="success" title={v.sep10.successTitle}>
+          {v.sep10.doneBody}
+        </Note>
+      ) : !anchorConfigured ? (
         <Note tone="muted" title={v.sep10.notConfiguredTitle}>
           {v.sep10.notConfiguredBody}
         </Note>
@@ -232,10 +245,12 @@ function KycStep({
   address,
   jwt,
   onAccepted,
+  completed,
 }: {
   address: string;
-  jwt: string;
+  jwt: string | null;
   onAccepted: () => void;
+  completed: boolean;
 }) {
   const { verify: v } = useStrings();
   const [state, setState] = useState<KycState>({ phase: "checking" });
@@ -247,6 +262,7 @@ function KycStep({
   });
 
   useEffect(() => {
+    if (completed) return; // already verified — show the done state, make no anchor calls
     let cancelled = false;
     void resolveKycServer().then((server) => {
       if (cancelled) return;
@@ -256,7 +272,7 @@ function KycStep({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [completed]);
 
   function handleResult(result: KycResult) {
     if (result.status === "ACCEPTED") {
@@ -270,6 +286,7 @@ function KycStep({
   }
 
   async function submit() {
+    if (!jwt) return;
     setState({ phase: "submitting" });
     try {
       const result = await submitKyc(address, jwt, fields);
@@ -285,7 +302,7 @@ function KycStep({
   }
 
   useEffect(() => {
-    if (state.phase !== "polling" || !kycServer) return;
+    if (state.phase !== "polling" || !kycServer || !jwt) return;
     const timer = setTimeout(() => {
       void pollKyc(kycServer, jwt, state.id)
         .then(handleResult)
@@ -297,6 +314,15 @@ function KycStep({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, kycServer, jwt]);
 
+  if (completed) {
+    return (
+      <ActionPanel overline={v.kyc.overline} heading={v.kyc.heading} description={v.kyc.description}>
+        <Note tone="success" title={v.kyc.doneTitle}>
+          {v.kyc.doneBody}
+        </Note>
+      </ActionPanel>
+    );
+  }
   if (state.phase === "checking" || state.phase === "unavailable") return null;
 
   return (
@@ -352,23 +378,22 @@ function KycStep({
 function AttestStep({
   address,
   tier,
-  isAttester,
+  jwt,
   kycAccepted,
 }: {
   address: string;
   tier: Tier | undefined;
-  isAttester: boolean;
+  jwt: string | null;
   kycAccepted: boolean;
 }) {
   const { verify: v } = useStrings();
-  return (
-    <ActionPanel
-      overline={v.attest.overline}
-      heading={v.attest.heading}
-      description={v.attest.description}
-      badge={kycAccepted ? v.attest.realBadge : v.attest.simBadge}
-    >
-      {tier !== undefined && tier !== Tier.None ? (
+  const a = v.autoAttest;
+
+  if (tier === undefined) return null; // still loading; the status block above shows the skeleton
+
+  if (tier !== Tier.None) {
+    return (
+      <ActionPanel overline={a.overline} heading={a.heading} description={a.description} badge={a.badge}>
         <Note tone="success" title={v.attest.alreadyTitle}>
           {v.attest.alreadyBody}
           <div className="mt-3">
@@ -380,146 +405,106 @@ function AttestStep({
             </Link>
           </div>
         </Note>
-      ) : isAttester ? (
-        <SelfAttest address={address} />
+      </ActionPanel>
+    );
+  }
+
+  return (
+    <ActionPanel overline={a.overline} heading={a.heading} description={a.description} badge={a.badge}>
+      {kycAccepted && jwt ? (
+        <AutoAttest address={address} jwt={jwt} />
       ) : (
-        <OperatorFallback />
+        <Note tone="muted" title={a.awaitingTitle}>
+          {a.awaitingBody}
+        </Note>
       )}
     </ActionPanel>
   );
 }
 
-/** Attester-holding wallet: attest its own tier directly as the testnet anchor stand-in. */
-function SelfAttest({ address }: { address: string }) {
-  const strings = useStrings();
-  const v = strings.verify;
+/**
+ * Automated tier assignment. Posts the anchor JWT to `/api/attest`; the backend re-confirms KYC and
+ * writes the tier with the server-held attester key. On success we invalidate the tier query, which
+ * flips the whole step to "already verified". On failure we surface the operator console as a
+ * break-glass fallback.
+ */
+function AutoAttest({ address, jwt }: { address: string; jwt: string }) {
+  const { verify: v } = useStrings();
+  const a = v.autoAttest;
   const queryClient = useQueryClient();
-  const action = useAction();
-  const [tier, setTier] = useState<Tier>(Tier.Basic);
+  const [state, setState] = useState<
+    { phase: "attesting" } | { phase: "done"; hash: string | null } | { phase: "error"; message: string }
+  >({ phase: "attesting" });
 
-  async function submit() {
-    if (action.pending) return;
-    const ok = await action.submit(() =>
-      contractClient.set_verification({ who: address, tier }, { publicKey: address }),
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/attest", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${jwt}` },
+        });
+        const body = (await res.json().catch(() => ({}))) as { hash?: string | null; error?: string };
+        if (cancelled) return;
+        if (!res.ok) {
+          setState({ phase: "error", message: body.error ?? a.errorBody });
+          return;
+        }
+        setState({ phase: "done", hash: body.hash ?? null });
+        void queryClient.invalidateQueries({ queryKey: ["tier", address] });
+      } catch (err) {
+        if (!cancelled) setState({ phase: "error", message: (err as Error).message });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [address, jwt, queryClient, a.errorBody]);
+
+  if (state.phase === "attesting") {
+    return (
+      <div className="flex items-center gap-3 rounded-xl border border-line bg-paper px-4 py-4">
+        <span
+          aria-hidden
+          className="size-4 shrink-0 animate-spin rounded-full border-2 border-accent border-t-transparent"
+        />
+        <p className="text-sm text-muted">{a.attesting}</p>
+      </div>
     );
-    if (ok !== undefined) void queryClient.invalidateQueries({ queryKey: ["tier", address] });
   }
 
-  if (action.tx.phase === "success") {
+  if (state.phase === "done") {
     return (
-      <Note tone="success" title={v.attest.successTitle}>
-        {action.tx.hash ? <ExplorerLink hash={action.tx.hash} label={v.viewOnExplorer} /> : null}
+      <Note tone="success" title={a.doneTitle}>
+        {a.doneBody}
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          <Link
+            href="/"
+            className="inline-flex rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink"
+          >
+            {a.exploreCta}
+          </Link>
+          {state.hash ? <ExplorerLink hash={state.hash} label={v.viewOnExplorer} /> : null}
+        </div>
       </Note>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <p className="rounded-xl border border-accent/20 bg-accent-soft px-4 py-3 text-sm text-accent-ink">
-        {v.attest.attesterHint}
-      </p>
-
-      <div>
-        <p className="text-sm font-semibold text-ink">{v.attest.tierLabel}</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {([Tier.Basic, Tier.Institution] as const).map((t) => {
-            const active = tier === t;
-            return (
-              <button
-                key={t}
-                type="button"
-                disabled={action.pending}
-                aria-pressed={active}
-                onClick={() => setTier(t)}
-                className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-colors disabled:opacity-60 ${
-                  active
-                    ? "border-accent bg-accent-soft text-accent-ink"
-                    : "border-line bg-surface text-muted hover:border-accent/40"
-                }`}
-              >
-                {v.attest.tiers[Tier[t]]}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {action.tx.phase === "error" ? (
-        <p className="text-sm text-cat-disaster">{action.tx.message}</p>
-      ) : null}
-
-      <button
-        type="button"
-        disabled={action.pending}
-        onClick={() => void submit()}
-        className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-ink disabled:cursor-not-allowed disabled:opacity-60"
+    <div className="space-y-3">
+      <p className="font-medium text-ink">{a.errorTitle}</p>
+      <p className="text-sm text-cat-disaster">{state.message}</p>
+      <Link
+        href="/operator"
+        className="inline-flex rounded-xl border border-line-strong bg-surface px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent/40"
       >
-        {action.tx.phase === "awaiting"
-          ? strings.wallet.connecting
-          : action.tx.phase === "submitting"
-            ? v.submitting
-            : v.attest.cta}
-      </button>
+        {a.fallbackCta}
+      </Link>
     </div>
   );
 }
 
-/** Non-attester wallet: the honest testnet model — an operator completes the attestation. */
-function OperatorFallback() {
-  const { verify: v } = useStrings();
-  return (
-    <Note tone="muted" title={v.attest.fallbackTitle}>
-      {v.attest.fallbackBody}
-      <div className="mt-3">
-        <Link
-          href="/operator"
-          className="inline-flex rounded-xl border border-line-strong bg-surface px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-accent/40"
-        >
-          {v.attest.fallbackCta}
-        </Link>
-      </div>
-    </Note>
-  );
-}
-
-/* ── Shared write cycle + primitives (mirrors the operator console) ──────────────────────── */
-
-type TxState =
-  | { phase: "idle" }
-  | { phase: "awaiting" }
-  | { phase: "submitting" }
-  | { phase: "success"; hash: string }
-  | { phase: "error"; message: string };
-
-function useAction() {
-  const strings = useStrings();
-  const [tx, setTx] = useState<TxState>({ phase: "idle" });
-  const pending = tx.phase === "awaiting" || tx.phase === "submitting";
-
-  async function submit<T>(
-    build: () => Promise<AssembledTransaction<Result<T>>>,
-  ): Promise<T | undefined> {
-    setTx({ phase: "awaiting" });
-    try {
-      const assembled = await build();
-      const sent = await assembled.signAndSend({
-        signTransaction: freighterApi.signTransaction,
-        watcher: { onSubmitted: () => setTx({ phase: "submitting" }), onProgress: () => {} },
-      });
-      if (sent.result.isErr()) {
-        setTx({ phase: "error", message: mapContractError(sent.result.unwrapErr(), strings.errors) });
-        return undefined;
-      }
-      setTx({ phase: "success", hash: sent.sendTransactionResponse?.hash ?? "" });
-      return sent.result.unwrap();
-    } catch (err) {
-      setTx({ phase: "error", message: mapContractError(err, strings.errors) });
-      return undefined;
-    }
-  }
-
-  return { tx, pending, submit };
-}
+/* ── Shared primitives ──────────────────────────────────────────────────────────────────── */
 
 function ActionPanel({
   overline,

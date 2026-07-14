@@ -4,6 +4,7 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import type { Config, ProjectState, RoundState } from "@/contract/src";
 import { Tier } from "@/contract/src";
 import { contractClient } from "./contract";
+import { useWallet } from "./wallet";
 import {
   fetchCampaignActivity,
   fetchCampaignContributions,
@@ -25,6 +26,20 @@ export function useConfig() {
     queryFn: async () => (await contractClient.get_config()).result,
     staleTime: 60_000,
   });
+}
+
+/**
+ * True when the connected wallet holds any operator role (admin / curator / attester). Drives
+ * role-gated UI — e.g. hiding the operator console from the header/footer nav for everyone else.
+ * Defaults to `false` while the wallet or config is still loading, so gated entries stay hidden
+ * until the role is actually proven.
+ */
+export function useIsOperator(): boolean {
+  const { address } = useWallet();
+  const { data: c } = useConfig();
+  return (
+    !!c && !!address && (c.admin === address || c.curator === address || c.attester === address)
+  );
 }
 
 /** Every matching round ("season") ever opened — powers `/seasons` and the round archive. */

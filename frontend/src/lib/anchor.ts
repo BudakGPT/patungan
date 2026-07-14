@@ -52,6 +52,18 @@ interface AnchorEndpoints {
   webAuthDomain: string;
 }
 
+/**
+ * Route an anchor request through our same-origin proxy (`app/api/anchor`). SEP-1/SEP-12 don't
+ * mandate CORS and the SDF reference anchor omits it on `stellar.toml` and `/sep12`, so a direct
+ * browser fetch is blocked. The proxy fetches server-side (no CORS) and re-serves same-origin; the
+ * target host is validated against the configured anchor domain server-side, so it's not an open
+ * proxy. `target` stays the real anchor URL everywhere else (SEP-10 `web_auth_domain` validation
+ * depends on it) — we only swap in the proxy at fetch time.
+ */
+function viaProxy(target: string): string {
+  return `/api/anchor?url=${encodeURIComponent(target)}`;
+}
+
 /** Minimal `stellar.toml` scrape for the two keys SEP-10 needs — avoids pulling a TOML parser. */
 function scrapeToml(toml: string, key: string): string | null {
   const m = toml.match(new RegExp(`^\\s*${key}\\s*=\\s*"([^"]+)"`, "m"));
@@ -75,7 +87,7 @@ async function resolveEndpoints(): Promise<AnchorEndpoints> {
   if (homeDomain) {
     const tomlUrl = `https://${homeDomain.replace(/\/+$/, "")}/.well-known/stellar.toml`;
     try {
-      const res = await fetch(tomlUrl, { headers: { Accept: "text/plain" } });
+      const res = await fetch(viaProxy(tomlUrl), { headers: { Accept: "text/plain" } });
       if (res.ok) {
         const toml = await res.text();
         signingKey = scrapeToml(toml, "SIGNING_KEY");
@@ -104,7 +116,7 @@ async function fetchChallenge(
 
   let res: Response;
   try {
-    res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+    res = await fetch(viaProxy(url.toString()), { headers: { Accept: "application/json" } });
   } catch (e) {
     throw new AnchorError("network", (e as Error).message);
   }
@@ -125,7 +137,7 @@ async function fetchChallenge(
 async function postForToken(authEndpoint: string, signedXdr: string): Promise<string> {
   let res: Response;
   try {
-    res = await fetch(authEndpoint, {
+    res = await fetch(viaProxy(authEndpoint), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ transaction: signedXdr }),
@@ -222,7 +234,7 @@ export async function resolveKycServer(): Promise<string | null> {
   const { homeDomain } = anchorConfig;
   if (!homeDomain) return null;
   try {
-    const res = await fetch(`https://${normalizeBase(homeDomain)}/.well-known/stellar.toml`, {
+    const res = await fetch(viaProxy(`https://${normalizeBase(homeDomain)}/.well-known/stellar.toml`), {
       headers: { Accept: "text/plain" },
     });
     if (!res.ok) return null;
@@ -239,7 +251,7 @@ export async function pollKyc(kycServer: string, jwt: string, id: string): Promi
   url.searchParams.set("id", id);
   let res: Response;
   try {
-    res = await fetch(url.toString(), { headers: { Authorization: `Bearer ${jwt}` } });
+    res = await fetch(viaProxy(url.toString()), { headers: { Authorization: `Bearer ${jwt}` } });
   } catch (e) {
     throw new AnchorError("network", (e as Error).message);
   }
@@ -264,7 +276,7 @@ export async function submitKyc(account: string, jwt: string, fields: KycFields)
 
   let res: Response;
   try {
-    res = await fetch(`${normalizeBase(kycServer)}/customer`, {
+    res = await fetch(viaProxy(`${normalizeBase(kycServer)}/customer`), {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${jwt}` },
       body: JSON.stringify({ account, ...fields }),

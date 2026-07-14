@@ -401,7 +401,7 @@ export default function DiscoveryPage() {
               {d.tagline}
             </p>
             <p className="mono mt-5 text-xs font-bold uppercase tracking-[.12em] text-ink/55">
-              {d.resultCount(approved.length)} · {l.seasonRef(roundId ?? "—")}
+              {d.resultCount(approved.length)} · {l.seasonRef(roundId ?? "–")}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

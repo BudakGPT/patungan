@@ -1,6 +1,6 @@
 import type { Strings } from "./strings.id";
 
-/** Vietnamese UI copy — opt-in locale, shape-checked against `strings.id.ts`. */
+/** Vietnamese UI copy. Opt-in locale, shape-checked against `strings.id.ts`. */
 export const vi: Strings = {
   appName: "Patungan",
   nav: {
@@ -68,10 +68,10 @@ export const vi: Strings = {
       },
       {
         title: "Phân bổ bậc hai",
-        copy: "Hợp đồng tính (Σ√c)² cho từng chiến dịch và chia quỹ đối ứng — số người thắng, không phải một cá voi.",
+        copy: "Hợp đồng tính (Σ√c)² cho từng chiến dịch và chia quỹ đối ứng: số người thắng, không phải một cá voi.",
       },
     ],
-    directoryComment: "danh bạ công khai — mọi chiến dịch đều được giám tuyển xác minh",
+    directoryComment: "danh bạ công khai: mọi chiến dịch đều được giám tuyển xác minh",
     seasonRef: (id: string | number) => `mùa #${id}`,
     title: "Patungan",
     subtitle: "Cùng nhau đóng góp, được đối ứng công bằng.",
@@ -86,7 +86,7 @@ export const vi: Strings = {
     donorCountSuffix: "người ủng hộ",
     projectedMatchLabel: "Dự kiến đối ứng",
     finalMatchLabel: "Đối ứng cuối cùng",
-    noMatchYet: "—",
+    noMatchYet: "–",
   },
   categories: {
     DevelopingRegions: "Khu vực đang phát triển",
@@ -135,14 +135,14 @@ export const vi: Strings = {
     targetProgress: "hướng tới mục tiêu",
     targetReached: "Đã đạt mục tiêu",
     noThumbAlt: "Không có ảnh",
-    // Onboarding "how it works" strip — QF explainer for cold visitors
+    // Onboarding "how it works" strip: QF explainer for cold visitors
     howItWorks: {
       overline: "Cách hoạt động",
       steps: [
         {
           n: "01",
           title: "Quyên góp trực tiếp, bất cứ lúc nào",
-          body: "Chọn một chiến dịch bạn tin tưởng, rồi quyên góp trực tiếp — không cần chờ đến mùa.",
+          body: "Chọn một chiến dịch bạn tin tưởng, rồi quyên góp trực tiếp, không cần chờ đến mùa.",
         },
         {
           n: "02",
@@ -192,7 +192,7 @@ export const vi: Strings = {
     donorSuffix: "người ủng hộ",
     projectedMatchLabel: "Dự kiến đối ứng bậc hai",
     notInRound:
-      "Chưa thuộc mùa đối ứng đang hoạt động — quyên góp trực tiếp vẫn được tính cho đối ứng của mùa tiếp theo.",
+      "Chưa thuộc mùa đối ứng đang hoạt động. Quyên góp trực tiếp vẫn được tính cho đối ứng của mùa tiếp theo.",
     /** Notice shown when a non-Approved campaign is opened directly (owner-shared link). */
     status: {
       Pending: "Chiến dịch này vẫn đang chờ kiểm duyệt. Quyên góp sẽ mở sau khi người kiểm duyệt phê duyệt.",
@@ -246,7 +246,7 @@ export const vi: Strings = {
       awaiting: "Mở Freighter để ký…",
       submitting: "Đang gửi giao dịch…",
       // Success
-      successTitle: "Đã gửi chiến dịch — đang chờ kiểm duyệt",
+      successTitle: "Đã gửi chiến dịch, đang chờ kiểm duyệt",
       successBody:
         "Chiến dịch của bạn đã được ghi lại on-chain với trạng thái Đang chờ kiểm duyệt. Sau khi người kiểm duyệt phê duyệt, chiến dịch sẽ công khai và có thể nhận quyên góp.",
       viewCampaign: "Xem chiến dịch",
@@ -257,7 +257,7 @@ export const vi: Strings = {
       heading: "Rp50 nghìn của bạn đi đâu",
       steps: [
         "Khoản quyên góp của bạn được ghi vào hợp đồng kèm địa chỉ, số tiền và ledger.",
-        "Đóng góp của bạn nâng trọng số (Σ√c)² của chiến dịch — tín hiệu công khai, không phải lời hứa.",
+        "Đóng góp của bạn nâng trọng số (Σ√c)² của chiến dịch: tín hiệu công khai, không phải lời hứa.",
         "Cuối mùa, quỹ đối ứng được chia theo tín hiệu đó. Ai cũng có thể kiểm chứng.",
       ],
       artifactsLabel: (id: number) => `Hiện vật chiến dịch #${id}`,
@@ -265,7 +265,7 @@ export const vi: Strings = {
     },
     ledger: {
       heading: "Hoạt động chiến dịch",
-      body: "Mọi khoản quyên góp vào và mọi khoản chi trả cho chủ sở hữu — dựng lại thẳng từ event log của hợp đồng, không có backend ở giữa.",
+      body: "Mọi khoản quyên góp vào và mọi khoản chi trả cho chủ sở hữu, dựng lại thẳng từ event log của hợp đồng, không có backend ở giữa.",
       empty: "Chưa có hoạt động on-chain nào trong cửa sổ lưu trữ RPC.",
       retention: "Chỉ hiển thị các sự kiện trong cửa sổ lưu trữ RPC Testnet.",
       filterAll: "Tất cả",
@@ -296,7 +296,7 @@ export const vi: Strings = {
       reviewBack: "Đổi số tiền",
       awaiting: "Mở Freighter để ký…",
       submitting: "Đang gửi giao dịch…",
-      successTitle: "Cảm ơn — đóng góp của bạn đã được ghi on-chain.",
+      successTitle: "Cảm ơn! Đóng góp của bạn đã được ghi on-chain.",
       done: "Xong",
       cancel: "Hủy",
       connectPrompt: "Kết nối ví Testnet để cùng góp.",
@@ -402,7 +402,7 @@ export const vi: Strings = {
     // Shared tx phases
     awaiting: "Mở Freighter để ký…",
     submitting: "Đang gửi giao dịch…",
-    // Status strip — the anchor every action is read against
+    // Status strip: the anchor every action is read against
     status: {
       connectedAs: "Đã kết nối với vai trò",
       roles: "Vai trò",
@@ -477,7 +477,7 @@ export const vi: Strings = {
     // 5 · Verify fallback
     verify: {
       heading: "Xác minh thủ công",
-      description: "Đặt cấp xác minh cho một địa chỉ — cách thay thế trên testnet cho trình xác thực KYC.",
+      description: "Đặt cấp xác minh cho một địa chỉ: cách thay thế trên testnet cho trình xác thực KYC.",
       addressLabel: "Địa chỉ ví (G…)",
       tierLabel: "Cấp độ",
       tiers: { None: "Không có", Basic: "Basic", Institution: "Institution" } as Record<string, string>,
@@ -529,7 +529,7 @@ export const vi: Strings = {
       donor: "Người ủng hộ",
       viewTx: "Xem giao dịch",
     },
-    // Gate ladder (owners need no verification tier — just a Testnet wallet)
+    // Gate ladder (owners need no verification tier, just a Testnet wallet)
     connectPrompt: "Kết nối ví Testnet để xem các chiến dịch của bạn.",
     wrongNetwork: "Chuyển Freighter sang Testnet để tiếp tục.",
     // Empty state
@@ -560,7 +560,7 @@ export const vi: Strings = {
     // Campaign-level claim of donations received while no round was open
     direct: {
       heading: "Quyên góp ngoài mùa",
-      body: "Các khoản quyên góp nhận được khi không có mùa nào hoạt động — có thể nhận bất cứ lúc nào.",
+      body: "Các khoản quyên góp nhận được khi không có mùa nào hoạt động có thể nhận bất cứ lúc nào.",
       claim: "Nhận quyên góp trực tiếp",
       claiming: "Đang nhận…",
       claimed: "Đã giải ngân quyên góp trực tiếp.",
@@ -573,7 +573,7 @@ export const vi: Strings = {
   },
   account: {
     title: "Đóng góp của tôi",
-    subtitle: "Lịch sử quyên góp trực tiếp của bạn, được dựng lại từ dữ liệu on-chain — nhóm theo chiến dịch.",
+    subtitle: "Lịch sử quyên góp trực tiếp của bạn, được dựng lại từ dữ liệu on-chain, nhóm theo chiến dịch.",
     // Gate ladder (a contributor only needs a Testnet wallet to see their own history)
     connectPrompt: "Kết nối ví Testnet để xem lịch sử đóng góp của bạn.",
     wrongNetwork: "Chuyển Freighter sang Testnet để tiếp tục.",
@@ -595,7 +595,7 @@ export const vi: Strings = {
     empty: "Bạn chưa quyên góp lần nào.",
     emptyHint: "Khoản quyên góp đầu tiên của bạn sẽ xuất hiện ở đây, được ghi trực tiếp từ giao dịch on-chain.",
     exploreCta: "Khám phá chiến dịch",
-    // Retention caveat — testnet RPC prunes old events; keep the reconstruction honest.
+    // Retention caveat: testnet RPC prunes old events; keep the reconstruction honest.
     retentionNote: "Chỉ những khoản quyên góp trong cửa sổ lưu trữ của Testnet RPC mới có thể hiển thị.",
   },
   /** Tier-aware verification badge labels + one-line unlock captions (`TierBadge`). */
@@ -615,17 +615,17 @@ export const vi: Strings = {
   verify: {
     title: "Xác minh",
     subtitle:
-      "Xác minh một lần để mở khóa đóng góp và gửi chiến dịch. Dữ liệu danh tính của bạn không bao giờ được lưu ở đây — chỉ cấp xác minh được ghi on-chain.",
+      "Xác minh một lần để mở khóa đóng góp và gửi chiến dịch. Dữ liệu danh tính của bạn không bao giờ được lưu ở đây. Chỉ cấp xác minh được ghi on-chain.",
     // Gate ladder
     connectPrompt: "Kết nối ví Testnet để bắt đầu xác minh.",
     wrongNetwork: "Chuyển Freighter sang Testnet để tiếp tục.",
-    // What each tier unlocks — the ladder rail
+    // What each tier unlocks: the ladder rail
     ladderHeading: "Những gì mỗi cấp mở khóa",
     ladder: [
       { tier: "Basic", unlock: "Đóng góp & gửi chiến dịch" },
       { tier: "Institution", unlock: "Cấp quỹ đối ứng với vai trò nhà tài trợ" },
     ],
-    // Step 1 — SEP-10 ownership
+    // Step 1: SEP-10 ownership
     sep10: {
       overline: "01 · Chứng minh quyền sở hữu",
       heading: "Chứng minh bạn sở hữu ví này",
@@ -635,6 +635,7 @@ export const vi: Strings = {
       awaiting: "Mở Freighter để ký…",
       successTitle: "Đã chứng minh quyền sở hữu",
       successBody: "Trình xác thực đã cấp mã phiên. Tiếp tục sang bước đặt cấp độ.",
+      doneBody: "Bạn đã chứng minh quyền sở hữu ví này.",
       notConfiguredTitle: "Trình xác thực chưa được cấu hình",
       notConfiguredBody:
         "Chưa có trình xác thực SEP-10 nào được kết nối trong môi trường này. Bạn vẫn có thể dùng cách đặt cấp độ mô phỏng trên testnet bên dưới.",
@@ -649,7 +650,7 @@ export const vi: Strings = {
         generic: "Xác minh với trình xác thực thất bại. Thử lại.",
       } as Record<string, string>,
     },
-    // Step 1.5 — SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
+    // Step 1.5: SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
     kyc: {
       overline: "01b · Thông tin KYC",
       heading: "Gửi thông tin KYC đến trình xác thực",
@@ -660,6 +661,8 @@ export const vi: Strings = {
       cta: "Gửi đến trình xác thực",
       submitting: "Đang gửi đến trình xác thực…",
       polling: "Đang kiểm tra trạng thái với trình xác thực…",
+      doneTitle: "KYC đã được chấp nhận",
+      doneBody: "Anchor đã chấp nhận thông tin KYC của bạn.",
       status: {
         NEEDS_INFO: "Trình xác thực cần thêm thông tin.",
         PROCESSING: "Trình xác thực đang xử lý hồ sơ của bạn.",
@@ -670,13 +673,13 @@ export const vi: Strings = {
       errors: {
         "not-configured": "Không có trình xác thực nào được cấu hình trong môi trường này.",
         "kyc-not-configured":
-          "Trình xác thực này không cung cấp dịch vụ KYC (SEP-12) — tiếp tục qua cách đặt cấp độ mô phỏng trên testnet bên dưới.",
+          "Trình xác thực này không cung cấp dịch vụ KYC (SEP-12). Tiếp tục qua cách đặt cấp độ mô phỏng trên testnet bên dưới.",
         "kyc-rejected": "Trình xác thực đã từ chối hồ sơ KYC. Thử lại.",
         network: "Không thể liên hệ trình xác thực. Kiểm tra kết nối rồi thử lại.",
         generic: "Gửi hồ sơ KYC thất bại. Thử lại.",
       } as Record<string, string>,
     },
-    // Step 2 — attest (real KYC hand-off, or the simulated testnet stand-in)
+    // Step 2: attest (real KYC hand-off, or the simulated testnet stand-in)
     attest: {
       overline: "02 · Đặt cấp độ",
       heading: "Nhận cấp xác minh của bạn",
@@ -685,7 +688,7 @@ export const vi: Strings = {
       description:
         "Trong môi trường thực tế, trình xác thực phê duyệt KYC rồi ghi cấp độ của bạn. Trên testnet, người vận hành (giữ vai trò người xác minh) thay thế trình xác thực.",
       // Attester-holder path (self-serve on testnet)
-      attesterHint: "Ví này giữ vai trò người xác minh — bạn có thể đặt cấp độ trực tiếp với tư cách thay thế trình xác thực.",
+      attesterHint: "Ví này giữ vai trò người xác minh, nên bạn có thể đặt cấp độ trực tiếp với tư cách thay thế trình xác thực.",
       tierLabel: "Cấp độ",
       tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
       cta: "Phê duyệt (KYC mô phỏng)",
@@ -693,11 +696,30 @@ export const vi: Strings = {
       // Non-attester fallback
       fallbackTitle: "Đang chờ người vận hành đặt cấp độ",
       fallbackBody:
-        "Trên testnet, việc đặt cấp độ do người vận hành xử lý thay cho trình xác thực. Quyền sở hữu ví của bạn đã được chứng minh — hãy yêu cầu người vận hành đặt cấp độ của bạn qua bảng điều khiển.",
+        "Trên testnet, việc đặt cấp độ do người vận hành xử lý thay cho trình xác thực. Quyền sở hữu ví của bạn đã được chứng minh. Hãy yêu cầu người vận hành đặt cấp độ của bạn qua bảng điều khiển.",
       fallbackCta: "Mở bảng điều khiển vận hành",
       alreadyTitle: "Bạn đã được xác minh",
       alreadyBody: "Không cần làm gì thêm. Bạn đã sẵn sàng đóng góp.",
       exploreCta: "Khám phá chiến dịch",
+    },
+    autoAttest: {
+      overline: "02 · Gán cấp độ",
+      heading: "Cấp xác minh của bạn",
+      description:
+        "Khi anchor chấp nhận KYC của bạn, dịch vụ attester của chúng tôi tự động ghi cấp độ của bạn lên chuỗi.",
+      badge: "Tự động",
+      attesting: "KYC đã được chấp nhận, đang ghi cấp độ của bạn lên chuỗi…",
+      doneTitle: "Đã xác minh!",
+      doneBody:
+        "Anchor đã xác nhận KYC của bạn và cấp Basic của bạn hiện đã ở trên chuỗi. Bạn đã sẵn sàng đóng góp.",
+      exploreCta: "Khám phá chiến dịch",
+      awaitingTitle: "Hoàn tất các bước phía trên",
+      awaitingBody:
+        "Sau khi bạn chứng minh quyền sở hữu và anchor chấp nhận KYC, cấp độ của bạn sẽ được cấp tự động.",
+      errorTitle: "Việc gán cấp độ tự động chưa hoàn tất",
+      errorBody:
+        "Quyền sở hữu và KYC của bạn đã được chứng minh, nhưng việc ghi cấp độ thất bại. Người điều hành có thể đặt thủ công.",
+      fallbackCta: "Mở bảng điều khiển điều hành",
     },
     // Shared tx phases
     submitting: "Đang gửi giao dịch…",
@@ -708,6 +730,7 @@ export const vi: Strings = {
     connect: "Kết nối ví",
     connecting: "Đang kết nối…",
     disconnect: "Ngắt kết nối ví",
+    verify: "Xác minh ví",
     notInstalled: "Cài đặt Freighter",
     wrongNetworkPill: "Sai mạng",
     testnetPill: "Testnet",
@@ -730,7 +753,7 @@ export const vi: Strings = {
   empty: "Chưa có dự án nào",
   errorGeneric: "Đã có lỗi xảy ra. Thử lại.",
   retry: "Thử lại",
-  staleData: "Không tải được cập nhật — đang hiển thị dữ liệu gần nhất.",
+  staleData: "Không tải được cập nhật. Đang hiển thị dữ liệu gần nhất.",
   /**
    * Shared Vietnamese fallback for every contract `Error` variant (mapped by name via
    * `mapContractError`). Context-specific screens may override individual keys by passing their

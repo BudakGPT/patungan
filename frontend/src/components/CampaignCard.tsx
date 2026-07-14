@@ -120,7 +120,7 @@ export function CampaignCard({
               {d.donorLabel}
             </span>
             <strong className="num tabular mt-2 block text-[clamp(1.9rem,2.3vw,2.6rem)] font-black">
-              {donors ?? "—"}
+              {donors ?? "–"}
             </strong>
           </div>
           <div className="metric-card bg-tile-cream">

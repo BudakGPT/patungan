@@ -171,7 +171,7 @@ export function CampaignDirectory() {
               <p className="mb-3 text-xs text-clay">{strings.staleData}</p>
             ) : null}
             <p className="mono mb-5 text-[11px] font-bold uppercase tracking-[.14em] text-ink/55">
-              {d.resultCount(visible.length)} · {l.seasonRef(roundId ?? "—")}
+              {d.resultCount(visible.length)} · {l.seasonRef(roundId ?? "–")}
             </p>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {visible.map((campaign, index) => (

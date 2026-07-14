@@ -1,4 +1,4 @@
-/** Bahasa Indonesia UI copy — the default locale. Components read this via `useStrings()`, never import it directly. */
+/** Bahasa Indonesia UI copy. The default locale. Components read this via `useStrings()`, never import it directly. */
 export const id = {
   appName: "Patungan",
   nav: {
@@ -69,10 +69,10 @@ export const id = {
       },
       {
         title: "Alokasi kuadratik",
-        copy: "Contract menghitung (Σ√c)² per kampanye dan membagi dana pendamping — yang menang jumlah orang, bukan satu whale.",
+        copy: "Contract menghitung (Σ√c)² per kampanye dan membagi dana pendamping: yang menang jumlah orang, bukan satu whale.",
       },
     ],
-    directoryComment: "direktori publik — semua kampanye terverifikasi kurator",
+    directoryComment: "direktori publik: semua kampanye terverifikasi kurator",
     seasonRef: (id: string | number) => `musim #${id}`,
     title: "Patungan",
     subtitle: "Urunan bersama, dicocokkan secara adil.",
@@ -87,7 +87,7 @@ export const id = {
     donorCountSuffix: "pendukung",
     projectedMatchLabel: "Proyeksi pencocokan",
     finalMatchLabel: "Pencocokan final",
-    noMatchYet: "—",
+    noMatchYet: "–",
   },
   /** Bahasa labels for the on-chain `Category` enum tags. Reused on every campaign surface. */
   categories: {
@@ -98,7 +98,7 @@ export const id = {
     FaithCommunity: "Keagamaan & Sosial",
     EnvironmentAnimals: "Lingkungan & Satwa",
   } as Record<string, string>,
-  /** Discovery `/` — the public directory over live chain state. */
+  /** Discovery `/`: the public directory over live chain state. */
   discovery: {
     heading: "Jelajahi kampanye",
     tagline: "Dukungan kecil dari banyak orang, dilipatgandakan secara adil.",
@@ -138,14 +138,14 @@ export const id = {
     targetProgress: "menuju target",
     targetReached: "Target tercapai",
     noThumbAlt: "Tanpa gambar",
-    // Onboarding "how it works" strip — QF explainer for cold visitors
+    // Onboarding "how it works" strip: QF explainer for cold visitors
     howItWorks: {
       overline: "Cara kerjanya",
       steps: [
         {
           n: "01",
           title: "Donasi langsung, kapan saja",
-          body: "Pilih kampanye yang kamu percaya, lalu beri donasi langsung — tanpa menunggu musim.",
+          body: "Pilih kampanye yang kamu percaya, lalu beri donasi langsung, tanpa menunggu musim.",
         },
         {
           n: "02",
@@ -166,7 +166,7 @@ export const id = {
       },
     },
   },
-  /** Campaign detail `/campaign/[id]` — story, ledger sidebar, inline contribute panel. */
+  /** Campaign detail `/campaign/[id]`: story, ledger sidebar, inline contribute panel. */
   campaign: {
     back: "Kembali ke jelajah",
     notFoundTitle: "Kampanye tidak ditemukan",
@@ -196,14 +196,14 @@ export const id = {
     donorSuffix: "pendukung",
     projectedMatchLabel: "Proyeksi dana pendamping kuadratik",
     notInRound:
-      "Belum termasuk musim pencocokan aktif — donasi langsung tetap dilipatkan pada musim berikutnya.",
+      "Belum termasuk musim pencocokan aktif. Donasi langsung tetap dilipatkan pada musim berikutnya.",
     /** Notice shown when a non-Approved campaign is opened directly (owner-shared link). */
     status: {
       Pending: "Kampanye ini masih menunggu kurasi. Donasi dibuka setelah disetujui kurator.",
       Rejected: "Kampanye ini tidak lolos kurasi dan tidak menerima donasi.",
       Cancelled: "Kampanye ini telah dibatalkan.",
     } as Record<string, string>,
-    /** Campaign create `/campaign/new` — gated self-serve submission form + IPFS image upload. */
+    /** Campaign create `/campaign/new`: gated self-serve submission form + IPFS image upload. */
     create: {
       back: "Kembali ke jelajah",
       heading: "Ajukan kampanye",
@@ -252,7 +252,7 @@ export const id = {
       awaiting: "Buka Freighter untuk menandatangani…",
       submitting: "Mengirim transaksi…",
       // Success
-      successTitle: "Kampanye terkirim — menunggu kurasi",
+      successTitle: "Kampanye terkirim, menunggu kurasi",
       successBody:
         "Kampanyemu tercatat on-chain dengan status Menunggu kurasi. Setelah kurator menyetujui, kampanye tampil publik dan bisa menerima donasi.",
       viewCampaign: "Lihat kampanye",
@@ -265,16 +265,16 @@ export const id = {
       heading: "Ke mana Rp50 ribu-mu pergi",
       steps: [
         "Donasimu tercatat di contract dengan alamat, jumlah, dan ledger.",
-        "Kontribusimu menaikkan bobot (Σ√c)² kampanye ini — sinyal publik, bukan janji.",
+        "Kontribusimu menaikkan bobot (Σ√c)² kampanye ini: sinyal publik, bukan janji.",
         "Di akhir musim, dana pendamping dibagi mengikuti sinyal itu. Bisa diaudit siapa pun.",
       ],
       artifactsLabel: (id: number) => `Artefak kampanye #${id}`,
       categoryLabel: "kategori",
     },
-    /** The public backer ledger under the story — recent `contrib` events for this campaign. */
+    /** The public backer ledger under the story: recent `contrib` events for this campaign. */
     ledger: {
       heading: "Aktivitas kampanye",
-      body: "Setiap donasi masuk dan setiap pencairan ke pemilik — direkonstruksi langsung dari event log contract, tanpa backend di tengah.",
+      body: "Setiap donasi masuk dan setiap pencairan ke pemilik, direkonstruksi langsung dari event log contract, tanpa backend di tengah.",
       empty: "Belum ada aktivitas on-chain dalam jendela retensi RPC.",
       retention: "Hanya event dalam jendela retensi RPC Testnet yang ditampilkan.",
       filterAll: "Semua",
@@ -305,7 +305,7 @@ export const id = {
       reviewBack: "Ubah jumlah",
       awaiting: "Buka Freighter untuk menandatangani…",
       submitting: "Mengirim transaksi…",
-      successTitle: "Terima kasih — urunanmu tercatat on-chain.",
+      successTitle: "Terima kasih! Urunanmu tercatat on-chain.",
       done: "Selesai",
       cancel: "Batal",
       connectPrompt: "Hubungkan wallet Testnet untuk ikut urunan.",
@@ -348,7 +348,7 @@ export const id = {
     } as Record<string, string>,
   },
   /**
-   * Seasons archive `/seasons` — every matching round as a reverse-chronological
+   * Seasons archive `/seasons`: every matching round as a reverse-chronological
    * ledger: the "this platform runs season after season" surface. Bahasa-first.
    */
   seasons: {
@@ -381,7 +381,7 @@ export const id = {
     emptyHint: "Musim pertama akan muncul di sini setelah sponsor membukanya.",
   },
   /**
-   * Round-scoped results `/results?round=` — the quadratic split reveal for one
+   * Round-scoped results `/results?round=`: the quadratic split reveal for one
    * season: per-campaign direct vs matched, ranked, with the crowd-beats-whale verdict.
    */
   results: {
@@ -411,7 +411,7 @@ export const id = {
     slowLoad: "Data on-chain memuat lebih lama dari biasanya.",
   },
   /**
-   * Operator/sponsor console `/operator` — the deepest, most privileged surface.
+   * Operator/sponsor console `/operator`: the deepest, most privileged surface.
    * Five write actions grouped by blast radius: the season lifecycle (open → fund → finalize) and
    * governance (curation queue, verify fallback). All copy Bahasa-first.
    */
@@ -427,7 +427,7 @@ export const id = {
     // Shared tx phases
     awaiting: "Buka Freighter untuk menandatangani…",
     submitting: "Mengirim transaksi…",
-    // Status strip — the anchor every action is read against
+    // Status strip: the anchor every action is read against
     status: {
       connectedAs: "Terhubung sebagai",
       roles: "Peran",
@@ -506,7 +506,7 @@ export const id = {
     verify: {
       heading: "Verifikasi manual",
       description:
-        "Tetapkan tingkat verifikasi untuk sebuah alamat — jalur pengganti testnet untuk KYC anchor.",
+        "Tetapkan tingkat verifikasi untuk sebuah alamat: jalur pengganti testnet untuk KYC anchor.",
       addressLabel: "Alamat wallet (G…)",
       tierLabel: "Tingkat",
       tiers: { None: "Tidak ada", Basic: "Dasar", Institution: "Institusi" } as Record<string, string>,
@@ -532,7 +532,7 @@ export const id = {
     } as Record<string, string>,
   },
   /**
-   * Owner dashboard `/dashboard` — a reconciliation ledger of the campaigns the
+   * Owner dashboard `/dashboard`: a reconciliation ledger of the campaigns the
    * connected wallet has submitted (every status), their lifetime direct total, and the per-season
    * matched payout each finalized round owes, with self-serve claim. Bahasa-first.
    */
@@ -564,7 +564,7 @@ export const id = {
       donor: "Pendukung",
       viewTx: "Lihat transaksi",
     },
-    // Gate ladder (owners need no verification tier — just a Testnet wallet)
+    // Gate ladder (owners need no verification tier, just a Testnet wallet)
     connectPrompt: "Hubungkan wallet Testnet untuk melihat kampanyemu.",
     wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
     // Empty state
@@ -595,7 +595,7 @@ export const id = {
     // Campaign-level claim of donations received while no round was open
     direct: {
       heading: "Donasi di luar musim",
-      body: "Donasi yang masuk saat tak ada musim aktif — bisa dicairkan kapan saja.",
+      body: "Donasi yang masuk saat tak ada musim aktif bisa dicairkan kapan saja.",
       claim: "Klaim donasi langsung",
       claiming: "Mengklaim…",
       claimed: "Donasi langsung telah dicairkan.",
@@ -607,13 +607,13 @@ export const id = {
     viewOnExplorer: "Lihat transaksi di Explorer",
   },
   /**
-   * Contributor account `/account` — "me": my verification tier, my total impact,
+   * Contributor account `/account` ("me"): my verification tier, my total impact,
    * and my past direct donations reconstructed from on-chain `contrib` events, grouped by campaign.
    */
   account: {
     title: "Kontribusi saya",
     subtitle:
-      "Riwayat donasi langsungmu, direkonstruksi dari catatan on-chain — dikelompokkan per kampanye.",
+      "Riwayat donasi langsungmu, direkonstruksi dari catatan on-chain, dikelompokkan per kampanye.",
     // Gate ladder (a contributor only needs a Testnet wallet to see their own history)
     connectPrompt: "Hubungkan wallet Testnet untuk melihat riwayat kontribusimu.",
     wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
@@ -636,7 +636,7 @@ export const id = {
     emptyHint:
       "Donasi pertamamu akan muncul di sini, tercatat langsung dari transaksi on-chain.",
     exploreCta: "Jelajahi kampanye",
-    // Retention caveat — testnet RPC prunes old events; keep the reconstruction honest.
+    // Retention caveat: testnet RPC prunes old events; keep the reconstruction honest.
     retentionNote:
       "Hanya donasi dalam jendela retensi RPC Testnet yang bisa ditampilkan.",
   },
@@ -655,24 +655,24 @@ export const id = {
     } as Record<string, string>,
   },
   /**
-   * Verification flow `/verify` — a linear 3-step trust ladder: see your tier,
+   * Verification flow `/verify`, a linear 3-step trust ladder: see your tier,
    * prove wallet ownership to the anchor (SEP-10), then get a tier attested. On testnet the anchor's
    * KYC is a clearly-labeled stand-in; the attester (operator) writes the tier. Bahasa-first.
    */
   verify: {
     title: "Verifikasi",
     subtitle:
-      "Verifikasi sekali untuk membuka urunan dan pengajuan kampanye. Data identitasmu tak pernah tersimpan di sini — hanya tingkat verifikasinya yang tercatat on-chain.",
+      "Verifikasi sekali untuk membuka urunan dan pengajuan kampanye. Data identitasmu tak pernah tersimpan di sini. Hanya tingkat verifikasinya yang tercatat on-chain.",
     // Gate ladder
     connectPrompt: "Hubungkan wallet Testnet untuk mulai verifikasi.",
     wrongNetwork: "Alihkan Freighter ke Testnet untuk melanjutkan.",
-    // What each tier unlocks — the ladder rail
+    // What each tier unlocks: the ladder rail
     ladderHeading: "Yang terbuka di tiap tingkat",
     ladder: [
       { tier: "Dasar", unlock: "Ikut urunan & ajukan kampanye" },
       { tier: "Institusi", unlock: "Isi dana pendamping sebagai sponsor" },
     ],
-    // Step 1 — SEP-10 ownership
+    // Step 1: SEP-10 ownership
     sep10: {
       overline: "01 · Bukti kepemilikan",
       heading: "Buktikan kamu pemilik wallet ini",
@@ -683,6 +683,7 @@ export const id = {
       awaiting: "Buka Freighter untuk menandatangani…",
       successTitle: "Kepemilikan terbukti",
       successBody: "Anchor menerbitkan token sesi. Lanjut ke penetapan tingkat.",
+      doneBody: "Anda telah membuktikan kepemilikan wallet ini.",
       notConfiguredTitle: "Anchor belum dikonfigurasi",
       notConfiguredBody:
         "Belum ada anchor SEP-10 yang tersambung di lingkungan ini. Kamu tetap bisa memakai jalur penetapan tingkat simulasi testnet di bawah.",
@@ -697,7 +698,7 @@ export const id = {
         generic: "Verifikasi anchor gagal. Coba lagi.",
       } as Record<string, string>,
     },
-    // Step 1.5 — SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
+    // Step 1.5: SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
     kyc: {
       overline: "01b · Data KYC",
       heading: "Kirim data KYC ke anchor",
@@ -709,6 +710,8 @@ export const id = {
       cta: "Kirim ke anchor",
       submitting: "Mengirim ke anchor…",
       polling: "Memeriksa status di anchor…",
+      doneTitle: "KYC diterima",
+      doneBody: "Anchor menerima detail KYC Anda.",
       status: {
         NEEDS_INFO: "Anchor meminta data tambahan.",
         PROCESSING: "Anchor sedang memproses pengajuanmu.",
@@ -719,13 +722,13 @@ export const id = {
       errors: {
         "not-configured": "Anchor belum dikonfigurasi di lingkungan ini.",
         "kyc-not-configured":
-          "Anchor ini tidak mempublikasikan layanan KYC (SEP-12) — lanjut lewat jalur penetapan tingkat simulasi testnet di bawah.",
+          "Anchor ini tidak mempublikasikan layanan KYC (SEP-12). Lanjut lewat jalur penetapan tingkat simulasi testnet di bawah.",
         "kyc-rejected": "Anchor menolak pengajuan KYC. Coba lagi.",
         network: "Gagal menghubungi anchor. Periksa koneksi lalu coba lagi.",
         generic: "Pengajuan KYC gagal. Coba lagi.",
       } as Record<string, string>,
     },
-    // Step 2 — attest (real KYC hand-off, or the simulated testnet stand-in)
+    // Step 2: attest (real KYC hand-off, or the simulated testnet stand-in)
     attest: {
       overline: "02 · Penetapan tingkat",
       heading: "Dapatkan tingkat verifikasi",
@@ -735,7 +738,7 @@ export const id = {
         "Di produksi, anchor menyetujui KYC lalu menuliskan tingkatmu. Di testnet, operator (pemegang peran verifikator) berperan sebagai anchor.",
       // Attester-holder path (self-serve on testnet)
       attesterHint:
-        "Wallet ini memegang peran verifikator — kamu bisa menetapkan tingkat langsung sebagai stand-in anchor.",
+        "Wallet ini memegang peran verifikator, jadi kamu bisa menetapkan tingkat langsung sebagai stand-in anchor.",
       tierLabel: "Tingkat",
       tiers: { Basic: "Dasar", Institution: "Institusi" } as Record<string, string>,
       cta: "Setujui (simulasi KYC)",
@@ -743,11 +746,30 @@ export const id = {
       // Non-attester fallback
       fallbackTitle: "Menunggu penetapan tingkat oleh operator",
       fallbackBody:
-        "Di testnet, penetapan tingkat diselesaikan oleh operator sebagai pengganti anchor. Kepemilikan wallet-mu sudah terbukti — minta operator menetapkan tingkatmu lewat konsol.",
+        "Di testnet, penetapan tingkat diselesaikan oleh operator sebagai pengganti anchor. Kepemilikan wallet-mu sudah terbukti. Minta operator menetapkan tingkatmu lewat konsol.",
       fallbackCta: "Buka konsol operator",
       alreadyTitle: "Kamu sudah terverifikasi",
       alreadyBody: "Tak perlu langkah lain. Kamu siap ikut urunan.",
       exploreCta: "Jelajahi kampanye",
+    },
+    autoAttest: {
+      overline: "02 · Penetapan tingkat",
+      heading: "Tingkat verifikasi Anda",
+      description:
+        "Saat anchor menerima KYC Anda, layanan attester kami mencatat tingkat Anda on-chain secara otomatis.",
+      badge: "Otomatis",
+      attesting: "KYC diterima, mencatat tingkat Anda on-chain…",
+      doneTitle: "Terverifikasi!",
+      doneBody:
+        "Anchor mengonfirmasi KYC Anda dan tingkat Basic Anda kini tercatat on-chain. Anda siap ikut urunan.",
+      exploreCta: "Jelajahi kampanye",
+      awaitingTitle: "Selesaikan langkah di atas",
+      awaitingBody:
+        "Setelah Anda membuktikan kepemilikan dan anchor menerima KYC, tingkat Anda diberikan otomatis.",
+      errorTitle: "Penetapan tingkat otomatis belum selesai",
+      errorBody:
+        "Kepemilikan dan KYC Anda terbukti, tetapi penulisan tingkat gagal. Operator dapat menetapkannya secara manual.",
+      fallbackCta: "Buka konsol operator",
     },
     // Shared tx phases
     submitting: "Mengirim transaksi…",
@@ -758,6 +780,7 @@ export const id = {
     connect: "Hubungkan Wallet",
     connecting: "Menghubungkan…",
     disconnect: "Putuskan Wallet",
+    verify: "Verifikasi Wallet",
     notInstalled: "Pasang Freighter",
     wrongNetworkPill: "Jaringan salah",
     testnetPill: "Testnet",
@@ -782,7 +805,7 @@ export const id = {
   empty: "Belum ada proyek",
   errorGeneric: "Terjadi kesalahan. Coba lagi.",
   retry: "Coba lagi",
-  staleData: "Gagal memuat pembaruan — menampilkan data terakhir.",
+  staleData: "Gagal memuat pembaruan. Menampilkan data terakhir.",
   /**
    * Shared Bahasa fallback for every contract `Error` variant (mapped by name via
    * `mapContractError`). Context-specific screens may override individual keys by passing their

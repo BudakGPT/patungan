@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useStrings } from "@/lib/locale";
 import { brand } from "@/brand";
 import { config } from "@/lib/config";
+import { useIsOperator } from "@/lib/hooks";
 import { WalletButton } from "./WalletButton";
 import { NetworkBanner } from "./NetworkBanner";
 import { LocaleToggle } from "./LocaleToggle";
@@ -17,19 +18,23 @@ export function Header() {
   const pathname = usePathname();
   const reduced = useReducedMotion();
 
-  const NAV_ITEMS = useMemo(
-    () =>
-      [
-        { href: "/", label: strings.nav.landing },
-        { href: "/campaigns", label: strings.nav.campaigns },
-        { href: "/seasons", label: strings.nav.seasons },
-        { href: "/results", label: strings.nav.results },
-        { href: "/dashboard", label: strings.nav.dashboard },
-        { href: "/account", label: strings.nav.account },
-        { href: "/operator", label: strings.nav.operator },
-      ] as const,
-    [strings],
-  );
+  // The operator console is role-gated (admin / curator / attester). Hide its nav entry for everyone
+  // else rather than surfacing a link that dead-ends in a "not authorized" gate. Direct-URL access is
+  // still caught by the page's own gate — a URL can't be truly hidden.
+  const isOperator = useIsOperator();
+
+  const NAV_ITEMS = useMemo(() => {
+    const items = [
+      { href: "/", label: strings.nav.landing },
+      { href: "/campaigns", label: strings.nav.campaigns },
+      { href: "/seasons", label: strings.nav.seasons },
+      { href: "/results", label: strings.nav.results },
+      { href: "/dashboard", label: strings.nav.dashboard },
+      { href: "/account", label: strings.nav.account },
+    ];
+    if (isOperator) items.push({ href: "/operator", label: strings.nav.operator });
+    return items;
+  }, [strings, isOperator]);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";

@@ -1,6 +1,6 @@
 import type { Strings } from "./strings.id";
 
-/** English UI copy — opt-in locale, shape-checked against `strings.id.ts`. */
+/** English UI copy. Opt-in locale, shape-checked against `strings.id.ts`. */
 export const en: Strings = {
   appName: "Patungan",
   nav: {
@@ -68,10 +68,10 @@ export const en: Strings = {
       },
       {
         title: "Quadratic allocation",
-        copy: "The contract computes (Σ√c)² per campaign and splits the matching pool — headcount wins, not one whale.",
+        copy: "The contract computes (Σ√c)² per campaign and splits the matching pool: headcount wins, not one whale.",
       },
     ],
-    directoryComment: "public directory — every campaign curator-verified",
+    directoryComment: "public directory: every campaign curator-verified",
     seasonRef: (id: string | number) => `season #${id}`,
     title: "Patungan",
     subtitle: "Chip in together, matched fairly.",
@@ -86,7 +86,7 @@ export const en: Strings = {
     donorCountSuffix: "backers",
     projectedMatchLabel: "Projected match",
     finalMatchLabel: "Final match",
-    noMatchYet: "—",
+    noMatchYet: "–",
   },
   categories: {
     DevelopingRegions: "Developing Regions",
@@ -135,14 +135,14 @@ export const en: Strings = {
     targetProgress: "toward target",
     targetReached: "Target reached",
     noThumbAlt: "No image",
-    // Onboarding "how it works" strip — QF explainer for cold visitors
+    // Onboarding "how it works" strip: QF explainer for cold visitors
     howItWorks: {
       overline: "How it works",
       steps: [
         {
           n: "01",
           title: "Donate directly, anytime",
-          body: "Pick a campaign you trust, then donate directly — no need to wait for a season.",
+          body: "Pick a campaign you trust, then donate directly. No need to wait for a season.",
         },
         {
           n: "02",
@@ -192,7 +192,7 @@ export const en: Strings = {
     donorSuffix: "backers",
     projectedMatchLabel: "Projected quadratic match",
     notInRound:
-      "Not part of an active matching season yet — direct donations still count toward the next season's match.",
+      "Not part of an active matching season yet. Direct donations still count toward the next season's match.",
     status: {
       Pending: "This campaign is still awaiting curation. Donations open once a curator approves it.",
       Rejected: "This campaign didn't pass curation and can't receive donations.",
@@ -246,7 +246,7 @@ export const en: Strings = {
       awaiting: "Open Freighter to sign…",
       submitting: "Sending transaction…",
       // Success
-      successTitle: "Campaign submitted — awaiting curation",
+      successTitle: "Campaign submitted, awaiting curation",
       successBody:
         "Your campaign is recorded on-chain with status Pending curation. Once a curator approves it, it goes public and can receive donations.",
       viewCampaign: "View campaign",
@@ -257,7 +257,7 @@ export const en: Strings = {
       heading: "Where your Rp50k goes",
       steps: [
         "Your donation is recorded in the contract with address, amount, and ledger.",
-        "Your contribution raises this campaign's (Σ√c)² weight — a public signal, not a promise.",
+        "Your contribution raises this campaign's (Σ√c)² weight: a public signal, not a promise.",
         "At season's end, the matching pool is split along that signal. Anyone can audit it.",
       ],
       artifactsLabel: (id: number) => `Campaign artifacts #${id}`,
@@ -265,7 +265,7 @@ export const en: Strings = {
     },
     ledger: {
       heading: "Campaign activity",
-      body: "Every donation in and every payout to the owner — reconstructed straight from the contract's event log, no backend in between.",
+      body: "Every donation in and every payout to the owner, reconstructed straight from the contract's event log, no backend in between.",
       empty: "No on-chain activity inside the RPC retention window yet.",
       retention: "Only events within the Testnet RPC retention window are shown.",
       filterAll: "All",
@@ -296,7 +296,7 @@ export const en: Strings = {
       reviewBack: "Change amount",
       awaiting: "Open Freighter to sign…",
       submitting: "Sending transaction…",
-      successTitle: "Thanks — your contribution is on-chain.",
+      successTitle: "Thanks! Your contribution is on-chain.",
       done: "Done",
       cancel: "Cancel",
       connectPrompt: "Connect a Testnet wallet to chip in.",
@@ -469,7 +469,7 @@ export const en: Strings = {
     verify: {
       heading: "Manual verification",
       description:
-        "Set a verification tier for an address — the testnet stand-in path for a KYC anchor.",
+        "Set a verification tier for an address: the testnet stand-in path for a KYC anchor.",
       addressLabel: "Wallet address (G…)",
       tierLabel: "Tier",
       tiers: { None: "None", Basic: "Basic", Institution: "Institution" } as Record<string, string>,
@@ -547,7 +547,7 @@ export const en: Strings = {
     },
     direct: {
       heading: "Donations outside a season",
-      body: "Donations that came in while no season was active — can be claimed anytime.",
+      body: "Donations that came in while no season was active can be claimed anytime.",
       claim: "Claim direct donations",
       claiming: "Claiming…",
       claimed: "Direct donations have been disbursed.",
@@ -560,7 +560,7 @@ export const en: Strings = {
   account: {
     title: "My contributions",
     subtitle:
-      "Your direct donation history, reconstructed from on-chain records — grouped by campaign.",
+      "Your direct donation history, reconstructed from on-chain records, grouped by campaign.",
     connectPrompt: "Connect a Testnet wallet to see your contribution history.",
     wrongNetwork: "Switch Freighter to Testnet to continue.",
     tierLabel: "Verification",
@@ -598,7 +598,7 @@ export const en: Strings = {
   verify: {
     title: "Verification",
     subtitle:
-      "Verify once to unlock contributing and campaign submission. Your identity data is never stored here — only your verification tier is recorded on-chain.",
+      "Verify once to unlock contributing and campaign submission. Your identity data is never stored here. Only your verification tier is recorded on-chain.",
     connectPrompt: "Connect a Testnet wallet to start verification.",
     wrongNetwork: "Switch Freighter to Testnet to continue.",
     ladderHeading: "What each tier unlocks",
@@ -616,6 +616,7 @@ export const en: Strings = {
       awaiting: "Open Freighter to sign…",
       successTitle: "Ownership proven",
       successBody: "The anchor issued a session token. Continue to tier assignment.",
+      doneBody: "You've proven ownership of this wallet.",
       notConfiguredTitle: "Anchor not configured",
       notConfiguredBody:
         "No SEP-10 anchor is connected in this environment yet. You can still use the simulated testnet tier-assignment path below.",
@@ -641,6 +642,8 @@ export const en: Strings = {
       cta: "Send to anchor",
       submitting: "Sending to anchor…",
       polling: "Checking status with anchor…",
+      doneTitle: "KYC accepted",
+      doneBody: "The anchor accepted your KYC details.",
       status: {
         NEEDS_INFO: "The anchor needs more information.",
         PROCESSING: "The anchor is processing your submission.",
@@ -651,7 +654,7 @@ export const en: Strings = {
       errors: {
         "not-configured": "No anchor is configured in this environment.",
         "kyc-not-configured":
-          "This anchor doesn't publish a KYC service (SEP-12) — continue via the simulated testnet tier-assignment path below.",
+          "This anchor doesn't publish a KYC service (SEP-12). Continue via the simulated testnet tier-assignment path below.",
         "kyc-rejected": "The anchor rejected the KYC submission. Try again.",
         network: "Couldn't reach the anchor. Check your connection and try again.",
         generic: "KYC submission failed. Try again.",
@@ -665,18 +668,37 @@ export const en: Strings = {
       description:
         "In production, the anchor approves KYC and then writes your tier. On testnet, the operator (holding the verifier role) stands in for the anchor.",
       attesterHint:
-        "This wallet holds the verifier role — you can set a tier directly as the anchor stand-in.",
+        "This wallet holds the verifier role, so you can set a tier directly as the anchor stand-in.",
       tierLabel: "Tier",
       tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
       cta: "Approve (simulated KYC)",
       successTitle: "Verification tier set!",
       fallbackTitle: "Waiting on the operator's tier assignment",
       fallbackBody:
-        "On testnet, tier assignment is handled by the operator in place of the anchor. Your wallet ownership is already proven — ask the operator to set your tier via the console.",
+        "On testnet, tier assignment is handled by the operator in place of the anchor. Your wallet ownership is already proven. Ask the operator to set your tier via the console.",
       fallbackCta: "Open operator console",
       alreadyTitle: "You're already verified",
       alreadyBody: "Nothing else to do. You're ready to contribute.",
       exploreCta: "Explore campaigns",
+    },
+    autoAttest: {
+      overline: "02 · Tier assignment",
+      heading: "Your verification tier",
+      description:
+        "When the anchor accepts your KYC, our attester service records your tier on-chain automatically.",
+      badge: "Automated",
+      attesting: "KYC accepted, recording your tier on-chain…",
+      doneTitle: "Verified!",
+      doneBody:
+        "The anchor confirmed your KYC and your Basic tier is now on-chain. You're ready to contribute.",
+      exploreCta: "Explore campaigns",
+      awaitingTitle: "Finish the steps above",
+      awaitingBody:
+        "Once you prove ownership and the anchor accepts your KYC, your tier is granted automatically.",
+      errorTitle: "Automatic tier assignment didn't complete",
+      errorBody:
+        "Your ownership and KYC are proven, but writing the tier failed. An operator can set it manually as a fallback.",
+      fallbackCta: "Open operator console",
     },
     submitting: "Sending transaction…",
     viewOnExplorer: "View transaction on Explorer",
@@ -686,6 +708,7 @@ export const en: Strings = {
     connect: "Connect Wallet",
     connecting: "Connecting…",
     disconnect: "Disconnect Wallet",
+    verify: "Verify Wallet",
     notInstalled: "Install Freighter",
     wrongNetworkPill: "Wrong network",
     testnetPill: "Testnet",
@@ -709,7 +732,7 @@ export const en: Strings = {
   empty: "No projects yet",
   errorGeneric: "Something went wrong. Try again.",
   retry: "Retry",
-  staleData: "Couldn't load updates — showing the last known data.",
+  staleData: "Couldn't load updates. Showing the last known data.",
   errors: {
     AlreadyInitialized: "The contract is already initialized.",
     NotAdmin: "Only an admin can do this.",
