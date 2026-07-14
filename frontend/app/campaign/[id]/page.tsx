@@ -158,7 +158,7 @@ function Content({
                   {strings.discovery.donorLabel}
                 </span>
                 <strong className="num tabular mt-2 text-3xl font-black">
-                  {donors ?? "—"}
+                  {donors ?? "–"}
                 </strong>
               </div>
               <div className="metric-card bg-tile-cream text-ink">
@@ -275,7 +275,7 @@ function Content({
               <img
                 className="aspect-[4/3] w-full object-cover"
                 src={thumb || visual.image}
-                alt={`${campaign.title} — ${visual.location}`}
+                alt={`${campaign.title}, ${visual.location}`}
               />
               <figcaption className="bg-ink px-5 py-3 text-xs font-black uppercase tracking-[.12em] text-white/70">
                 {visual.location}

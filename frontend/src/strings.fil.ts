@@ -1,6 +1,6 @@
 import type { Strings } from "./strings.id";
 
-/** Filipino UI copy — opt-in locale, shape-checked against `strings.id.ts`. */
+/** Filipino UI copy. Opt-in locale, shape-checked against `strings.id.ts`. */
 export const fil: Strings = {
   appName: "Patungan",
   nav: {
@@ -68,10 +68,10 @@ export const fil: Strings = {
       },
       {
         title: "Kuwadratikong alokasyon",
-        copy: "Kinukuwenta ng contract ang (Σ√c)² bawat kampanya at hinahati ang pondo sa pagtutumbas — bilang ng tao ang panalo, hindi iisang whale.",
+        copy: "Kinukuwenta ng contract ang (Σ√c)² bawat kampanya at hinahati ang pondo sa pagtutumbas: bilang ng tao ang panalo, hindi iisang whale.",
       },
     ],
-    directoryComment: "pampublikong direktoryo — bawat kampanya ay na-verify ng curator",
+    directoryComment: "pampublikong direktoryo: bawat kampanya ay na-verify ng curator",
     seasonRef: (id: string | number) => `season #${id}`,
     title: "Patungan",
     subtitle: "Sabayang ambag, patas na tinutumbasan.",
@@ -86,7 +86,7 @@ export const fil: Strings = {
     donorCountSuffix: "tagasuporta",
     projectedMatchLabel: "Inaasahang tutumbasin",
     finalMatchLabel: "Panghuling tinumbasan",
-    noMatchYet: "—",
+    noMatchYet: "–",
   },
   categories: {
     DevelopingRegions: "Umuunlad na Rehiyon",
@@ -135,14 +135,14 @@ export const fil: Strings = {
     targetProgress: "papunta sa target",
     targetReached: "Naabot ang target",
     noThumbAlt: "Walang larawan",
-    // Onboarding "how it works" strip — QF explainer for cold visitors
+    // Onboarding "how it works" strip: QF explainer for cold visitors
     howItWorks: {
       overline: "Paano ito gumagana",
       steps: [
         {
           n: "01",
           title: "Direktang magdonasyon, kahit kailan",
-          body: "Pumili ng kampanyang pinagkakatiwalaan mo, tapos magdonasyon nang direkta — hindi na kailangang maghintay ng season.",
+          body: "Pumili ng kampanyang pinagkakatiwalaan mo, tapos magdonasyon nang direkta, hindi na kailangang maghintay ng season.",
         },
         {
           n: "02",
@@ -192,7 +192,7 @@ export const fil: Strings = {
     donorSuffix: "tagasuporta",
     projectedMatchLabel: "Inaasahang kuwadratikong tumbasan",
     notInRound:
-      "Hindi pa bahagi ng aktibong season ng pagtutumbas — mabibilang pa rin ang direktang donasyon sa tumbasan ng susunod na season.",
+      "Hindi pa bahagi ng aktibong season ng pagtutumbas. Mabibilang pa rin ang direktang donasyon sa tumbasan ng susunod na season.",
     /** Notice shown when a non-Approved campaign is opened directly (owner-shared link). */
     status: {
       Pending: "Naghihintay pa ang kampanyang ito ng kurasyon. Bubukas ang donasyon kapag inaprubahan ng kurador.",
@@ -246,7 +246,7 @@ export const fil: Strings = {
       awaiting: "Buksan ang Freighter para pumirma…",
       submitting: "Ipinapadala ang transaksyon…",
       // Success
-      successTitle: "Naisumite ang kampanya — naghihintay ng kurasyon",
+      successTitle: "Naisumite ang kampanya, naghihintay ng kurasyon",
       successBody:
         "Naitala na ang kampanya mo on-chain na may status na Naghihintay ng kurasyon. Kapag inaprubahan ng kurador, magiging publiko ito at makakatanggap na ng donasyon.",
       viewCampaign: "Tingnan ang kampanya",
@@ -257,7 +257,7 @@ export const fil: Strings = {
       heading: "Saan napupunta ang iyong Rp50rb",
       steps: [
         "Naitatala ang donasyon mo sa contract kasama ang address, halaga, at ledger.",
-        "Itinataas ng kontribusyon mo ang (Σ√c)² na timbang ng kampanyang ito — pampublikong senyales, hindi pangako.",
+        "Itinataas ng kontribusyon mo ang (Σ√c)² na timbang ng kampanyang ito: pampublikong senyales, hindi pangako.",
         "Sa katapusan ng season, hinahati ang pondo sa pagtutumbas ayon sa senyales na iyon. Maaaring i-audit ng kahit sino.",
       ],
       artifactsLabel: (id: number) => `Mga artifact ng kampanya #${id}`,
@@ -265,7 +265,7 @@ export const fil: Strings = {
     },
     ledger: {
       heading: "Aktibidad ng kampanya",
-      body: "Bawat donasyong pumapasok at bawat pagbabayad sa may-ari — direktang binuo mula sa event log ng contract, walang backend sa pagitan.",
+      body: "Bawat donasyong pumapasok at bawat pagbabayad sa may-ari, direktang binuo mula sa event log ng contract, walang backend sa pagitan.",
       empty: "Wala pang on-chain na aktibidad sa loob ng RPC retention window.",
       retention: "Tanging mga event sa loob ng Testnet RPC retention window ang ipinapakita.",
       filterAll: "Lahat",
@@ -296,7 +296,7 @@ export const fil: Strings = {
       reviewBack: "Baguhin ang halaga",
       awaiting: "Buksan ang Freighter para pumirma…",
       submitting: "Ipinapadala ang transaksyon…",
-      successTitle: "Salamat — naitala na ang ambag mo on-chain.",
+      successTitle: "Salamat! Naitala na ang ambag mo on-chain.",
       done: "Tapos na",
       cancel: "Kanselahin",
       connectPrompt: "Ikonekta ang Testnet wallet para sumali sa ambagan.",
@@ -404,7 +404,7 @@ export const fil: Strings = {
     // Shared tx phases
     awaiting: "Buksan ang Freighter para pumirma…",
     submitting: "Ipinapadala ang transaksyon…",
-    // Status strip — the anchor every action is read against
+    // Status strip: the anchor every action is read against
     status: {
       connectedAs: "Nakakonekta bilang",
       roles: "Mga Role",
@@ -481,7 +481,7 @@ export const fil: Strings = {
     // 5 · Verify fallback
     verify: {
       heading: "Manual na beripikasyon",
-      description: "Magtakda ng verification tier para sa isang address — ang testnet stand-in path para sa KYC anchor.",
+      description: "Magtakda ng verification tier para sa isang address: ang testnet stand-in path para sa KYC anchor.",
       addressLabel: "Wallet address (G…)",
       tierLabel: "Tier",
       tiers: { None: "Wala", Basic: "Basic", Institution: "Institution" } as Record<string, string>,
@@ -533,7 +533,7 @@ export const fil: Strings = {
       donor: "Tagasuporta",
       viewTx: "Tingnan ang transaksyon",
     },
-    // Gate ladder (owners need no verification tier — just a Testnet wallet)
+    // Gate ladder (owners need no verification tier, just a Testnet wallet)
     connectPrompt: "Ikonekta ang Testnet wallet para makita ang mga kampanya mo.",
     wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
     // Empty state
@@ -564,7 +564,7 @@ export const fil: Strings = {
     // Campaign-level claim of donations received while no round was open
     direct: {
       heading: "Donasyong labas sa season",
-      body: "Mga donasyong pumasok habang walang aktibong season — puwedeng i-claim anumang oras.",
+      body: "Mga donasyong pumasok habang walang aktibong season, puwedeng i-claim anumang oras.",
       claim: "I-claim ang direktang donasyon",
       claiming: "Kina-claim…",
       claimed: "Naipamahagi na ang direktang donasyon.",
@@ -577,7 +577,7 @@ export const fil: Strings = {
   },
   account: {
     title: "Aking mga ambag",
-    subtitle: "Ang kasaysayan ng iyong direktang donasyon, muling binuo mula sa mga on-chain na tala — pinagsama-sama ayon sa kampanya.",
+    subtitle: "Ang kasaysayan ng iyong direktang donasyon, muling binuo mula sa mga on-chain na tala, pinagsama-sama ayon sa kampanya.",
     // Gate ladder (a contributor only needs a Testnet wallet to see their own history)
     connectPrompt: "Ikonekta ang Testnet wallet para makita ang kasaysayan ng ambag mo.",
     wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
@@ -599,7 +599,7 @@ export const fil: Strings = {
     empty: "Wala ka pang naidonasyon.",
     emptyHint: "Lalabas dito ang unang donasyon mo, direktang naitala mula sa on-chain na transaksyon.",
     exploreCta: "Tuklasin ang mga kampanya",
-    // Retention caveat — testnet RPC prunes old events; keep the reconstruction honest.
+    // Retention caveat: testnet RPC prunes old events; keep the reconstruction honest.
     retentionNote: "Mga donasyon lang sa loob ng retention window ng Testnet RPC ang maipapakita.",
   },
   /** Tier-aware verification badge labels + one-line unlock captions (`TierBadge`). */
@@ -619,17 +619,17 @@ export const fil: Strings = {
   verify: {
     title: "Beripikasyon",
     subtitle:
-      "Mag-verify nang isang beses para ma-unlock ang pag-ambag at pagsumite ng kampanya. Hindi kailanman naka-store dito ang datos ng pagkakakilanlan mo — ang tier ng beripikasyon lang ang naitatala on-chain.",
+      "Mag-verify nang isang beses para ma-unlock ang pag-ambag at pagsumite ng kampanya. Hindi kailanman naka-store dito ang datos ng pagkakakilanlan mo. Ang tier ng beripikasyon lang ang naitatala on-chain.",
     // Gate ladder
     connectPrompt: "Ikonekta ang Testnet wallet para magsimula ng beripikasyon.",
     wrongNetwork: "Ilipat ang Freighter sa Testnet para magpatuloy.",
-    // What each tier unlocks — the ladder rail
+    // What each tier unlocks: the ladder rail
     ladderHeading: "Ang na-a-unlock sa bawat tier",
     ladder: [
       { tier: "Basic", unlock: "Mag-ambag at magsumite ng kampanya" },
       { tier: "Institution", unlock: "Magpunô ng pondo sa pagtutumbas bilang sponsor" },
     ],
-    // Step 1 — SEP-10 ownership
+    // Step 1: SEP-10 ownership
     sep10: {
       overline: "01 · Patunay ng pagmamay-ari",
       heading: "Patunayan na sa iyo ang wallet na ito",
@@ -655,7 +655,7 @@ export const fil: Strings = {
         generic: "Nabigo ang beripikasyon ng anchor. Subukan ulit.",
       } as Record<string, string>,
     },
-    // Step 1.5 — SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
+    // Step 1.5: SEP-12 KYC fields (real, only when the anchor publishes a KYC_SERVER)
     kyc: {
       overline: "01b · Detalye ng KYC",
       heading: "Ipadala ang detalye ng KYC sa anchor",
@@ -678,13 +678,13 @@ export const fil: Strings = {
       errors: {
         "not-configured": "Walang naka-configure na anchor sa environment na ito.",
         "kyc-not-configured":
-          "Hindi naglalathala ng serbisyong KYC (SEP-12) ang anchor na ito — magpatuloy sa pamamagitan ng simulated testnet tier-assignment path sa ibaba.",
+          "Hindi naglalathala ng serbisyong KYC (SEP-12) ang anchor na ito. Magpatuloy sa pamamagitan ng simulated testnet tier-assignment path sa ibaba.",
         "kyc-rejected": "Tinanggihan ng anchor ang KYC submission. Subukan ulit.",
         network: "Hindi naabot ang anchor. Suriin ang koneksyon at subukan ulit.",
         generic: "Nabigo ang KYC submission. Subukan ulit.",
       } as Record<string, string>,
     },
-    // Step 2 — attest (real KYC hand-off, or the simulated testnet stand-in)
+    // Step 2: attest (real KYC hand-off, or the simulated testnet stand-in)
     attest: {
       overline: "02 · Pagtatakda ng tier",
       heading: "Kunin ang iyong verification tier",
@@ -693,7 +693,7 @@ export const fil: Strings = {
       description:
         "Sa production, inaaprubahan ng anchor ang KYC at pagkatapos ay isusulat ang tier mo. Sa testnet, ang operator (may hawak na verifier role) ang humahalili sa anchor.",
       // Attester-holder path (self-serve on testnet)
-      attesterHint: "Hawak ng wallet na ito ang verifier role — puwede kang magtakda ng tier nang direkta bilang anchor stand-in.",
+      attesterHint: "Hawak ng wallet na ito ang verifier role, kaya puwede kang magtakda ng tier nang direkta bilang anchor stand-in.",
       tierLabel: "Tier",
       tiers: { Basic: "Basic", Institution: "Institution" } as Record<string, string>,
       cta: "Aprubahan (simulated KYC)",
@@ -701,7 +701,7 @@ export const fil: Strings = {
       // Non-attester fallback
       fallbackTitle: "Naghihintay ng pagtatakda ng tier ng operator",
       fallbackBody:
-        "Sa testnet, ang operator ang humahawak ng pagtatakda ng tier bilang kapalit ng anchor. Napatunayan na ang pagmamay-ari ng wallet mo — hilingin sa operator na itakda ang tier mo sa pamamagitan ng console.",
+        "Sa testnet, ang operator ang humahawak ng pagtatakda ng tier bilang kapalit ng anchor. Napatunayan na ang pagmamay-ari ng wallet mo. Hilingin sa operator na itakda ang tier mo sa pamamagitan ng console.",
       fallbackCta: "Buksan ang operator console",
       alreadyTitle: "Na-verify ka na",
       alreadyBody: "Wala nang ibang gagawin. Handa ka nang mag-ambag.",
@@ -713,7 +713,7 @@ export const fil: Strings = {
       description:
         "Kapag tinanggap ng anchor ang iyong KYC, awtomatikong itinatala ng aming attester service ang iyong tier on-chain.",
       badge: "Awtomatiko",
-      attesting: "Tinanggap ang KYC — itinatala ang iyong tier on-chain…",
+      attesting: "Tinanggap ang KYC, itinatala ang iyong tier on-chain…",
       doneTitle: "Na-verify!",
       doneBody:
         "Kinumpirma ng anchor ang iyong KYC at ang iyong Basic tier ay nasa on-chain na. Handa ka nang mag-ambag.",
@@ -758,7 +758,7 @@ export const fil: Strings = {
   empty: "Wala pang proyekto",
   errorGeneric: "May naganap na error. Subukan ulit.",
   retry: "Subukan ulit",
-  staleData: "Hindi na-load ang mga update — ipinapakita ang huling nakuhang datos.",
+  staleData: "Hindi na-load ang mga update. Ipinapakita ang huling nakuhang datos.",
   /**
    * Shared Filipino fallback for every contract `Error` variant (mapped by name via
    * `mapContractError`). Context-specific screens may override individual keys by passing their
