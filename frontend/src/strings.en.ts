@@ -616,6 +616,7 @@ export const en: Strings = {
       awaiting: "Open Freighter to sign…",
       successTitle: "Ownership proven",
       successBody: "The anchor issued a session token. Continue to tier assignment.",
+      doneBody: "You've proven ownership of this wallet.",
       notConfiguredTitle: "Anchor not configured",
       notConfiguredBody:
         "No SEP-10 anchor is connected in this environment yet. You can still use the simulated testnet tier-assignment path below.",
@@ -641,6 +642,8 @@ export const en: Strings = {
       cta: "Send to anchor",
       submitting: "Sending to anchor…",
       polling: "Checking status with anchor…",
+      doneTitle: "KYC accepted",
+      doneBody: "The anchor accepted your KYC details.",
       status: {
         NEEDS_INFO: "The anchor needs more information.",
         PROCESSING: "The anchor is processing your submission.",
@@ -678,6 +681,25 @@ export const en: Strings = {
       alreadyBody: "Nothing else to do. You're ready to contribute.",
       exploreCta: "Explore campaigns",
     },
+    autoAttest: {
+      overline: "02 · Tier assignment",
+      heading: "Your verification tier",
+      description:
+        "When the anchor accepts your KYC, our attester service records your tier on-chain automatically.",
+      badge: "Automated",
+      attesting: "KYC accepted — recording your tier on-chain…",
+      doneTitle: "Verified!",
+      doneBody:
+        "The anchor confirmed your KYC and your Basic tier is now on-chain. You're ready to contribute.",
+      exploreCta: "Explore campaigns",
+      awaitingTitle: "Finish the steps above",
+      awaitingBody:
+        "Once you prove ownership and the anchor accepts your KYC, your tier is granted automatically.",
+      errorTitle: "Automatic tier assignment didn't complete",
+      errorBody:
+        "Your ownership and KYC are proven, but writing the tier failed. An operator can set it manually as a fallback.",
+      fallbackCta: "Open operator console",
+    },
     submitting: "Sending transaction…",
     viewOnExplorer: "View transaction on Explorer",
     tierError: "Failed to load verification tier. Try again.",
@@ -686,6 +708,7 @@ export const en: Strings = {
     connect: "Connect Wallet",
     connecting: "Connecting…",
     disconnect: "Disconnect Wallet",
+    verify: "Verify Wallet",
     notInstalled: "Install Freighter",
     wrongNetworkPill: "Wrong network",
     testnetPill: "Testnet",

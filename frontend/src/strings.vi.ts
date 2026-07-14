@@ -635,6 +635,7 @@ export const vi: Strings = {
       awaiting: "Mở Freighter để ký…",
       successTitle: "Đã chứng minh quyền sở hữu",
       successBody: "Trình xác thực đã cấp mã phiên. Tiếp tục sang bước đặt cấp độ.",
+      doneBody: "Bạn đã chứng minh quyền sở hữu ví này.",
       notConfiguredTitle: "Trình xác thực chưa được cấu hình",
       notConfiguredBody:
         "Chưa có trình xác thực SEP-10 nào được kết nối trong môi trường này. Bạn vẫn có thể dùng cách đặt cấp độ mô phỏng trên testnet bên dưới.",
@@ -660,6 +661,8 @@ export const vi: Strings = {
       cta: "Gửi đến trình xác thực",
       submitting: "Đang gửi đến trình xác thực…",
       polling: "Đang kiểm tra trạng thái với trình xác thực…",
+      doneTitle: "KYC đã được chấp nhận",
+      doneBody: "Anchor đã chấp nhận thông tin KYC của bạn.",
       status: {
         NEEDS_INFO: "Trình xác thực cần thêm thông tin.",
         PROCESSING: "Trình xác thực đang xử lý hồ sơ của bạn.",
@@ -699,6 +702,25 @@ export const vi: Strings = {
       alreadyBody: "Không cần làm gì thêm. Bạn đã sẵn sàng đóng góp.",
       exploreCta: "Khám phá chiến dịch",
     },
+    autoAttest: {
+      overline: "02 · Gán cấp độ",
+      heading: "Cấp xác minh của bạn",
+      description:
+        "Khi anchor chấp nhận KYC của bạn, dịch vụ attester của chúng tôi tự động ghi cấp độ của bạn lên chuỗi.",
+      badge: "Tự động",
+      attesting: "KYC đã được chấp nhận — đang ghi cấp độ của bạn lên chuỗi…",
+      doneTitle: "Đã xác minh!",
+      doneBody:
+        "Anchor đã xác nhận KYC của bạn và cấp Basic của bạn hiện đã ở trên chuỗi. Bạn đã sẵn sàng đóng góp.",
+      exploreCta: "Khám phá chiến dịch",
+      awaitingTitle: "Hoàn tất các bước phía trên",
+      awaitingBody:
+        "Sau khi bạn chứng minh quyền sở hữu và anchor chấp nhận KYC, cấp độ của bạn sẽ được cấp tự động.",
+      errorTitle: "Việc gán cấp độ tự động chưa hoàn tất",
+      errorBody:
+        "Quyền sở hữu và KYC của bạn đã được chứng minh, nhưng việc ghi cấp độ thất bại. Người điều hành có thể đặt thủ công.",
+      fallbackCta: "Mở bảng điều khiển điều hành",
+    },
     // Shared tx phases
     submitting: "Đang gửi giao dịch…",
     viewOnExplorer: "Xem giao dịch trên Explorer",
@@ -708,6 +730,7 @@ export const vi: Strings = {
     connect: "Kết nối ví",
     connecting: "Đang kết nối…",
     disconnect: "Ngắt kết nối ví",
+    verify: "Xác minh ví",
     notInstalled: "Cài đặt Freighter",
     wrongNetworkPill: "Sai mạng",
     testnetPill: "Testnet",

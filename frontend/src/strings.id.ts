@@ -683,6 +683,7 @@ export const id = {
       awaiting: "Buka Freighter untuk menandatangani…",
       successTitle: "Kepemilikan terbukti",
       successBody: "Anchor menerbitkan token sesi. Lanjut ke penetapan tingkat.",
+      doneBody: "Anda telah membuktikan kepemilikan wallet ini.",
       notConfiguredTitle: "Anchor belum dikonfigurasi",
       notConfiguredBody:
         "Belum ada anchor SEP-10 yang tersambung di lingkungan ini. Kamu tetap bisa memakai jalur penetapan tingkat simulasi testnet di bawah.",
@@ -709,6 +710,8 @@ export const id = {
       cta: "Kirim ke anchor",
       submitting: "Mengirim ke anchor…",
       polling: "Memeriksa status di anchor…",
+      doneTitle: "KYC diterima",
+      doneBody: "Anchor menerima detail KYC Anda.",
       status: {
         NEEDS_INFO: "Anchor meminta data tambahan.",
         PROCESSING: "Anchor sedang memproses pengajuanmu.",
@@ -749,6 +752,25 @@ export const id = {
       alreadyBody: "Tak perlu langkah lain. Kamu siap ikut urunan.",
       exploreCta: "Jelajahi kampanye",
     },
+    autoAttest: {
+      overline: "02 · Penetapan tingkat",
+      heading: "Tingkat verifikasi Anda",
+      description:
+        "Saat anchor menerima KYC Anda, layanan attester kami mencatat tingkat Anda on-chain secara otomatis.",
+      badge: "Otomatis",
+      attesting: "KYC diterima — mencatat tingkat Anda on-chain…",
+      doneTitle: "Terverifikasi!",
+      doneBody:
+        "Anchor mengonfirmasi KYC Anda dan tingkat Basic Anda kini tercatat on-chain. Anda siap ikut urunan.",
+      exploreCta: "Jelajahi kampanye",
+      awaitingTitle: "Selesaikan langkah di atas",
+      awaitingBody:
+        "Setelah Anda membuktikan kepemilikan dan anchor menerima KYC, tingkat Anda diberikan otomatis.",
+      errorTitle: "Penetapan tingkat otomatis belum selesai",
+      errorBody:
+        "Kepemilikan dan KYC Anda terbukti, tetapi penulisan tingkat gagal. Operator dapat menetapkannya secara manual.",
+      fallbackCta: "Buka konsol operator",
+    },
     // Shared tx phases
     submitting: "Mengirim transaksi…",
     viewOnExplorer: "Lihat transaksi di Explorer",
@@ -758,6 +780,7 @@ export const id = {
     connect: "Hubungkan Wallet",
     connecting: "Menghubungkan…",
     disconnect: "Putuskan Wallet",
+    verify: "Verifikasi Wallet",
     notInstalled: "Pasang Freighter",
     wrongNetworkPill: "Jaringan salah",
     testnetPill: "Testnet",

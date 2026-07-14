@@ -640,6 +640,7 @@ export const fil: Strings = {
       awaiting: "Buksan ang Freighter para pumirma…",
       successTitle: "Napatunayan ang pagmamay-ari",
       successBody: "Naglabas ang anchor ng session token. Magpatuloy sa pagtatakda ng tier.",
+      doneBody: "Napatunayan mo na ang pagmamay-ari ng wallet na ito.",
       notConfiguredTitle: "Hindi pa naka-configure ang anchor",
       notConfiguredBody:
         "Wala pang nakakonektang SEP-10 anchor sa environment na ito. Magagamit mo pa rin ang simulated testnet tier-assignment path sa ibaba.",
@@ -665,6 +666,8 @@ export const fil: Strings = {
       cta: "Ipadala sa anchor",
       submitting: "Ipinapadala sa anchor…",
       polling: "Sinusuri ang status sa anchor…",
+      doneTitle: "Tinanggap ang KYC",
+      doneBody: "Tinanggap ng anchor ang iyong mga detalye ng KYC.",
       status: {
         NEEDS_INFO: "Kailangan ng anchor ng dagdag na impormasyon.",
         PROCESSING: "Pinoproseso ng anchor ang isinumite mo.",
@@ -704,6 +707,25 @@ export const fil: Strings = {
       alreadyBody: "Wala nang ibang gagawin. Handa ka nang mag-ambag.",
       exploreCta: "Tuklasin ang mga kampanya",
     },
+    autoAttest: {
+      overline: "02 · Pagtatalaga ng tier",
+      heading: "Ang iyong verification tier",
+      description:
+        "Kapag tinanggap ng anchor ang iyong KYC, awtomatikong itinatala ng aming attester service ang iyong tier on-chain.",
+      badge: "Awtomatiko",
+      attesting: "Tinanggap ang KYC — itinatala ang iyong tier on-chain…",
+      doneTitle: "Na-verify!",
+      doneBody:
+        "Kinumpirma ng anchor ang iyong KYC at ang iyong Basic tier ay nasa on-chain na. Handa ka nang mag-ambag.",
+      exploreCta: "Tuklasin ang mga kampanya",
+      awaitingTitle: "Tapusin ang mga hakbang sa itaas",
+      awaitingBody:
+        "Kapag napatunayan mo ang pagmamay-ari at tinanggap ng anchor ang KYC, awtomatikong ibibigay ang iyong tier.",
+      errorTitle: "Hindi nakumpleto ang awtomatikong pagtatalaga ng tier",
+      errorBody:
+        "Napatunayan ang iyong pagmamay-ari at KYC, ngunit nabigo ang pagsulat ng tier. Maaaring itakda ito nang manu-mano ng operator.",
+      fallbackCta: "Buksan ang operator console",
+    },
     // Shared tx phases
     submitting: "Ipinapadala ang transaksyon…",
     viewOnExplorer: "Tingnan ang transaksyon sa Explorer",
@@ -713,6 +735,7 @@ export const fil: Strings = {
     connect: "Ikonekta ang Wallet",
     connecting: "Kumokonekta…",
     disconnect: "Idiskonekta ang Wallet",
+    verify: "I-verify ang Wallet",
     notInstalled: "I-install ang Freighter",
     wrongNetworkPill: "Maling network",
     testnetPill: "Testnet",
