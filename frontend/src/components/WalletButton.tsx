@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useWallet } from "@/lib/wallet";
 import { useTier } from "@/lib/hooks";
 import { useStrings } from "@/lib/locale";
@@ -96,6 +97,14 @@ export function WalletButton() {
 
         {menuOpen ? (
           <div role="menu" className="glass-dark absolute right-0 top-full z-50 mt-2 w-48 rounded-xl p-1">
+            <Link
+              href="/verify"
+              role="menuitem"
+              onClick={() => setMenuOpen(false)}
+              className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-bold text-paper/80 hover:bg-white/10 hover:text-paper"
+            >
+              {strings.wallet.verify}
+            </Link>
             <button
               type="button"
               role="menuitem"
