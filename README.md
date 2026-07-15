@@ -210,11 +210,11 @@ every payout settles on-chain. Only one season is open at a time; finalizing fre
 ```text
  Wallet                       Soroban contract             On-chain effect
  ──────                       ────────────────             ───────────────
- operator  open_round ──────▶ season opens · categories
+ sponsor   open_round ──────▶ season opens · categories
  sponsor   fund_pool ───────▶ pool grows ────────────────▶ match pool ▲
  donors    contribute ──────▶ tag (donor, project, amt) ─▶ Σ√c per donor
    ·· many small gifts ··
- operator  finalize_round ──▶ split = (Σ√c)² share ──────▶ amounts locked
+ sponsor   finalize_round ──▶ split = (Σ√c)² share ──────▶ amounts locked
  owner     claim ───────────▶ pay direct + match ────────▶ → payout wallet
 ```
 
