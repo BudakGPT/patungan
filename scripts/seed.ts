@@ -22,10 +22,12 @@ const STATE_PATH = join(__dirname, ".seed-state.json");
 
 const ADMIN_IDENTITY = process.env.PATUNGAN_ADMIN_IDENTITY ?? "patungan-admin";
 
-// Amounts are in stroops (native XLM SAC = the IDR stand-in). Kept tiny — friendbot funds
-// each throwaway donor with 10_000 XLM, so these never exhaust a balance.
-const CROWD_AMOUNT = BigInt(process.env.SEED_CROWD_AMOUNT ?? 25_000);
-const WHALE_AMOUNT = BigInt(process.env.SEED_WHALE_AMOUNT ?? 1_000_000);
+// Amounts are in stroops (native XLM SAC = the IDR stand-in). Well within the ~10_000 XLM
+// friendbot grant each donor gets. The current-round pair is deliberately near-symmetric in
+// TOTAL money (8 × CROWD ≈ WHALE), so the QF reveal isolates a single variable — breadth of
+// support — and the crowd campaign wins the match on people alone, not on money.
+const CROWD_AMOUNT = BigInt(process.env.SEED_CROWD_AMOUNT ?? 500_000);
+const WHALE_AMOUNT = BigInt(process.env.SEED_WHALE_AMOUNT ?? 4_000_000);
 const PRIOR_POOL = BigInt(process.env.SEED_PRIOR_POOL ?? 50_000_000);
 const CURRENT_POOL = BigInt(process.env.SEED_CURRENT_POOL ?? 100_000_000);
 const CROWD_N = 8;
@@ -379,6 +381,16 @@ async function main() {
   // 4. CURRENT round — open (all categories), fund, seed crowd-vs-whale, LEAVE OPEN.
   console.log("==> Current round (open season)");
   rounds = (await client.list_rounds()).result;
+  // If the tracked current round has since been finalized/cancelled (e.g. a demo reset), roll to a
+  // fresh one: drop the stale id so the block below opens a new Open round instead of no-op warning.
+  if (state.currentRoundId !== undefined) {
+    const tracked = rounds.find((r) => r.id === state.currentRoundId);
+    if (tracked && tracked.status.tag !== "Open") {
+      console.log(`   tracked current round ${state.currentRoundId} is ${tracked.status.tag} — opening a fresh round`);
+      state.currentRoundId = undefined;
+      saveState(state);
+    }
+  }
   if (state.currentRoundId === undefined) {
     const open = rounds.find((r) => r.status.tag === "Open" && r.id !== priorId);
     if (open) state.currentRoundId = open.id;
