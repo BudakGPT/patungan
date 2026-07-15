@@ -55,7 +55,13 @@ export function CampaignDirectory() {
     });
     const sorted = [...filtered];
     if (sort === "mostBacked") {
-      sorted.sort((a, b) => descBig(a.lifetime_direct, b.lifetime_direct));
+      // Rank by the crowd's quadratic match (breadth-weighted), not raw rupiah, so the campaign
+      // backed by the most people leads. Out-of-round campaigns (no match) fall back to direct.
+      sorted.sort((a, b) => {
+        const ma = matchOf.get(a.id) ?? 0n;
+        const mb = matchOf.get(b.id) ?? 0n;
+        return ma === mb ? descBig(a.lifetime_direct, b.lifetime_direct) : descBig(ma, mb);
+      });
     } else if (sort === "newest") {
       sorted.sort((a, b) => descBig(a.created_ledger, b.created_ledger));
     } else {
@@ -69,7 +75,7 @@ export function CampaignDirectory() {
     return sorted;
     // `inScope` is derived from the round data captured by these dependencies.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [approved, category, search, sort, roundId, openRound.data]);
+  }, [approved, category, search, sort, roundId, openRound.data, matchOf]);
 
   const filtersActive = category !== null || search.trim() !== "";
   const resetFilters = () => {
