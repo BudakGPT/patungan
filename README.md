@@ -33,8 +33,7 @@ database** in between.
         <img src="https://img.shields.io/badge/🕸_Live_Demo-patungan--stellar.vercel.app-3E1BDB?style=for-the-badge" alt="Live Demo"/>
     </a>
     &nbsp;
-    <!-- TODO(demo): swap href="#demo" for the YouTube URL once the narrated walkthrough is uploaded. -->
-    <a href="#demo">
+    <a href="https://youtu.be/SHNpSGKmeGs?si=eqbqkaEsqxbuzdJT">
         <img src="https://img.shields.io/badge/Demo_Video-Watch_the_walkthrough-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo Video"/>
     </a>
 </p>
