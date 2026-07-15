@@ -416,14 +416,14 @@ patungan/
             <a href="https://github.com/haekalhdn">
                 <img src="https://avatars.githubusercontent.com/u/178357458?v=4" width="80px;" alt="Haekal Handrian"/>
                 <br /><sub><b>Haekal Handrian</b></sub>
-                <br /><sub>Fullstack Developer</sub>
+                <br /><sub>UI/UX Designer</sub>
             </a>
         </td>
         <td align="center">
             <a href="https://github.com/erikwilbert">
                 <img src="https://avatars.githubusercontent.com/u/198186768?v=4" width="80px;" alt="Erik Wilbert"/>
                 <br /><sub><b>Erik Wilbert</b></sub>
-                <br /><sub>Fullstack Developer</sub>
+                <br /><sub>Quality Assurance</sub>
             </a>
         </td>
     </tr>
