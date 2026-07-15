@@ -1,59 +1,353 @@
 <p align="center">
-    <img src="frontend/public/assets/patungan-logo.png" alt="Patungan Logo" width="200"/>
+    <img src="frontend/public/assets/patungan-banner.svg" alt="Patungan: gotong royong on-chain. Quadratic funding on Stellar." width="100%"/>
 </p>
 
-# **Patungan**
-
-Di banyak tempat, **gotong royong** sudah menjadi budaya — saling *urunan* untuk tujuan bersama.  
-Tapi bagaimana kalau semangat itu bisa diperkuat oleh teknologi? Bukan sekadar **donasi biasa**, tapi sistem yang memastikan **suara rakyat kecil lebih didengar** dari pada dompet satu orang kaya.
-
----
-
-**Patungan** menghadirkan **Quadratic Funding** di atas **Stellar blockchain** —  
-sebuah mekanisme di mana kontribusi kecil dari *banyak orang* mendapat **matching yang jauh lebih besar** dibandingkan satu donasi besar dari satu pihak.
-
-> *"Gotong royong, on-chain."*
-
-Tujuannya sederhana: mengubah **donasi sosial** menjadi **platform terdesentralisasi** yang transparan, adil, dan bisa diakses siapa saja untuk:
-
-- 💰 **Berkontribusi** ke kampanye sosial pilihan (*Developing Regions, Disaster Relief, Education & Health*)
-- ⚖️ **Menyaksikan keadilan** — cause yang didukung *paling banyak orang* mendapat matching terbesar, bukan yang didukung satu whale
-- 🔗 **Memverifikasi semua transaksi** langsung di blockchain — **tanpa server, tanpa database**
-
-> **Status:** ✅ Complete — Smart contract (32 tests green, incl. multi-round QF + money conservation + tier-gating) + frontend (Next.js, 9 routes) + deploy/bindings/seed/e2e scripts — all live on Stellar **Testnet**.
->
-> 🏆 **APAC Stellar Hackathon** · Payment & Consumer Applications · Stellar **Testnet**
-
-## Deployment
 <p align="center">
-    <a href="https://patungan-stellar.vercel.app/" target="_blank">
-        <br/>
-        <b>🌐 Patungan — Live on Vercel</b>
-        <br/>
-    </a>
-    <sub>Hosted on Vercel · Stellar Testnet</sub>
+     <b>Rp10.000 from 100 people should beat Rp1.000.000 from one.</b>
+     <br>
+     <i>Patungan makes it so.</i>
+</p>
+
+A matching pool is split by <b>how many people</b> back a cause, not
+<b>how much</b> any single wallet gives, so broad, grassroots support wins the biggest match.
+It’s <i>gotong royong</i> (Indonesia’s tradition of communal mutual aid) the way it was always
+meant to work: many small hands outweighing one deep pocket.
+
+The mechanism is **Quadratic Funding**, running on the **Stellar** blockchain: every
+contribution, match, and payout is transparent and verifiable on-chain, with **no server and no
+database** in between.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/tests-32_passing-brightgreen?style=flat-square" alt="32 tests passing"/>
+  <img src="https://img.shields.io/badge/live-Stellar_Testnet-3E1BDB?style=flat-square&logo=stellar&logoColor=white" alt="Live on Stellar Testnet"/>
+  <img src="https://img.shields.io/badge/backend-none-lightgrey?style=flat-square" alt="No backend"/>
+  <img src="https://img.shields.io/badge/frontend-9_routes-black?style=flat-square&logo=next.js&logoColor=white" alt="9 routes"/>
+</p>
+
+<p align="center">
+  🏆 <b>APAC Stellar Hackathon</b> · Payment &amp; Consumer Applications · Stellar <b>Testnet</b>
 </p>
 
 <p align="center">
     <a href="https://patungan-stellar.vercel.app/">
-        <img src="https://img.shields.io/badge/🚀_Live_Demo-patungan--stellar.vercel.app-blue?style=for-the-badge" alt="Live Demo"/>
+        <img src="https://img.shields.io/badge/🕸_Live_Demo-patungan--stellar.vercel.app-3E1BDB?style=for-the-badge" alt="Live Demo"/>
     </a>
     &nbsp;
-    <a href="https://youtube.com" target="_blank">
-        <img src="https://img.shields.io/badge/▶_Demo_Video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo Video"/>
+    <!-- TODO(demo): replace href="#demo" with the YouTube URL once the demo video is uploaded. -->
+    <a href="#demo">
+        <img src="https://img.shields.io/badge/Demo_Video-coming_soon-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo Video (coming soon)"/>
     </a>
 </p>
 
-## Smart Contract
-<p align="left">
-    <img src="https://img.shields.io/badge/Contract_ID-CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO-purple?style=flat-square&logo=stellar&logoColor=white" alt="Contract ID"/>
+---
+
+## Demo
+
+<!--
+  TODO(demo): drop the four GIFs into docs/assets/ and uncomment the <img> tags below.
+  Cut them from the recorded walkthrough. See docs/video-demo-guide.md for the exact clips.
+  Then point the "Demo Video" badge above at the YouTube URL.
+-->
+
+> 🎬 **A 3-minute walkthrough is on the way.** The demo follows one thread end-to-end: a
+> crowd-backed school roof out-earning a whale-backed water well, live on-chain.
+
+The demo walks through:
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <!-- <img src="docs/assets/match-engine.gif" alt="Live match engine" width="100%"/> -->
+      <b>① The match engine</b><br/>
+      <sub>Watch the crowd-share flip as money-raised and people-backed diverge.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <!-- <img src="docs/assets/contribute.gif" alt="Live contribution" width="100%"/> -->
+      <b>② A live contribution</b><br/>
+      <sub>Sign in Freighter → confirm on-chain → the donor count ticks up in real time.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <!-- <img src="docs/assets/results.gif" alt="Quadratic funding reveal" width="100%"/> -->
+      <b>③ The reveal</b><br/>
+      <sub>Results ranked by match: the crowd campaign beats the whale despite less money.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <!-- <img src="docs/assets/operator.gif" alt="Operator console" width="100%"/> -->
+      <b>④ The operator console</b><br/>
+      <sub>Open/fund/finalize a round, curate campaigns, and attest verification tiers.</sub>
+    </td>
+  </tr>
+</table>
+
+## How It Works
+
+Four moves, all on-chain:
+
+- 🤝 **Give.** Anyone can donate directly to a curated campaign, anytime: a straight
+  contributor → campaign transfer (`contribute`).
+- ⚖️ **Match.** Sponsors fund a matching **pool**. Each round, the pool is split by the
+  quadratic formula, `match ∝ (Σ√contribution)²`, so a cause backed by *many* people earns a
+  far bigger match than one backed by a single large donor. Only one round is open at a time,
+  and finalizing freezes that round’s split.
+- 🔐 **Verify.** Lightweight on-chain tiers gate who can act: `Basic` to give, `Institution`
+  to sponsor a pool, via `set_verification`. KYC data never touches the chain; only the
+  resulting tier does.
+- 🧾 **Settle.** `finalize_round` computes and stores the split on-chain, and campaign owners
+  `claim` their matched funds directly to their payout address.
+
+Campaigns are grouped into **six curated categories**: Developing Regions, Disaster Relief,
+Education, Health, Faith &amp; Community, and Environment &amp; Animals. Every submission is
+reviewed by a **curator** before it becomes visible or matchable.
+
+## Why It Matters
+
+Indonesia is the **world’s most generous country, seven years running**, with **90% of people
+donating** to charity ([CAF World Giving Index 2024][wgi]). Yet most of that giving, an
+estimated **Rp600 trillion (~US$38 billion) a year** ([ANTARA][antara]), moves through
+informal, opaque channels: *arisan*, mosque and church collections, disaster-relief drives,
+village funds. There’s no transparency into where it lands, and no leverage that rewards broad
+participation over a single large cheque.
+
+Patungan brings that giving on-chain:
+
+- **The wedge**: turn informal communal giving into a transparent, auditable public-goods
+  platform, with a receipt for every rupiah in and out.
+- **Why Stellar**: sub-cent fees and built-in fiat on/off-ramps make *micro*-contributions
+  economically viable, in a way high-fee chains simply can’t.
+- **The flywheel**: sponsor, CSR, and foundation capital gets *democratically allocated* by
+  the crowd, so matching money follows genuine grassroots support instead of the loudest wallet.
+
+[wgi]: https://www.prnewswire.com/news-releases/record-levels-of-global-generosity--indonesia-is-worlds-most-generous-country-with-kenya-second-and-singapore-rising-to-third-according-to-world-giving-index-2024-302226474.html
+[antara]: https://en.antaranews.com/news/371009/indonesias-philanthropy-potential-capped-at-rp600-trillion-minister
+
+## Architecture
+
+Two modules, joined at deploy time:
+
+<table>
+  <tr>
+    <th align="left">Module</th>
+    <th align="left">Path</th>
+    <th align="left">Stack</th>
+    <th align="left">Role</th>
+  </tr>
+  <tr>
+    <td><b>Contract</b></td>
+    <td><code>contracts/patungan/</code></td>
+    <td>Rust / Soroban</td>
+    <td>Holds pools, records tagged contributions, runs the QF match per round, disburses</td>
+  </tr>
+  <tr>
+    <td><b>Frontend</b></td>
+    <td><code>frontend/</code></td>
+    <td>Next.js 14 · React · TS</td>
+    <td>Wallet connect, discovery, campaign self-serve, operator console, seasons, verification</td>
+  </tr>
+  <tr>
+    <td><b>Scripts</b></td>
+    <td><code>scripts/</code></td>
+    <td>Bash + Node/TS</td>
+    <td><code>deploy.sh</code> (deploy + write IDs), <code>seed.ts</code> (demo data), <code>e2e.ts</code> (smoke test)</td>
+  </tr>
+</table>
+
+> **No server, no database.** The frontend reads chain state directly over Soroban RPC. The
+> only coupling between the modules is the generated TypeScript bindings
+> (`frontend/src/contract/`) plus the contract/token IDs written into `frontend/.env.local`.
+
+**Deployed contract (Testnet):**
+
+<p>
+  <a href="https://lab.stellar.org/smart-contracts/contract-explorer?$=network$id=testnet&label=Testnet&horizonUrl=https:////horizon-testnet.stellar.org&rpcUrl=https:////soroban-testnet.stellar.org&passphrase=Test%20SDF%20Network%20/;%20September%202015;&smartContracts$explorer$contractId=CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO;;" target="_blank">
+      <img src="https://img.shields.io/badge/Contract_ID-CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO-3E1BDB?style=flat-square&logo=stellar&logoColor=white" alt="Contract ID"/>
+  </a>
 </p>
 
 ```
 CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO
 ```
 
-## Contributor
+## Who Does What
+
+<table>
+  <tr>
+    <th align="left">Role</th>
+    <th align="left">Needs</th>
+    <th align="left">Can</th>
+  </tr>
+  <tr>
+    <td><b>Guest</b></td>
+    <td>–</td>
+    <td>Browse campaigns and view QF results (read-only)</td>
+  </tr>
+  <tr>
+    <td><b>Contributor</b></td>
+    <td>Tier <code>Basic</code></td>
+    <td>Contribute to approved campaigns</td>
+  </tr>
+  <tr>
+    <td><b>Sponsor</b></td>
+    <td>Tier <code>Institution</code></td>
+    <td>Open a round, fund the matching pool, finalize a round</td>
+  </tr>
+  <tr>
+    <td><b>Campaign Owner</b></td>
+    <td>Tier <code>Basic</code></td>
+    <td>Submit a campaign (self-serve), claim matched funds</td>
+  </tr>
+  <tr>
+    <td><b>Curator / Attester</b></td>
+    <td>Operator role</td>
+    <td>Approve/reject campaigns · set verification tiers (Operator Console)</td>
+  </tr>
+</table>
+
+## Roadmap
+
+Today’s build is a complete, working product on Testnet. The scope lines below are deliberate,
+each with a clear path forward:
+
+- 🔐 **Real anchor KYC.** `/verify` runs the full SEP-10 → SEP-12 flow; with no reference anchor
+  wired by default, it degrades to a clearly-labeled operator-attest path. *Next: wire a
+  production anchor.*
+- 🌐 **Server-side IPFS pin.** Campaign images pin from the browser via a scoped Pinata key.
+  *Next: move pinning behind a signed endpoint.*
+- 🔍 **Indexed discovery.** Search/discovery reads Soroban RPC directly (no index). Fine at
+  this scale. *Next: a free read-index if it needs to scale.*
+- 💸 **Mainnet.** Everything runs at **$0 on Testnet**; real money only enters on a mainnet
+  launch, explicitly out of scope for this hackathon.
+
+---
+
+## Developer / Setup
+
+<details>
+<summary><b>Run it locally</b></summary>
+
+<br/>
+
+**Prerequisites**
+
+<p>
+  <img src="https://img.shields.io/badge/Rust-rustup%20%2B%20wasm32v1--none-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust"/>
+  <img src="https://img.shields.io/badge/Stellar_CLI-≥_v27-3E1BDB?style=flat-square&logo=stellar&logoColor=white" alt="Stellar CLI"/>
+  <img src="https://img.shields.io/badge/Node.js-18%2B-green?style=flat-square&logo=node.js&logoColor=white" alt="Node"/>
+</p>
+
+```bash
+# 1. Clone
+git clone https://github.com/BudakGPT/patungan.git
+cd patungan
+
+# 2. Build & test the contract: 32 tests (multi-round QF, conservation, tier gates)
+just contract-test
+
+# 3. Deploy to Stellar Testnet (build wasm, deploy, init roles, write .env.local)
+just deploy
+just bindings              # regenerate frontend/src/contract/ from the deployed id
+
+# 4. Seed a demo world (campaigns + a finalized season + an open round)
+just seed
+
+# 5. Run the frontend
+cd frontend && npm install # bindings import TS source directly, no extra build
+just dev                   # Next.js dev server
+
+# 6. (optional) End-to-end smoke test: submit→approve→verify→contribute→finalize→claim
+just e2e
+```
+
+> 💡 No [`just`](https://github.com/casey/just)? Open the `justfile` and run the underlying
+> commands directly.
+
+</details>
+
+<details>
+<summary><b>Environment variables</b></summary>
+
+<br/>
+
+`scripts/deploy.sh` writes `frontend/.env.local` for you (git-ignored). Two integrations are
+opt-in:
+
+```dotenv
+# --- written by deploy.sh ---
+NEXT_PUBLIC_NETWORK=TESTNET
+NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+NEXT_PUBLIC_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
+NEXT_PUBLIC_CONTRACT_ID=<fresh contract id>
+NEXT_PUBLIC_TOKEN_ID=<the IDR-stand-in SAC address>
+NEXT_PUBLIC_EXPLORER_BASE=https://stellar.expert/explorer/testnet
+NEXT_PUBLIC_ADMIN_ADDRESS=<the operator public key>
+NEXT_PUBLIC_ATTESTER_ADDRESS=<attester public key>
+NEXT_PUBLIC_CURATOR_ADDRESS=<curator public key>
+
+# --- IPFS image pinning: needed for real /campaign/new uploads ---
+NEXT_PUBLIC_IPFS_GATEWAY=https://gateway.pinata.cloud/ipfs/
+NEXT_PUBLIC_PINATA_JWT=<a scoped/short-lived Pinata upload JWT>
+
+# --- testnet anchor: needed for real SEP-10/SEP-12 on /verify ---
+NEXT_PUBLIC_ANCHOR_HOME_DOMAIN=<anchor's domain, for stellar.toml discovery>
+NEXT_PUBLIC_ANCHOR_AUTH_ENDPOINT=<optional explicit SEP-10 WEB_AUTH_ENDPOINT override>
+```
+
+> Without the IPFS/anchor vars the app still builds and runs: `/campaign/new` surfaces a clear
+> “not configured” error, and `/verify` falls back to the labeled **simulated attest**.
+
+</details>
+
+<details>
+<summary><b>Routes</b></summary>
+
+<br/>
+
+| Route | Role | What it does |
+|---|---|---|
+| `/` | Anyone | Discovery: category filter, search, sort, the current round’s banner |
+| `/campaign/[id]` | Anyone → Contributor | Campaign detail + inline contribute (gated: connect → Testnet → verified ≥ Basic) |
+| `/campaign/new` | Campaign Owner | Self-serve submission (title/story/category/image → IPFS) |
+| `/operator` | Sponsor / Curator / Attester | Open/fund/finalize a round, approve/reject campaigns, attest a tier |
+| `/dashboard` | Campaign Owner | Owned campaigns, per-round match status, claim / claim-unmatched |
+| `/seasons` | Anyone | Archive of past (finalized) rounds |
+| `/results?round=` | Anyone | A single round’s QF reveal (direct vs. matched, ranked) |
+| `/account` | Contributor | Own contribution history, reconstructed from on-chain contrib events |
+| `/verify` | Anyone | SEP-10 anchor auth → SEP-12 KYC (or simulated-attest fallback) → TierBadge |
+
+</details>
+
+<details>
+<summary><b>Project layout</b></summary>
+
+<br/>
+
+```
+patungan/
+├─ contracts/patungan/     # Soroban contract (Rust)
+├─ frontend/               # Next.js 14 App Router app (React + TS)
+├─ scripts/                # deploy.sh, seed.ts, e2e.ts
+└─ justfile                # common tasks
+```
+
+</details>
+
+**Tech stack**
+
+<p>
+  <img src="https://img.shields.io/badge/Stellar-Soroban-3E1BDB?style=flat-square&logo=stellar&logoColor=white" alt="Stellar"/>
+  <img src="https://img.shields.io/badge/Rust-Smart_Contract-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust"/>
+  <img src="https://img.shields.io/badge/Next.js_14-App_Router-black?style=flat-square&logo=next.js&logoColor=white" alt="Next.js"/>
+  <img src="https://img.shields.io/badge/React_18-Frontend-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React"/>
+  <img src="https://img.shields.io/badge/TypeScript-Language-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript"/>
+  <img src="https://img.shields.io/badge/TailwindCSS-Styling-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="TailwindCSS"/>
+  <img src="https://img.shields.io/badge/Framer_Motion-Animations-FF0055?style=flat-square&logo=framer&logoColor=white" alt="Framer Motion"/>
+</p>
+
+---
+
+## Contributors
+
 <table>
     <tr>
         <td align="center">
@@ -87,264 +381,10 @@ CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO
     </tr>
 </table>
 
-## Architecture Overview
-
-Dua modul, disatukan saat deploy:
-
-<table>
-  <tr>
-    <th style="width:180px; text-align:left;">Module</th>
-    <th style="text-align:left;">Path</th>
-    <th style="text-align:left;">Stack</th>
-    <th style="text-align:left;">Role</th>
-  </tr>
-  <tr>
-    <td><b>Contract</b></td>
-    <td><code>contracts/patungan/</code></td>
-    <td>Rust / Soroban</td>
-    <td>Holds pools, records tagged contributions, runs the QF match per round, disburses</td>
-  </tr>
-  <tr>
-    <td><b>Frontend</b></td>
-    <td><code>frontend/</code></td>
-    <td>Next.js 14 + React + TS</td>
-    <td>Wallet connect, discovery, campaign self-serve, operator console, seasons archive, verification</td>
-  </tr>
-  <tr>
-    <td><b>Scripts</b></td>
-    <td><code>scripts/</code></td>
-    <td>Bash + Node/TS</td>
-    <td><code>deploy.sh</code> (deploy + write IDs), <code>seed.ts</code> (seed data), <code>e2e.ts</code> (smoke test)</td>
-  </tr>
-</table>
-
-> **No server, no database** — the frontend reads chain state directly over Soroban RPC.  
-> The only coupling between the two modules is the generated TypeScript bindings (`frontend/src/contract/`) plus the contract/token IDs written into `frontend/.env.local`.
-
-## How It Works
-
-- 🏷️ **Categories, not any-cause.** `DevelopingRegions`, `DisasterRelief`, `EducationHealth`.
-  Campaigns are submitted, then approved by a **curator** before they're visible or matched.
-- 💸 **Two money flows, two cadences.** Direct donations (contributor → campaign) are
-  always-open. Matching (sponsor pool → QF split) settles per **round**; a round freezes the
-  in-window contribution pattern and splits *that round's* pool. Only one round is `Open` at a
-  time.
-- 🔐 **Tiered verification.** `Verification(addr) → {None, Basic, Institution}`, written by an
-  **attester**. Contributors need `Basic`; sponsors funding a pool need `Institution`. KYC PII
-  never touches the chain — only the resulting tier does.
-- 🧑‍💼 **Self-serve roles.** ① Sponsor (open/fund/finalize rounds) → ② Contributor (browse, verify,
-  give) → ③ Campaign owner (submit a campaign, claim its match).
-
-## **User Roles**
-
-### 🧭 **Guest**
-- Hanya bisa mengakses halaman dengan mode *read-only* — browsing kampanye dan melihat hasil QF
-
-### 👤 **Contributor (Basic Verified)**
-- Bisa **berkontribusi** ke kampanye yang sudah di-approve
-- Harus sudah melewati **verifikasi tier Basic** (via SEP-12 atau simulated attest)
-
-### 🏢 **Sponsor (Institution Verified)**
-- Bisa **membuka round baru**, **mendanai matching pool**, dan **finalize round**
-- Memerlukan **verifikasi tier Institution**
-
-### 📋 **Campaign Owner**
-- Bisa **submit kampanye baru** (*self-serve via /campaign/new*)
-- Bisa **claim matched funds** setelah round di-finalize
-
-### 🛠️ **Admin / Curator / Attester**
-- Curator: **approve/reject kampanye** yang disubmit
-- Attester: **set verification tier** untuk user
-- Memiliki **akses ke Operator Console** (`/operator`)
-
-## Routes
-
-<table>
-  <tr>
-    <th style="width:200px; text-align:left;">Route</th>
-    <th style="text-align:left;">Role</th>
-    <th style="text-align:left;">What it does</th>
-  </tr>
-  <tr>
-    <td><code>/</code></td>
-    <td>Anyone</td>
-    <td>Discovery — category filter, search, sort, the current round's banner</td>
-  </tr>
-  <tr>
-    <td><code>/campaign/[id]</code></td>
-    <td>Anyone → Contributor</td>
-    <td>Campaign detail + inline contribute (gated: connect → Testnet → verified ≥ Basic)</td>
-  </tr>
-  <tr>
-    <td><code>/campaign/new</code></td>
-    <td>Campaign Owner</td>
-    <td>Self-serve submission (title/story/category/image → IPFS)</td>
-  </tr>
-  <tr>
-    <td><code>/operator</code></td>
-    <td>Sponsor / Curator / Attester</td>
-    <td>Open/fund/finalize a round, approve/reject campaigns, simulate-attest a tier</td>
-  </tr>
-  <tr>
-    <td><code>/dashboard</code></td>
-    <td>Campaign Owner</td>
-    <td>Owned campaigns, per-round match status, claim / claim-unmatched</td>
-  </tr>
-  <tr>
-    <td><code>/seasons</code></td>
-    <td>Anyone</td>
-    <td>Archive of past (finalized) rounds</td>
-  </tr>
-  <tr>
-    <td><code>/results?round=</code></td>
-    <td>Anyone</td>
-    <td>A single round's QF reveal (direct vs. matched, ranked)</td>
-  </tr>
-  <tr>
-    <td><code>/account</code></td>
-    <td>Contributor</td>
-    <td>Own contribution history, reconstructed from on-chain contrib events</td>
-  </tr>
-  <tr>
-    <td><code>/verify</code></td>
-    <td>Anyone</td>
-    <td>SEP-10 anchor auth → SEP-12 KYC (or simulated-attest fallback) → TierBadge</td>
-  </tr>
-</table>
-
-## Project Layout
-
-```
-patungan/
-├─ contracts/patungan/     # Soroban contract (Rust)
-├─ frontend/               # Next.js 14 App Router app (React + TS)
-├─ scripts/                # deploy.sh, seed.ts, e2e.ts
-└─ justfile                # common tasks
-```
-
-## Getting Started
-
-### Prerequisites
-<p align="left">
-  <img src="https://img.shields.io/badge/Rust-rustup%20%2B%20wasm32v1--none-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust"/>
-  <img src="https://img.shields.io/badge/Stellar_CLI-≥_v27-blue?style=flat-square&logo=stellar&logoColor=white" alt="Stellar CLI"/>
-  <img src="https://img.shields.io/badge/Node.js-18%2B-green?style=flat-square&logo=node.js&logoColor=white" alt="Node"/>
-</p>
-
-### 1. Clone this repo
-```bash
-git clone https://github.com/BudakGPT/patungan.git
-cd patungan
-```
-
-### 2. Build & test the contract
-```bash
-just contract-test          # cargo test — 32 tests (multi-round QF, conservation, tier gates)
-```
-
-### 3. Deploy to Stellar Testnet
-```bash
-just deploy                 # build wasm, deploy a fresh contract id, init roles, write .env.local
-just bindings               # regenerate frontend/src/contract/ from the deployed id
-```
-
-### 4. Seed data
-```bash
-just seed                   # seed categories/campaigns + a finalized round (seasons) + an open round
-```
-
-### 5. Run the frontend
-```bash
-cd frontend && npm install  # frontend deps (bindings import TS source directly, no extra build)
-just dev                    # Next.js dev server — visit the routes above
-```
-
-### 6. End-to-end smoke test *(optional)*
-```bash
-just e2e                    # full submit→approve→verify→contribute→finalize→claim smoke test
-```
-
-> 💡 If you don't have [`just`](https://github.com/casey/just), open the `justfile` and run the underlying commands directly.
-
-## Environment Variables
-
-`scripts/deploy.sh` writes `frontend/.env.local` for you (git-ignored), holding the Testnet wiring. Two more integrations are opt-in:
-
-```dotenv
-# --- written by deploy.sh ---
-NEXT_PUBLIC_NETWORK=TESTNET
-NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
-NEXT_PUBLIC_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
-NEXT_PUBLIC_CONTRACT_ID=<fresh contract id>
-NEXT_PUBLIC_TOKEN_ID=<the IDR-stand-in SAC address>
-NEXT_PUBLIC_EXPLORER_BASE=https://stellar.expert/explorer/testnet
-NEXT_PUBLIC_ADMIN_ADDRESS=<the operator public key>
-NEXT_PUBLIC_ATTESTER_ADDRESS=<attester public key>
-NEXT_PUBLIC_CURATOR_ADDRESS=<curator public key>
-
-# --- IPFS image pinning — needed for real /campaign/new uploads ---
-NEXT_PUBLIC_IPFS_GATEWAY=https://gateway.pinata.cloud/ipfs/
-NEXT_PUBLIC_PINATA_JWT=<a scoped/short-lived Pinata upload JWT>
-
-# --- testnet anchor — needed for real SEP-10/SEP-12 on /verify ---
-NEXT_PUBLIC_ANCHOR_HOME_DOMAIN=<anchor's domain, for stellar.toml discovery>
-NEXT_PUBLIC_ANCHOR_AUTH_ENDPOINT=<optional explicit SEP-10 WEB_AUTH_ENDPOINT override>
-```
-
-> Without the IPFS/anchor vars, the app still builds and runs: `/campaign/new` surfaces a clear "not configured" error, and `/verify` falls back to the labeled **simulated attest**.
-
-## Cost Ledger ($0 on Testnet)
-
-<table>
-  <tr>
-    <th style="width:200px; text-align:left;">Piece</th>
-    <th style="text-align:left;">Provider</th>
-    <th style="text-align:left;">Testnet Cost</th>
-  </tr>
-  <tr>
-    <td><b>Image Pin</b></td>
-    <td>Pinata (1 GB free) / Filebase (5 GB free)</td>
-    <td>$0</td>
-  </tr>
-  <tr>
-    <td><b>Anchor / KYC</b></td>
-    <td>SDF reference anchor, or simulated-attest fallback</td>
-    <td>$0</td>
-  </tr>
-  <tr>
-    <td><b>Contract + RPC</b></td>
-    <td>Stellar Testnet</td>
-    <td>$0</td>
-  </tr>
-</table>
-
-> Money only enters the picture on a real **mainnet** launch — explicitly out of scope for this hackathon.
-
-## Known Limitations (Deliberate)
-
-- 🔐 **SEP-12 is simulated unless you wire a real anchor.** No reference anchor is configured by
-  default — `/verify` degrades to the operator-attest path, clearly labeled in the UI.
-- 🌐 **IPFS credential is client-visible.** `NEXT_PUBLIC_PINATA_JWT` ships to the browser; use a
-  scoped/short-lived upload-only key.
-- 🔍 **Discovery/search runs over Soroban RPC directly** (no index) — fine at hackathon scale;
-  a free read-index is the escape hatch if it doesn't scale.
-- 🔒 **One `Open` round at a time**, contract-enforced — a sponsor must finalize or cancel the
-  current round before opening the next.
-
-## Tech Stack
-<p align="left">
-  <img src="https://img.shields.io/badge/Stellar-Soroban-blue?style=for-the-badge&logo=stellar&logoColor=white" alt="Stellar"/>
-  <img src="https://img.shields.io/badge/Rust-Smart_Contract-orange?style=for-the-badge&logo=rust&logoColor=white" alt="Rust"/>
-  <img src="https://img.shields.io/badge/Next.js_14-App_Router-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js"/>
-  <img src="https://img.shields.io/badge/React_18-Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/>
-  <img src="https://img.shields.io/badge/TypeScript-Language-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
-  <img src="https://img.shields.io/badge/TailwindCSS-Styling-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS"/>
-  <img src="https://img.shields.io/badge/Framer_Motion-Animations-FF0055?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion"/>
-</p>
-
-## Others
-<p align="left">
+<p>
     <a href="https://github.com/BudakGPT/patungan">
         <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo"/>
     </a>
 </p>
+
+<sub>Built for the APAC Stellar Hackathon · Payment &amp; Consumer Applications · runs entirely on Stellar Testnet.</sub>
