@@ -185,6 +185,39 @@ Two modules, joined at deploy time:
 CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO
 ```
 
+### Data flow
+
+Two paths carry the whole product. First, **verification** — an anchor's KYC becomes an
+on-chain tier, and the account to attest is read from the signed JWT, never from client input,
+so no PII ever touches the chain:
+
+```text
+ Browser · /verify            Next.js · /api/attest        Anchor + Soroban
+ ─────────────────            ─────────────────────        ────────────────
+ SEP-10  →  JWT
+ SEP-12  →  ACCEPTED
+ POST /api/attest ──────────▶ account = JWT.sub
+   { Bearer JWT }             re-check KYC ──────────────▶ ACCEPTED ✓
+                              skip if tier ≥ Basic
+                              set_verification ──────────▶ tx · ATTESTER_SECRET ✓
+   { ok, tier, hash } ◀────── return
+  invalidate ["tier", account]  →  UI shows "Verified" · Step 02 unlocks
+```
+
+Then **funding** — a sponsor's pool is split by *how many* people gave, not *how much*, and
+every payout settles on-chain. Only one season is open at a time; finalizing freezes its split:
+
+```text
+ Wallet                       Soroban contract             On-chain effect
+ ──────                       ────────────────             ───────────────
+ operator  open_round ──────▶ season opens · categories
+ sponsor   fund_pool ───────▶ pool grows ────────────────▶ match pool ▲
+ donors    contribute ──────▶ tag (donor, project, amt) ─▶ Σ√c per donor
+   ·· many small gifts ··
+ operator  finalize_round ──▶ split = (Σ√c)² share ──────▶ amounts locked
+ owner     claim ───────────▶ pay direct + match ────────▶ → payout wallet
+```
+
 ## Who Does What
 
 <table>
