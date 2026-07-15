@@ -51,12 +51,12 @@ database** in between.
     <td width="50%" valign="top">
       <img src="https://github.com/user-attachments/assets/44f1069e-39e1-4440-bf99-1f7ecdc35849" alt="App overview and campaign exploration" width="100%"/>
       <b>① Overview &amp; explore</b><br/>
-      <sub>Land on Patungan and browse the open season — search, filter, and sort live campaigns.</sub>
+      <sub>Land on Patungan and browse the open season: search, filter, and sort live campaigns.</sub>
     </td>
     <td width="50%" valign="top">
       <img src="https://github.com/user-attachments/assets/d74569b8-8dee-4c6f-a0af-f05392a307ae" alt="Verify and chip in" width="100%"/>
       <b>② Verify &amp; chip in</b><br/>
-      <sub>Clear a SEP verification tier, then back a campaign in Freighter — the donor count ticks up live.</sub>
+      <sub>Clear a SEP verification tier, then back a campaign in Freighter. The donor count ticks up live.</sub>
     </td>
   </tr>
   <tr>
@@ -187,7 +187,7 @@ CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO
 
 ### Data flow
 
-Two paths carry the whole product. First, **verification** — an anchor's KYC becomes an
+Two paths carry the whole product. First, **verification**, an anchor's KYC becomes an
 on-chain tier, and the account to attest is read from the signed JWT, never from client input,
 so no PII ever touches the chain:
 
@@ -204,7 +204,7 @@ so no PII ever touches the chain:
   invalidate ["tier", account]  →  UI shows "Verified" · Step 02 unlocks
 ```
 
-Then **funding** — a sponsor's pool is split by *how many* people gave, not *how much*, and
+Then **funding**, a sponsor's pool is split by *how many* people gave, not *how much*, and
 every payout settles on-chain. Only one season is open at a time; finalizing freezes its split:
 
 ```text
