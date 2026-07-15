@@ -33,9 +33,9 @@ database** in between.
         <img src="https://img.shields.io/badge/🕸_Live_Demo-patungan--stellar.vercel.app-3E1BDB?style=for-the-badge" alt="Live Demo"/>
     </a>
     &nbsp;
-    <!-- TODO(demo): replace href="#demo" with the YouTube URL once the demo video is uploaded. -->
+    <!-- TODO(demo): swap href="#demo" for the YouTube URL once the narrated walkthrough is uploaded. -->
     <a href="#demo">
-        <img src="https://img.shields.io/badge/Demo_Video-coming_soon-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo Video (coming soon)"/>
+        <img src="https://img.shields.io/badge/Demo_Video-Watch_the_walkthrough-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo Video"/>
     </a>
 </p>
 
@@ -43,40 +43,56 @@ database** in between.
 
 ## Demo
 
-<!--
-  TODO(demo): drop the four GIFs into docs/assets/ and uncomment the <img> tags below.
-  Cut them from the recorded walkthrough. See docs/video-demo-guide.md for the exact clips.
-  Then point the "Demo Video" badge above at the YouTube URL.
--->
-
-> 🎬 **A 3-minute walkthrough is on the way.** The demo follows one thread end-to-end: a
-> crowd-backed school roof out-earning a whale-backed water well, live on-chain.
-
-The demo walks through:
+> 🎬 **See it run.** Eight clips, one thread end-to-end: a crowd-backed school roof
+> out-earning a whale-backed water well, live on Stellar testnet.
 
 <table>
   <tr>
     <td width="50%" valign="top">
-      <!-- <img src="docs/assets/match-engine.gif" alt="Live match engine" width="100%"/> -->
-      <b>① The match engine</b><br/>
-      <sub>Watch the crowd-share flip as money-raised and people-backed diverge.</sub>
+      <img src="https://github.com/user-attachments/assets/44f1069e-39e1-4440-bf99-1f7ecdc35849" alt="App overview and campaign exploration" width="100%"/>
+      <b>① Overview &amp; explore</b><br/>
+      <sub>Land on Patungan and browse the open season: search, filter, and sort live campaigns.</sub>
     </td>
     <td width="50%" valign="top">
-      <!-- <img src="docs/assets/contribute.gif" alt="Live contribution" width="100%"/> -->
-      <b>② A live contribution</b><br/>
-      <sub>Sign in Freighter → confirm on-chain → the donor count ticks up in real time.</sub>
+      <img src="https://github.com/user-attachments/assets/d74569b8-8dee-4c6f-a0af-f05392a307ae" alt="Verify and chip in" width="100%"/>
+      <b>② Verify &amp; chip in</b><br/>
+      <sub>Clear a SEP verification tier, then back a campaign in Freighter. The donor count ticks up live.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <!-- <img src="docs/assets/results.gif" alt="Quadratic funding reveal" width="100%"/> -->
-      <b>③ The reveal</b><br/>
-      <sub>Results ranked by match: the crowd campaign beats the whale despite less money.</sub>
+      <img src="https://github.com/user-attachments/assets/8e3d269e-1adf-4809-babe-ade421174757" alt="Submit a campaign" width="100%"/>
+      <b>③ Submit a campaign</b><br/>
+      <sub>Anyone proposes a project: title, story, category, and the wallet that will receive funds.</sub>
     </td>
     <td width="50%" valign="top">
-      <!-- <img src="docs/assets/operator.gif" alt="Operator console" width="100%"/> -->
-      <b>④ The operator console</b><br/>
-      <sub>Open/fund/finalize a round, curate campaigns, and attest verification tiers.</sub>
+      <img src="https://github.com/user-attachments/assets/5a18343d-c306-4520-aedf-d9f10f0c8c64" alt="Curator approves" width="100%"/>
+      <b>④ Curator approves</b><br/>
+      <sub>A curator reviews the queue and admits the campaign into the open season.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="https://github.com/user-attachments/assets/678ae446-8a5a-4c4d-aa23-dd1d1f3cc22e" alt="Quadratic funding reveal" width="100%"/>
+      <b>⑤ The reveal</b><br/>
+      <sub>Results ranked by quadratic match: the crowd campaign beats the whale on fewer rupiah.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="https://github.com/user-attachments/assets/b2e1f584-bc10-4975-befb-0e0a1ffd6bf1" alt="Finalize the season" width="100%"/>
+      <b>⑥ Finalize the season</b><br/>
+      <sub>The operator closes the round and the match pool locks to the on-chain results.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="https://github.com/user-attachments/assets/0b1c8dce-916f-4a4f-ad2f-bb85f9187760" alt="Claim funds" width="100%"/>
+      <b>⑦ Claim funds</b><br/>
+      <sub>Recipients claim their direct raise plus quadratic match straight to their wallet.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="https://github.com/user-attachments/assets/510b27b5-af3a-4ee1-a678-60b50e884b65" alt="Open a season" width="100%"/>
+      <b>⑧ Open a season</b><br/>
+      <sub>The operator opens a fresh season and picks which categories compete for the match pool.</sub>
     </td>
   </tr>
 </table>
@@ -167,6 +183,39 @@ Two modules, joined at deploy time:
 
 ```
 CBEWV5XLRNWKB2CRBJYHCJ54FQJMUCU5S2CWL7S7RHCXBTWMZ2NWU4SO
+```
+
+### Data flow
+
+Two paths carry the whole product. First, **verification**, an anchor's KYC becomes an
+on-chain tier, and the account to attest is read from the signed JWT, never from client input,
+so no PII ever touches the chain:
+
+```text
+ Browser · /verify            Next.js · /api/attest        Anchor + Soroban
+ ─────────────────            ─────────────────────        ────────────────
+ SEP-10  →  JWT
+ SEP-12  →  ACCEPTED
+ POST /api/attest ──────────▶ account = JWT.sub
+   { Bearer JWT }             re-check KYC ──────────────▶ ACCEPTED ✓
+                              skip if tier ≥ Basic
+                              set_verification ──────────▶ tx · ATTESTER_SECRET ✓
+   { ok, tier, hash } ◀────── return
+  invalidate ["tier", account]  →  UI shows "Verified" · Step 02 unlocks
+```
+
+Then **funding**, a sponsor's pool is split by *how many* people gave, not *how much*, and
+every payout settles on-chain. Only one season is open at a time; finalizing freezes its split:
+
+```text
+ Wallet                       Soroban contract             On-chain effect
+ ──────                       ────────────────             ───────────────
+ sponsor   open_round ──────▶ season opens · categories
+ sponsor   fund_pool ───────▶ pool grows ────────────────▶ match pool ▲
+ donors    contribute ──────▶ tag (donor, project, amt) ─▶ Σ√c per donor
+   ·· many small gifts ··
+ sponsor   finalize_round ──▶ split = (Σ√c)² share ──────▶ amounts locked
+ owner     claim ───────────▶ pay direct + match ────────▶ → payout wallet
 ```
 
 ## Who Does What

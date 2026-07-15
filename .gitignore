@@ -30,6 +30,9 @@ scripts/.keys/
 
 # ---- Planning & scratch docs (kept local, out of the shipped repo) ----
 docs/
+
+# ---- Demo recordings (raw gif/mp4 originals; compressed copies uploaded to GitHub CDN) ----
+demo/
 prototype-arisan/
 ralph/
 graphify-out/
